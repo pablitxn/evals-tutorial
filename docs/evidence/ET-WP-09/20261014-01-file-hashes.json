@@ -1,0 +1,66 @@
+{
+  "originalFoundation": "5f95fca766616b770152665d00031e516f967c22",
+  "integrationBase": "d54fe4add6c0e3be74f2e660e990a7c9c19d5e3d",
+  "files": [
+    {
+      "path": "apps/server/src/review/index.ts",
+      "bytes": 9163,
+      "sha256": "e16307b63ea29c7a11ecc9ad42910f163d7d2dc6b9e2069e72161b813a56092f"
+    },
+    {
+      "path": "packages/review/README.md",
+      "bytes": 3808,
+      "sha256": "05495f4bf061a61973283f00943fa00b0beee8a8d13d3f3698daf658cd109ea2"
+    },
+    {
+      "path": "packages/review/src/broker.ts",
+      "bytes": 8918,
+      "sha256": "201848d4539cd1f0c7293ce94d6f951c55bca7add2337d63935857f2f47793aa"
+    },
+    {
+      "path": "packages/review/src/evidence.ts",
+      "bytes": 8666,
+      "sha256": "8b29e19b79da1de4e911eca8c70baeb0107c91618068fa49e9847afe6f3cb3e3"
+    },
+    {
+      "path": "packages/review/src/index.ts",
+      "bytes": 358,
+      "sha256": "fc8590d7e328de5a7eb9b0ce7fe18e6d533eb25deb17b619037fcfa508b12aea"
+    },
+    {
+      "path": "packages/review/tests/broker.test.ts",
+      "bytes": 6040,
+      "sha256": "adf45cc9f0b66515ee486b4bea84e3c7c3db6cd25f49de4cc567e4aa77e73750"
+    },
+    {
+      "path": "packages/review/tests/evidence.test.ts",
+      "bytes": 4724,
+      "sha256": "cf6b86bb9a7436e043750e65d770b8509c092837ec9779bba7da1d9e4048fba2"
+    },
+    {
+      "path": "packages/review/tests/service.test.ts",
+      "bytes": 8523,
+      "sha256": "1c9347d4086b73b0c9ac80075dcbe9728319ea763f6c2384e9777017840f8048"
+    },
+    {
+      "path": "packages/review/tests/support.ts",
+      "bytes": 6555,
+      "sha256": "0de9b4345d4f6f5d0d3ee069a91b3dd5e49acbacca8c3359572dc8546b41fe3b"
+    },
+    {
+      "path": "packages/review/tsconfig.json",
+      "bytes": 154,
+      "sha256": "2328f958d1353f193c9191f525d026476abd53771fcd53237b9c520bfb62670c"
+    },
+    {
+      "path": "docs/evidence/ET-WP-09/20261014-01-mock-receipts.json",
+      "bytes": 11273,
+      "sha256": "f66833efa40f2bd084585b92b1ffe58436b38a608f4f832475d8cf6a90ad0d28"
+    },
+    {
+      "path": "docs/evidence/ET-WP-09/20261014-01-tests.txt",
+      "bytes": 4593,
+      "sha256": "04d447a74869f1e018665bc33a7139303595f6ed363eca579c2a17e648304c1f"
+    }
+  ]
+}
