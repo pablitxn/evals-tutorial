@@ -1,0 +1,156 @@
+
+> evals-tutorial@0.1.0 test
+> node scripts/test.mjs
+
+✔ Code mode and malicious worker-selected routing cannot invoke provider (7.625472ms)
+✔ lifetime budget is atomic under concurrency and persists across rebinds (2.750938ms)
+✔ binding is an immutable row snapshot, preserves reference for judge only (1.192345ms)
+✔ failed/refused provider attempts consume budget and expose only typed errors (0.926845ms)
+✔ normalized judge validation rejects malformed, nonfinite and contradictory results (2.749496ms)
+✔ deadline and cancellation finish even when provider ignores abort (30.673319ms)
+✔ host bounds reject token budget, expired deadline and wrong row correlation (0.641408ms)
+✔ private response envelope keeps refusal and malformed output separate from scores (0.449657ms)
+✔ review passes code as quoted data with frozen evidence and one lifetime call (9.561367ms)
+✔ review rejects unknown evidence references, schema failure and source mismatch (2.69352ms)
+✔ review operational failure consumes attempt; cancellation/late reply cannot complete (34.579141ms)
+✔ broker bounds combined concurrent judge/review requests (31.424132ms)
+✔ shared provider transport attaches WP09 grounded review operation without executing source (44.341177ms)
+✔ actual corpus schemas, all rows, document resolver and agent boundary are compatible (340.876089ms)
+✔ profile has no ambient fallback and revision excludes secret (3.109794ms)
+✔ Azure requires explicit resource routing, rejects arbitrary paths and credentials (0.467891ms)
+✔ agent rejects input references, unknown variants and domain mismatch before inference (35.820078ms)
+✔ agent validates output schema and correlation and preserves operational refusal (12.860618ms)
+✔ agent cancellation and timeout reject transport that ignores signal (31.781094ms)
+✔ agent document boundary verifies manifest, root, media, digest and duplicates (10.113337ms)
+✔ supervisor passes allowlisted environment only and emits one bounded JSON response (38.310796ms)
+✔ supervisor rejects extra stdout, malformed JSON and over-limit protocol (65.409355ms)
+✔ supervisor bounds hanging process and cancellation with no stderr secrets (69.39046ms)
+✔ mocked run orchestration preserves snapshots, idempotency and fixture truth (120.141544ms)
+✔ syntax errors, stale binding and missing isolation precede all provider calls (13.850592ms)
+✔ wrong fixture verdict differs from evaluator execution failure (24.8992ms)
+✔ agent sees no references/fixtures/source; malformed response has no score (55.01339ms)
+✔ one active run, queued cancellation, bounded capacity and ignored late provider replies (49.70309ms)
+✔ run timeout is operational and unfinished rows remain in the receipt (42.093564ms)
+✔ validation rejects concurrent compiles before allocating another isolated worker (1.172087ms)
+✔ host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget (1.934722ms)
+﹣ actual Docker RunService validates before mocked paid calls and records real fixture verdicts (0.154841ms) # SKIP
+✔ content loader verifies immutable hashes and rejects modified data/documents (81.493943ms)
+✔ loopback API does not infer; errors and origin checks fail closed (51.10021ms)
+✔ invalid snapshots never reach a producer (8.77063ms)
+✔ recording retries preserve immutable results, serialize writes and never repeat execution (51.11542ms)
+✔ malformed recording links never become successful telemetry or rewrite execution (9.782384ms)
+✔ actual content envelopes, domain schemas, shared manifest and discriminating code fixtures (261.893386ms)
+✔ boundary probes reject malformed shapes rather than grading them as semantic failures (105.227739ms)
+✔ content loader detects tampered reference, fixture and actual document bytes (131.258229ms)
+✔ independent visual authoring ledger agrees with reference readings and each dataset (63.302159ms)
+✔ scores reject contradictions, non-finite values and unbounded/unknown fields (1.719527ms)
+✔ wire validators execute with string code generation disabled (66.415089ms)
+✔ Phoenix opaque GlobalIDs retain padding without broadening tutorial IDs or URLs (1.295479ms)
+✔ agent requests exclude references, fixture answers, source and arbitrary provider routing (3.315591ms)
+✔ broker rejects URL/model selection and oversized rubrics (0.52603ms)
+✔ canonical content hash is stable across key order and includes document hash (1.421616ms)
+✔ Python and TS validate and hash the same wire data (130.549494ms)
+✔ Python rejects invalid envelopes and imports generated types (129.384632ms)
+✔ frozen snapshot/hash/row validation fails before a Phoenix request (10.282215ms)
+✔ explicit frozen loopback origin is required; no ambient endpoint fallback (0.362252ms)
+✔ unavailable Phoenix and HTML masquerading as JSON return sanitized typed failure (37.511622ms)
+✔ pre-aborted recording sends no network traffic (1.83243ms)
+✔ recording deadline aborts a hung transport and returns timeout independently of execution (14.109208ms)
+✔ W3C context is stable, row-bound and fixture-bound (1.249763ms)
+✔ CSV read-back handles quoted commas, quotes, newlines and CRLF (0.343597ms)
+✔ untrusted instructions remain quoted user data; transport receives no tools or executable source port (53.110935ms)
+✔ malformed assessment: unknown criterion (4.548673ms)
+✔ malformed assessment: unknown example (2.187067ms)
+✔ malformed assessment: empty example list (1.871623ms)
+✔ malformed assessment: ungrounded evidence (1.974276ms)
+✔ malformed assessment: empty feedback (1.769181ms)
+✔ malformed assessment: no next action (1.627324ms)
+✔ malformed assessment: no findings (1.549176ms)
+✔ malformed assessment: cheating accusation (1.878295ms)
+✔ malformed assessment: infallibility claim (1.760143ms)
+✔ ready must cover every rubric criterion (2.992483ms)
+✔ the broker and service can both validate long summaries without duplicating the fallibility notice (3.279864ms)
+✔ bounded parser rejects malformed provider response (8 bytes) (2.538078ms)
+✔ bounded parser rejects malformed provider response (14 bytes) (2.40124ms)
+✔ bounded parser rejects malformed provider response (405 bytes) (2.370001ms)
+✔ bounded parser rejects malformed provider response (32769 bytes) (2.869161ms)
+✔ budget and inconsistent binding fail before transport (2.483145ms)
+✔ oversized evidence is rejected without truncating quoted material (6.122305ms)
+✔ transport failures are sanitized and never retried automatically (2.505477ms)
+✔ aborted calls never reach transport (1.690863ms)
+✔ abort and timeout settle even when transport ignores its signal and replies late (36.021727ms)
+✔ binding derives exact source/data/rubric/receipt/agent/provider identities from saved evidence (47.991779ms)
+✔ ineligible: late edit with old code hash (1.229805ms)
+✔ ineligible: matching hash but different stored source (0.824161ms)
+✔ ineligible: modified dataset bytes (0.822378ms)
+✔ ineligible: new rubric version (0.682034ms)
+✔ ineligible: different tutorial (0.656395ms)
+✔ ineligible: operational failure in a completed run (2.716053ms)
+✔ ineligible: partial agent execution (0.751685ms)
+✔ ineligible: unvalidated source (0.751214ms)
+✔ ineligible: missing fixture coverage (2.072652ms)
+✔ ineligible: duplicate fixture rows (1.750805ms)
+✔ ineligible: incorrect fixture output (1.681876ms)
+✔ ineligible: forged fixture verdict (1.831287ms)
+✔ ineligible: unmatched fixture (1.359088ms)
+✔ ineligible: missing explanatory evidence (1.329863ms)
+✔ ineligible: missing agent source digest (0.526331ms)
+✔ ineligible: missing agent prompt digest (0.51551ms)
+✔ ineligible: missing provider provenance (0.512665ms)
+✔ ineligible: provider configuration changed (0.550245ms)
+✔ ineligible: provider model changed without revision (0.544786ms)
+✔ ineligible: disabled provider (0.381207ms)
+✔ ineligible: unknown agent variant (0.516021ms)
+✔ ineligible: mismatched receipt ID (0.408239ms)
+✔ ineligible: wrong run mode (1.456492ms)
+✔ ineligible: wrong provenance code hash (0.561256ms)
+✔ ineligible: intro is read-only (0.392038ms)
+✔ any agent source, prompt, result, rubric, lock or runner identity change invalidates the binding (13.841805ms)
+✔ service completes through the bounded review operation with a typed mock transport (59.425602ms)
+✔ same request ID is idempotent under concurrent creates; returned records and requests are isolated (7.799942ms)
+✔ reused request ID with a different payload conflicts before another provider call (2.729378ms)
+✔ failed eligibility never invokes the broker (1.92838ms)
+✔ educational needs_changes is distinct from operational failure (6.440603ms)
+✔ educational inconclusive is distinct from operational failure (7.252663ms)
+✔ operational errors are failed without an assessment, sanitized, and explicit retries retain old receipts (14.855735ms)
+✔ malformed mock broker feedback cannot complete a review (6.820328ms)
+✔ cancel before dispatch avoids inference; cancel is idempotent (3.319519ms)
+✔ cancel during provider wait aborts and ignores late completion (3.408206ms)
+✔ timeout ends a review even if a mock broker ignores cancellation (24.639541ms)
+✔ late rubric change rejects completion (7.11845ms)
+✔ late receipt change rejects completion (8.91987ms)
+✔ late provider change rejects completion (7.863512ms)
+✔ late dataset change rejects completion (6.777919ms)
+✔ late source edit cannot satisfy current completion; old record remains historical (7.296716ms)
+✔ bounded active work, retained receipt capacity, and shutdown fail closed (14.948539ms)
+✔ served consultation binds actual prepared MAF source without changing datasets (173.623066ms)
+✔ actual corpus is served read-only with exact dataset and document identities (217.609235ms)
+ℹ tests 123
+ℹ suites 0
+ℹ pass 122
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 2849.015097
+test_no_ambient_provider_fallback (test_agents.ProfileTests.test_no_ambient_provider_fallback) ... ok
+test_strict_json_rejects_unportable_numbers (test_agents.ProfileTests.test_strict_json_rejects_unportable_numbers) ... ok
+test_jsonl_malformed_extra_line_and_oversize_rejected (test_agents.ProtocolTests.test_jsonl_malformed_extra_line_and_oversize_rejected) ... ok
+test_malformed_identity_still_returns_valid_failure (test_agents.ProtocolTests.test_malformed_identity_still_returns_valid_failure) ... ok
+test_missing_profile_has_correlated_failure_and_no_inference (test_agents.ProtocolTests.test_missing_profile_has_correlated_failure_and_no_inference) ... ok
+test_reference_exclusion_in_actual_jsonl_process (test_agents.ProtocolTests.test_reference_exclusion_in_actual_jsonl_process) ... ok
+test_all_prepared_agents_use_explicit_global_profile (test_agents.SDKTests.test_all_prepared_agents_use_explicit_global_profile) ... Executing <Task pending name='Task-2' coro=<SDKTests.test_all_prepared_agents_use_explicit_global_profile() running at /workspace/evals-tutorial/apps/agents/tests/test_agents.py:70> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/futures.py:389, Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.107 seconds
+ok
+test_document_serialization_uses_bytes_ids_and_no_reference (test_agents.SDKTests.test_document_serialization_uses_bytes_ids_and_no_reference) ... ok
+test_judge_and_review_use_same_model_structured_output_no_tools (test_agents.SDKTests.test_judge_and_review_use_same_model_structured_output_no_tools) ... ok
+test_judge_contradictory_score_and_review_malformed_are_errors (test_agents.SDKTests.test_judge_contradictory_score_and_review_malformed_are_errors) ... ok
+test_malformed_nonfinite_duplicate_and_array_outputs_fail (test_agents.SDKTests.test_malformed_nonfinite_duplicate_and_array_outputs_fail) ... ok
+test_provider_errors_have_zero_retries_and_no_secret (test_agents.SDKTests.test_provider_errors_have_zero_retries_and_no_secret) ... ok
+test_reference_and_unknown_variant_excluded_before_inference (test_agents.SDKTests.test_reference_and_unknown_variant_excluded_before_inference) ... ok
+test_refusal_timeout_and_cancellation_are_operational_errors (test_agents.SDKTests.test_refusal_timeout_and_cancellation_are_operational_errors) ... ok
+test_w3c_trace_continuity_without_sensitive_telemetry (test_agents.SDKTests.test_w3c_trace_continuity_without_sensitive_telemetry) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 5.027s
+
+OK

@@ -1,0 +1,34 @@
+
+> evals-tutorial@0.1.0 test:docker
+> node scripts/test-docker.mjs
+
+✔ mocked run orchestration preserves snapshots, idempotency and fixture truth (115.305343ms)
+✔ syntax errors, stale binding and missing isolation precede all provider calls (13.861121ms)
+✔ wrong fixture verdict differs from evaluator execution failure (24.4858ms)
+✔ agent sees no references/fixtures/source; malformed response has no score (54.034311ms)
+✔ one active run, queued cancellation, bounded capacity and ignored late provider replies (49.924745ms)
+✔ run timeout is operational and unfinished rows remain in the receipt (38.167324ms)
+✔ validation rejects concurrent compiles before allocating another isolated worker (1.074322ms)
+✔ host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget (1.656288ms)
+✔ actual Docker RunService validates before mocked paid calls and records real fixture verdicts (15294.586437ms)
+▶ actual restricted Docker boundary and compiler adversarial suite
+  ✔ syntax, exact types, exports, references and forbidden imports have source positions (27013.840526ms)
+  ✔ criterion failure is completed execution; thrown exception and malformed result are errors (13228.662614ms)
+  ✔ escaped Node APIs still see no host paths, socket, secrets or writable root (4623.797829ms)
+  ✔ network none rejects socket connection even through escaped Node APIs (4333.307343ms)
+  ✔ tmpfs size prevents unbounded filesystem growth (4370.740454ms)
+  ✔ infinite loop, heap pressure, stderr and protocol floods are bounded (24793.47148ms)
+  ✔ actual running container has recorded restrictions; abort removes it (5277.608498ms)
+  ✔ actual JSONL broker calls are bound and bounded; unknown methods terminate execution (30319.377147ms)
+  ✔ startup removes only abandoned containers for the exact owned session (1482.965987ms)
+  ✔ missing Docker fails closed without submitted-code execution (2.331278ms)
+✔ actual restricted Docker boundary and compiler adversarial suite (115451.689995ms)
+✔ virtual SDK wire declarations match the frozen public types exactly (1.97097ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 131640.167605

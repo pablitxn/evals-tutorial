@@ -7,6 +7,7 @@ try {
   run('npm',['ci','--ignore-scripts']);
   if(!existsSync(python)) run('python3',['-m','venv','.venv']);
   run(python,['-m','pip','install','--cache-dir','.local/pip-cache','--require-hashes','-r','apps/agents/requirements.lock']);
+  run(python,['-m','pip','check']);
   const result=run(python,['-c','import sysconfig; print(sysconfig.get_path("purelib"))'],{stdio:'pipe',encoding:'utf8'});
   writeFileSync(resolve(result.stdout.trim(),'evals_tutorial.pth'),resolve(root,'packages/contracts/python')+'\n'+resolve(root,'apps/agents/src')+'\n');
   run('npm',['run','contracts:check']);
@@ -18,6 +19,7 @@ try {
   if(!process.env.PHOENIX_IMAGE) throw new Error('Both language dependencies installed; pinned PHOENIX_IMAGE is missing. Image preparation is incomplete.');
   requireFile('packages/evaluator-runtime/Dockerfile','Isolated runner image');
   run('docker',['compose','pull','phoenix']);
-  run('docker',['build','--tag','evals-tutorial-runner:0.1.0','--build-arg',`RUNNER_BASE_IMAGE=${pins.runnerBaseImage}`,'--file','packages/evaluator-runtime/Dockerfile','.']);
+  run('docker',['pull',pins.runnerBaseImage]);
+  run('docker',['build','--network=none','--tag','evals-tutorial-runner:0.1.0','--build-arg',`RUNNER_BASE_IMAGE=${pins.runnerBaseImage}`,'--file','packages/evaluator-runtime/Dockerfile','.']);
   console.log('Both dependency stacks and local images prepared; no inference requested.');
 } catch(error){fail(error);}

@@ -30,6 +30,8 @@ export interface AgentService { invoke(request: AgentRequest, signal: AbortSigna
 export interface TutorialServices {
   status(): Promise<ServiceStatus>;
   content?: ContentService; validation?: ValidationService; runs?: RunService; reviews?: ReviewService;
+  /** Explicit retry of stored telemetry only; never repeats execution/inference. */
+  recordRun?(runId: string): Promise<RunRecord>;
 }
 export class ServiceError extends Error {
   constructor(public readonly detail: OperationError, public readonly httpStatus = 400) { super(detail.message); }
