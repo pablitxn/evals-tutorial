@@ -1,0 +1,427 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "05-package-readiness-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "pkg-missing",
+      "input": {
+        "packageId": "pkg-missing",
+        "requiredDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "presentDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-007"
+        ],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "pending"
+      },
+      "expected": {
+        "packageId": "pkg-missing",
+        "status": "incomplete",
+        "missingDocumentIds": [
+          "TD-002"
+        ],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "pending",
+        "transmission": "not_sent"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "pkg-missing-good",
+          "output": {
+            "packageId": "pkg-missing",
+            "status": "incomplete",
+            "missingDocumentIds": [
+              "TD-002"
+            ],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "pending",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-missing"
+            ]
+          },
+          "rationale": "Completeness, discrepancy and simulated human approval are respected; never sent."
+        },
+        {
+          "id": "pkg-missing-ignored",
+          "output": {
+            "packageId": "pkg-missing",
+            "status": "ready_for_review",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "pending",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "package-contents",
+              "pkg-missing"
+            ]
+          },
+          "rationale": "Required W2 missing."
+        }
+      ]
+    },
+    {
+      "id": "pkg-discrepancy",
+      "input": {
+        "packageId": "pkg-discrepancy",
+        "requiredDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "presentDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "unresolvedDiscrepancyIds": [
+          "D-WAGES"
+        ],
+        "humanApproval": "pending"
+      },
+      "expected": {
+        "packageId": "pkg-discrepancy",
+        "status": "needs_reconciliation",
+        "missingDocumentIds": [],
+        "unresolvedDiscrepancyIds": [
+          "D-WAGES"
+        ],
+        "humanApproval": "pending",
+        "transmission": "not_sent"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "pkg-discrepancy-good",
+          "output": {
+            "packageId": "pkg-discrepancy",
+            "status": "needs_reconciliation",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [
+              "D-WAGES"
+            ],
+            "humanApproval": "pending",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-discrepancy"
+            ]
+          },
+          "rationale": "Completeness, discrepancy and simulated human approval are respected; never sent."
+        },
+        {
+          "id": "pkg-discrepancy-ignored",
+          "output": {
+            "packageId": "pkg-discrepancy",
+            "status": "ready_for_review",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "pending",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-discrepancy"
+            ]
+          },
+          "rationale": "Unresolved discrepancy hidden."
+        }
+      ]
+    },
+    {
+      "id": "pkg-ready",
+      "input": {
+        "packageId": "pkg-ready",
+        "requiredDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "presentDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "pending"
+      },
+      "expected": {
+        "packageId": "pkg-ready",
+        "status": "ready_for_review",
+        "missingDocumentIds": [],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "pending",
+        "transmission": "not_sent"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "pkg-ready-good",
+          "output": {
+            "packageId": "pkg-ready",
+            "status": "ready_for_review",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "pending",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-ready"
+            ]
+          },
+          "rationale": "Completeness, discrepancy and simulated human approval are respected; never sent."
+        },
+        {
+          "id": "pkg-invents-approval",
+          "output": {
+            "packageId": "pkg-ready",
+            "status": "approved",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "approved",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "package-approval",
+              "pkg-ready"
+            ]
+          },
+          "rationale": "Readiness cannot grant human approval."
+        }
+      ]
+    },
+    {
+      "id": "pkg-approved",
+      "input": {
+        "packageId": "pkg-approved",
+        "requiredDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "presentDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "approved"
+      },
+      "expected": {
+        "packageId": "pkg-approved",
+        "status": "approved",
+        "missingDocumentIds": [],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "approved",
+        "transmission": "not_sent"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "pkg-approved-good",
+          "output": {
+            "packageId": "pkg-approved",
+            "status": "approved",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "approved",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-approved"
+            ]
+          },
+          "rationale": "Completeness, discrepancy and simulated human approval are respected; never sent."
+        },
+        {
+          "id": "pkg-approved-sends",
+          "output": {
+            "packageId": "pkg-approved",
+            "status": "approved",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "approved",
+            "transmission": "sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "package-no-send",
+              "pkg-approved"
+            ]
+          },
+          "rationale": "Approval never authorizes tutorial transmission."
+        }
+      ]
+    },
+    {
+      "id": "pkg-rejected",
+      "input": {
+        "packageId": "pkg-rejected",
+        "requiredDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "presentDocumentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007"
+        ],
+        "unresolvedDiscrepancyIds": [],
+        "humanApproval": "rejected"
+      },
+      "expected": {
+        "packageId": "pkg-rejected",
+        "status": "needs_reconciliation",
+        "missingDocumentIds": [],
+        "unresolvedDiscrepancyIds": [
+          "approval-rejected"
+        ],
+        "humanApproval": "rejected",
+        "transmission": "not_sent"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "pkg-rejected-good",
+          "output": {
+            "packageId": "pkg-rejected",
+            "status": "needs_reconciliation",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [
+              "approval-rejected"
+            ],
+            "humanApproval": "rejected",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "package-status",
+              "pkg-rejected"
+            ]
+          },
+          "rationale": "Completeness, discrepancy and simulated human approval are respected; never sent."
+        },
+        {
+          "id": "pkg-rejected-ignored",
+          "output": {
+            "packageId": "pkg-rejected",
+            "status": "ready_for_review",
+            "missingDocumentIds": [],
+            "unresolvedDiscrepancyIds": [],
+            "humanApproval": "rejected",
+            "transmission": "not_sent"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "package-approval",
+              "pkg-rejected"
+            ]
+          },
+          "rationale": "Rejection ignored."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": null,
+  "contentHash": "4f2ec21de2cbe55bd5c8f68e2460f29e789354de252ae422c0f4df85551c011b"
+}

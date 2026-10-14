@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "package-status",
+      "description": "Missing -> incomplete; unresolved/rejected -> needs_reconciliation; clean pending -> ready_for_review; clean approved -> approved.",
+      "mode": "Code"
+    },
+    {
+      "id": "package-contents",
+      "description": "Exact required-minus-present and unresolved sets; rejected adds approval-rejected.",
+      "mode": "Code"
+    },
+    {
+      "id": "package-approval",
+      "description": "Human decision is simulated supplied input; never derived from readiness or review completion.",
+      "mode": "Code"
+    },
+    {
+      "id": "package-no-send",
+      "description": "Every response must say not_sent; no transmission tool or side effect exists.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

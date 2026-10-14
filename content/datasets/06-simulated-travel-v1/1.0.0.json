@@ -1,0 +1,547 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "06-simulated-travel-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "travel-budget",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 32000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-A",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 28000,
+            "feesCents": 3000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-B",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 29000,
+            "feesCents": 4000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-C",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-11",
+            "returnDate": "2027-03-13",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-D",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-12",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [
+          "FL-A"
+        ],
+        "totalsCents": {
+          "FL-A": 31000,
+          "FL-B": 33000,
+          "FL-C": 22000,
+          "FL-D": 22000
+        },
+        "status": "recommendation"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "travel-budget-good",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-A",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 31000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "travel-budget",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Eligible full-price recommendation or honest no-options without booking."
+        },
+        {
+          "id": "travel-fees-ignored",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-B",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 29000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-budget",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Fare alone hides total above budget."
+        },
+        {
+          "id": "travel-wrong-outbound",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-C",
+            "departDate": "2027-03-11",
+            "returnDate": "2027-03-13",
+            "totalCents": 22000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-dates",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Wrong outbound date."
+        },
+        {
+          "id": "travel-wrong-return",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-D",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-12",
+            "totalCents": 22000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-dates",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Wrong return date."
+        },
+        {
+          "id": "travel-false-none",
+          "output": {
+            "status": "no_options",
+            "optionId": null,
+            "departDate": null,
+            "returnDate": null,
+            "totalCents": null,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-no-options",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Eligible option exists; always-no-options fails."
+        },
+        {
+          "id": "travel-claims-booking",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-A",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 31000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": true
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-no-booking",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Simulation cannot claim booking."
+        },
+        {
+          "id": "travel-not-simulated",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-A",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 31000,
+            "currency": "USD",
+            "simulated": false,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-no-booking",
+              "travel-budget"
+            ]
+          },
+          "rationale": "Simulation must remain explicit."
+        }
+      ]
+    },
+    {
+      "id": "travel-boundary",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 31000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-A",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 28000,
+            "feesCents": 3000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-B",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 29000,
+            "feesCents": 4000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-C",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-11",
+            "returnDate": "2027-03-13",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-D",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-12",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [
+          "FL-A"
+        ],
+        "totalsCents": {
+          "FL-A": 31000,
+          "FL-B": 33000,
+          "FL-C": 22000,
+          "FL-D": 22000
+        },
+        "status": "recommendation"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "travel-boundary-good",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-A",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 31000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "travel-budget",
+              "travel-boundary"
+            ]
+          },
+          "rationale": "Eligible full-price recommendation or honest no-options without booking."
+        }
+      ]
+    },
+    {
+      "id": "travel-none",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 20000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-A",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 28000,
+            "feesCents": 3000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-B",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 29000,
+            "feesCents": 4000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-C",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-11",
+            "returnDate": "2027-03-13",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-D",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-12",
+            "fareCents": 20000,
+            "feesCents": 2000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [],
+        "totalsCents": {
+          "FL-A": 31000,
+          "FL-B": 33000,
+          "FL-C": 22000,
+          "FL-D": 22000
+        },
+        "status": "no_options"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "travel-none-good",
+          "output": {
+            "status": "no_options",
+            "optionId": null,
+            "departDate": null,
+            "returnDate": null,
+            "totalCents": null,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "travel-no-options",
+              "travel-none"
+            ]
+          },
+          "rationale": "Eligible full-price recommendation or honest no-options without booking."
+        },
+        {
+          "id": "travel-invented",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-Z",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 19000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-membership",
+              "travel-none"
+            ]
+          },
+          "rationale": "No supplied option with this ID."
+        },
+        {
+          "id": "travel-null-contradiction",
+          "output": {
+            "status": "no_options",
+            "optionId": "FL-A",
+            "departDate": null,
+            "returnDate": null,
+            "totalCents": null,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "travel-no-options",
+              "travel-none"
+            ]
+          },
+          "rationale": "No-options cannot contain an itinerary."
+        }
+      ]
+    },
+    {
+      "id": "travel-empty",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 32000,
+        "currency": "USD",
+        "options": []
+      },
+      "expected": {
+        "eligibleOptionIds": [],
+        "totalsCents": {},
+        "status": "no_options"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "travel-empty-good",
+          "output": {
+            "status": "no_options",
+            "optionId": null,
+            "departDate": null,
+            "returnDate": null,
+            "totalCents": null,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "travel-no-options",
+              "travel-empty"
+            ]
+          },
+          "rationale": "Eligible full-price recommendation or honest no-options without booking."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": null,
+  "contentHash": "fee9df3999f9e2fa82a19793e3d68c2e338c457ecaf770674fb8fc3ad1c0036f"
+}
