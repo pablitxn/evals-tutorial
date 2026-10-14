@@ -1,0 +1,1 @@
+Python frozen-contract validation: seven datasets, 60 fixtures, all domain schemas and RFC 8785 hashes match TS

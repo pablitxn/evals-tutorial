@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "policy-evidence",
+      "description": "Code: exact supplied clause quotes, existing/required evidence IDs and unique citations.",
+      "mode": "Code"
+    },
+    {
+      "id": "policy-quality",
+      "description": "LLM Judge: correct decision, faithful policy/fact application and honest missing evidence. Wrong decision/invented fact is fail; vague but correct is partial.",
+      "mode": "LLM Judge"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

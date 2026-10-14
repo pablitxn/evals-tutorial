@@ -1,0 +1,1528 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "03-independent-tie-out-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "tie-balanced",
+      "input": {
+        "documentSetId": "tax-demo-v1",
+        "documentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-002",
+          "TD-007",
+          "TD-008"
+        ],
+        "taxYear": 2025,
+        "currency": "USD"
+      },
+      "expected": {
+        "currency": "USD",
+        "readings": [
+          {
+            "documentId": "TD-003",
+            "formType": "1040",
+            "status": "read",
+            "wagesCents": 6050000,
+            "withholdingCents": 605000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 4200000,
+            "withholdingCents": 420000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-002",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 1850000,
+            "withholdingCents": 185000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "status": "read",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": 12500
+          },
+          {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "status": "unsupported",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          }
+        ],
+        "wages": {
+          "w2SumCents": 6050000,
+          "form1040Cents": 6050000,
+          "deltaCents": 0,
+          "verdict": "match",
+          "documentIds": [
+            "TD-003",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "withholding": {
+          "w2SumCents": 605000,
+          "form1040Cents": 605000,
+          "deltaCents": 0,
+          "verdict": "match",
+          "documentIds": [
+            "TD-003",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "toleranceCents": 0
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "tie-balanced-good",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "extract-fields",
+              "tie-balanced"
+            ]
+          },
+          "rationale": "Correct extraction and independently reported match, mismatch or indeterminate ties."
+        },
+        {
+          "id": "tie-swap-fields",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 605000,
+                "withholdingCents": 6050000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 420000,
+                "withholdingCents": 4200000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 185000,
+                "withholdingCents": 1850000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "extract-fields",
+              "TD-001"
+            ]
+          },
+          "rationale": "Two internally agreeing but semantically swapped fields are not independent truth."
+        },
+        {
+          "id": "tie-interest-as-wages",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6062500,
+              "form1040Cents": 6050000,
+              "deltaCents": 12500,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002",
+                "TD-007"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "tie-wages",
+              "TD-007"
+            ]
+          },
+          "rationale": "Interest must not enter the W2 wage sum."
+        },
+        {
+          "id": "tie-duplicate-reading",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "extract-fields",
+              "TD-002"
+            ]
+          },
+          "rationale": "Duplicate page cannot replace the missing W2-B reading."
+        },
+        {
+          "id": "tie-wrong-sources",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "tie-evidence",
+              "TD-002"
+            ]
+          },
+          "rationale": "Source IDs must cover the exact W2s and 1040."
+        }
+      ]
+    },
+    {
+      "id": "tie-wages",
+      "input": {
+        "documentSetId": "tax-demo-v1",
+        "documentIds": [
+          "TD-004",
+          "TD-001",
+          "TD-002",
+          "TD-007",
+          "TD-008"
+        ],
+        "taxYear": 2025,
+        "currency": "USD"
+      },
+      "expected": {
+        "currency": "USD",
+        "readings": [
+          {
+            "documentId": "TD-004",
+            "formType": "1040",
+            "status": "read",
+            "wagesCents": 6150000,
+            "withholdingCents": 605000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 4200000,
+            "withholdingCents": 420000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-002",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 1850000,
+            "withholdingCents": 185000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "status": "read",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": 12500
+          },
+          {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "status": "unsupported",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          }
+        ],
+        "wages": {
+          "w2SumCents": 6050000,
+          "form1040Cents": 6150000,
+          "deltaCents": -100000,
+          "verdict": "mismatch",
+          "documentIds": [
+            "TD-004",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "withholding": {
+          "w2SumCents": 605000,
+          "form1040Cents": 605000,
+          "deltaCents": 0,
+          "verdict": "match",
+          "documentIds": [
+            "TD-004",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "toleranceCents": 0
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "tie-wages-good",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-004",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6150000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6150000,
+              "deltaCents": -100000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "extract-fields",
+              "tie-wages"
+            ]
+          },
+          "rationale": "Correct extraction and independently reported match, mismatch or indeterminate ties."
+        },
+        {
+          "id": "tie-false-balance",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-004",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6150000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1950000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6150000,
+              "form1040Cents": 6150000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "extract-fields",
+              "TD-002"
+            ]
+          },
+          "rationale": "Invented extraction falsely balances the true mismatch."
+        },
+        {
+          "id": "tie-wages-hidden",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-004",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6150000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6150000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 605000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-004",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "tie-wages",
+              "tie-wages"
+            ]
+          },
+          "rationale": "One matching comparison cannot hide failure in the other."
+        }
+      ]
+    },
+    {
+      "id": "tie-withholding",
+      "input": {
+        "documentSetId": "tax-demo-v1",
+        "documentIds": [
+          "TD-005",
+          "TD-001",
+          "TD-002",
+          "TD-007",
+          "TD-008"
+        ],
+        "taxYear": 2025,
+        "currency": "USD"
+      },
+      "expected": {
+        "currency": "USD",
+        "readings": [
+          {
+            "documentId": "TD-005",
+            "formType": "1040",
+            "status": "read",
+            "wagesCents": 6050000,
+            "withholdingCents": 615000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 4200000,
+            "withholdingCents": 420000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-002",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 1850000,
+            "withholdingCents": 185000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "status": "read",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": 12500
+          },
+          {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "status": "unsupported",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          }
+        ],
+        "wages": {
+          "w2SumCents": 6050000,
+          "form1040Cents": 6050000,
+          "deltaCents": 0,
+          "verdict": "match",
+          "documentIds": [
+            "TD-005",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "withholding": {
+          "w2SumCents": 605000,
+          "form1040Cents": 615000,
+          "deltaCents": -10000,
+          "verdict": "mismatch",
+          "documentIds": [
+            "TD-005",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "toleranceCents": 0
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "tie-withholding-good",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-005",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 615000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-005",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 615000,
+              "deltaCents": -10000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-005",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "extract-fields",
+              "tie-withholding"
+            ]
+          },
+          "rationale": "Correct extraction and independently reported match, mismatch or indeterminate ties."
+        },
+        {
+          "id": "tie-withholding-hidden",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-005",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 615000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6050000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-005",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 615000,
+              "deltaCents": 0,
+              "verdict": "match",
+              "documentIds": [
+                "TD-005",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "tie-withholding",
+              "tie-withholding"
+            ]
+          },
+          "rationale": "One matching comparison cannot hide failure in the other."
+        }
+      ]
+    },
+    {
+      "id": "tie-both",
+      "input": {
+        "documentSetId": "tax-demo-v1",
+        "documentIds": [
+          "TD-006",
+          "TD-001",
+          "TD-002",
+          "TD-007",
+          "TD-008"
+        ],
+        "taxYear": 2025,
+        "currency": "USD"
+      },
+      "expected": {
+        "currency": "USD",
+        "readings": [
+          {
+            "documentId": "TD-006",
+            "formType": "1040",
+            "status": "read",
+            "wagesCents": 6150000,
+            "withholdingCents": 615000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 4200000,
+            "withholdingCents": 420000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-002",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 1850000,
+            "withholdingCents": 185000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "status": "read",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": 12500
+          },
+          {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "status": "unsupported",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          }
+        ],
+        "wages": {
+          "w2SumCents": 6050000,
+          "form1040Cents": 6150000,
+          "deltaCents": -100000,
+          "verdict": "mismatch",
+          "documentIds": [
+            "TD-006",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "withholding": {
+          "w2SumCents": 605000,
+          "form1040Cents": 615000,
+          "deltaCents": -10000,
+          "verdict": "mismatch",
+          "documentIds": [
+            "TD-006",
+            "TD-001",
+            "TD-002"
+          ]
+        },
+        "toleranceCents": 0
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "tie-both-good",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-006",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6150000,
+                "withholdingCents": 615000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-002",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 1850000,
+                "withholdingCents": 185000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 6050000,
+              "form1040Cents": 6150000,
+              "deltaCents": -100000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-006",
+                "TD-001",
+                "TD-002"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 605000,
+              "form1040Cents": 615000,
+              "deltaCents": -10000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-006",
+                "TD-001",
+                "TD-002"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "extract-fields",
+              "tie-both"
+            ]
+          },
+          "rationale": "Correct extraction and independently reported match, mismatch or indeterminate ties."
+        }
+      ]
+    },
+    {
+      "id": "tie-missing",
+      "input": {
+        "documentSetId": "tax-demo-v1",
+        "documentIds": [
+          "TD-003",
+          "TD-001",
+          "TD-009",
+          "TD-007",
+          "TD-008"
+        ],
+        "taxYear": 2025,
+        "currency": "USD"
+      },
+      "expected": {
+        "currency": "USD",
+        "readings": [
+          {
+            "documentId": "TD-003",
+            "formType": "1040",
+            "status": "read",
+            "wagesCents": 6050000,
+            "withholdingCents": 605000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "status": "read",
+            "wagesCents": 4200000,
+            "withholdingCents": 420000,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-009",
+            "formType": "unknown",
+            "status": "unreadable",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          },
+          {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "status": "read",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": 12500
+          },
+          {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "status": "unsupported",
+            "wagesCents": null,
+            "withholdingCents": null,
+            "interestCents": null
+          }
+        ],
+        "wages": {
+          "w2SumCents": null,
+          "form1040Cents": 6050000,
+          "deltaCents": null,
+          "verdict": "indeterminate",
+          "documentIds": [
+            "TD-003",
+            "TD-001",
+            "TD-009"
+          ]
+        },
+        "withholding": {
+          "w2SumCents": null,
+          "form1040Cents": 605000,
+          "deltaCents": null,
+          "verdict": "indeterminate",
+          "documentIds": [
+            "TD-003",
+            "TD-001",
+            "TD-009"
+          ]
+        },
+        "toleranceCents": 0
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "tie-missing-good",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-009",
+                "formType": "unknown",
+                "status": "unreadable",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": null,
+              "form1040Cents": 6050000,
+              "deltaCents": null,
+              "verdict": "indeterminate",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-009"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": null,
+              "form1040Cents": 605000,
+              "deltaCents": null,
+              "verdict": "indeterminate",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-009"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "extract-fields",
+              "tie-missing"
+            ]
+          },
+          "rationale": "Correct extraction and independently reported match, mismatch or indeterminate ties."
+        },
+        {
+          "id": "tie-missing-as-zero",
+          "output": {
+            "currency": "USD",
+            "readings": [
+              {
+                "documentId": "TD-003",
+                "formType": "1040",
+                "status": "read",
+                "wagesCents": 6050000,
+                "withholdingCents": 605000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-001",
+                "formType": "W2",
+                "status": "read",
+                "wagesCents": 4200000,
+                "withholdingCents": 420000,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-009",
+                "formType": "unknown",
+                "status": "unreadable",
+                "wagesCents": 0,
+                "withholdingCents": 0,
+                "interestCents": null
+              },
+              {
+                "documentId": "TD-007",
+                "formType": "1099INT",
+                "status": "read",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": 12500
+              },
+              {
+                "documentId": "TD-008",
+                "formType": "unknown",
+                "status": "unsupported",
+                "wagesCents": null,
+                "withholdingCents": null,
+                "interestCents": null
+              }
+            ],
+            "wages": {
+              "w2SumCents": 4200000,
+              "form1040Cents": 6050000,
+              "deltaCents": -1850000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-009"
+              ]
+            },
+            "withholding": {
+              "w2SumCents": 420000,
+              "form1040Cents": 605000,
+              "deltaCents": -185000,
+              "verdict": "mismatch",
+              "documentIds": [
+                "TD-003",
+                "TD-001",
+                "TD-009"
+              ]
+            }
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "extract-fields",
+              "TD-009"
+            ]
+          },
+          "rationale": "Unknown amount is not an observed zero."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": {
+    "path": "documents/tax-demo-v1/manifest.json",
+    "sha256": "e0cd7d303e2644536d5b8f39d6fe193725eee85aaf02c4e95cb4886dc1dc2957"
+  },
+  "contentHash": "46e192449bb1f5d4146fb8f4d86a91872341bb0a38dedf3defc4e732ad98f4f7"
+}

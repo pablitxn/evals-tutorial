@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "star-flag",
+      "description": "Use the explicit starred boolean; urgency is not a star.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

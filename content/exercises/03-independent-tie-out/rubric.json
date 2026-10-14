@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "extract-fields",
+      "description": "Compare every extracted page field/ID with independently authored reference readings.",
+      "mode": "Code"
+    },
+    {
+      "id": "tie-wages",
+      "description": "Recompute summed W2 wages versus 1040 wages; signed delta, zero tolerance.",
+      "mode": "Code"
+    },
+    {
+      "id": "tie-withholding",
+      "description": "Recompute withholding separately; a wage pass cannot hide a withholding mismatch.",
+      "mode": "Code"
+    },
+    {
+      "id": "tie-evidence",
+      "description": "Exact source document sets; preserve null/indeterminate rather than zero.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

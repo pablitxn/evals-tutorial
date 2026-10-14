@@ -1,0 +1,2 @@
+# PDFs are generated binary assets; preserve byte offsets and avoid text diffs.
+*.pdf binary
