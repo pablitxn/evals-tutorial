@@ -1,0 +1,110 @@
+{
+  "testedParent": "c144dce2c363898c04d7a9f2362a922e0d3d9e31",
+  "artifacts": [
+    {
+      "path": "apps/server/src/telemetry/index.ts",
+      "bytes": 461,
+      "sha256": "8a66294d10adc6f1b25aa5080ba211a5b3cbba7f7111a305dd492d750ce1426b"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/corpus-phoenix.json",
+      "bytes": 4866,
+      "sha256": "b969fb850eb7ac3b18e04ab0145b75fb6d0a4339faed9b3c1652688c0fe9feb1"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/corpus-tests.txt",
+      "bytes": 1077,
+      "sha256": "418b318aa5ebda827782061c43953fadf67ad77c48e1ad7dea09a1ee7e893a32"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/local-phoenix.json",
+      "bytes": 6070,
+      "sha256": "4c0eef004ef36c7d372632fc45baa29f6e33eeb06f17b2aa5dc6bf2ae9cd71cb"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/local-tests.txt",
+      "bytes": 1782,
+      "sha256": "2ca9fa72870e100a229df47d137db9b78083e1d475b8b7c43dd82f8cfd5dc132"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/observed-links.json",
+      "bytes": 783,
+      "sha256": "2fe02690c91d0ea76caa0882761cdd68571b0532001afdf4496ad00ab54e85cd"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/offline-tests.txt",
+      "bytes": 709,
+      "sha256": "a31081edcc8eab0008f693f0e139c9bf77cab0149cb42e8a98de885876504079"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/probe-python-versions.txt",
+      "bytes": 594,
+      "sha256": "b9ade313535bb81154c70aad61174db040c77b97f82759a4d84997c2dde89a71"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording/shared-tests.txt",
+      "bytes": 6846,
+      "sha256": "38db787b4fcb38bbb3ff344322c1c6a42aea19a800ef48c310164333887f4918"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-01-phoenix-recording.md",
+      "bytes": 10990,
+      "sha256": "d5415f58bbfc69cf672932be9368d0ae06b9b80a07b3390c107156a5e34562f0"
+    },
+    {
+      "path": "packages/phoenix/README.md",
+      "bytes": 5922,
+      "sha256": "bbada108da0566eb1d513ccf6830ab4db42dc0a25188660f0786282be1800f20"
+    },
+    {
+      "path": "packages/phoenix/src/context.ts",
+      "bytes": 669,
+      "sha256": "e946928c33a7816863b73a8da1804bf3dadb49484e9bed4d01768e50882e7cea"
+    },
+    {
+      "path": "packages/phoenix/src/index.ts",
+      "bytes": 25961,
+      "sha256": "250a7cfe0ba6016151fb59d7820a71b08cd2e5a0300014a826fcb0d8fd44ed11"
+    },
+    {
+      "path": "packages/phoenix/src/state.ts",
+      "bytes": 2153,
+      "sha256": "8f72f82ac51442736ffb027388385e7698b45e4fe63b27b818a4639b84ff425c"
+    },
+    {
+      "path": "packages/phoenix/tests/corpus-phoenix.test.ts",
+      "bytes": 5532,
+      "sha256": "e7f414eeeac4b6ee32b2deb81728320481093e9b1d845c96c1db15e0dae336a9"
+    },
+    {
+      "path": "packages/phoenix/tests/fixtures.ts",
+      "bytes": 2406,
+      "sha256": "d3bbcc4abdd2836b5555678c2dc5ee67b27a58f511e7d99b70616d102519d2d3"
+    },
+    {
+      "path": "packages/phoenix/tests/local-phoenix.test.ts",
+      "bytes": 15252,
+      "sha256": "ff4fa995b62d596b71de07f9c6cb008f35a10c92fd7fe3a3525d0905a46ce9f3"
+    },
+    {
+      "path": "packages/phoenix/tests/python_trace.py",
+      "bytes": 1352,
+      "sha256": "e8ee4f591aa7cbc844c44676d3dccd1f8131a91e2c4ca7c12d2b320be2dd1b57"
+    },
+    {
+      "path": "packages/phoenix/tests/record.test.ts",
+      "bytes": 4786,
+      "sha256": "071dc6fa2467a899cc81509d3ebd119b876acf91e4990955cb92291df347bd7b"
+    },
+    {
+      "path": "packages/phoenix/tests/restart.ts",
+      "bytes": 526,
+      "sha256": "acd16b4886089eddd5dda98b62b3c1ff34e1d837a1b77bfc8b71e5b1e066c4b4"
+    },
+    {
+      "path": "packages/phoenix/tsconfig.json",
+      "bytes": 175,
+      "sha256": "2a751fe1a1b3df5fedbb845d54e52aa2057de506631c7d13cf34638cf7875b7e"
+    }
+  ]
+}
