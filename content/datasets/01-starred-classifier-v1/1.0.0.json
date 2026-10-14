@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "01-starred-classifier-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "star-on",
+      "input": {
+        "messageId": "message-on",
+        "text": "Workshop reminder",
+        "starred": true
+      },
+      "expected": {
+        "label": "starred"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "star-on-good",
+          "output": {
+            "label": "starred"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "star-flag",
+              "star-on"
+            ]
+          },
+          "rationale": "Matches the explicit boolean, not message urgency."
+        },
+        {
+          "id": "star-on-wrong",
+          "output": {
+            "label": "not_starred"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "star-flag",
+              "star-on"
+            ]
+          },
+          "rationale": "The label contradicts the explicit flag."
+        }
+      ]
+    },
+    {
+      "id": "star-off",
+      "input": {
+        "messageId": "message-off",
+        "text": "URGENT: please read now",
+        "starred": false
+      },
+      "expected": {
+        "label": "not_starred"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "star-off-good",
+          "output": {
+            "label": "not_starred"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "star-flag",
+              "star-off"
+            ]
+          },
+          "rationale": "Matches the explicit boolean, not message urgency."
+        },
+        {
+          "id": "star-off-wrong",
+          "output": {
+            "label": "starred"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "star-flag",
+              "star-off"
+            ]
+          },
+          "rationale": "The label contradicts the explicit flag."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": null,
+  "contentHash": "e9d83405d973d0d760bd6cca34eddb844bd27234db11cb004d2b2bdc94d37882"
+}

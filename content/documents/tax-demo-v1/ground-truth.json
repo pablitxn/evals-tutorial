@@ -1,0 +1,152 @@
+{
+  "version": "1.0.0",
+  "readings": [
+    {
+      "documentId": "TD-001",
+      "formType": "W2",
+      "status": "read",
+      "wagesCents": 4200000,
+      "withholdingCents": 420000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-002",
+      "formType": "W2",
+      "status": "read",
+      "wagesCents": 1850000,
+      "withholdingCents": 185000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-003",
+      "formType": "1040",
+      "status": "read",
+      "wagesCents": 6050000,
+      "withholdingCents": 605000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-004",
+      "formType": "1040",
+      "status": "read",
+      "wagesCents": 6150000,
+      "withholdingCents": 605000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-005",
+      "formType": "1040",
+      "status": "read",
+      "wagesCents": 6050000,
+      "withholdingCents": 615000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-006",
+      "formType": "1040",
+      "status": "read",
+      "wagesCents": 6150000,
+      "withholdingCents": 615000,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-007",
+      "formType": "1099INT",
+      "status": "read",
+      "wagesCents": null,
+      "withholdingCents": null,
+      "interestCents": 12500
+    },
+    {
+      "documentId": "TD-008",
+      "formType": "unknown",
+      "status": "unsupported",
+      "wagesCents": null,
+      "withholdingCents": null,
+      "interestCents": null
+    },
+    {
+      "documentId": "TD-009",
+      "formType": "unknown",
+      "status": "unreadable",
+      "wagesCents": null,
+      "withholdingCents": null,
+      "interestCents": null
+    }
+  ],
+  "representations": [
+    {
+      "documentId": "TD-001",
+      "pngId": "TD-001",
+      "pdfId": "TD-001-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-002",
+      "pngId": "TD-002",
+      "pdfId": "TD-002-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-003",
+      "pngId": "TD-003",
+      "pdfId": "TD-003-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-004",
+      "pngId": "TD-004",
+      "pdfId": "TD-004-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-005",
+      "pngId": "TD-005",
+      "pdfId": "TD-005-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-006",
+      "pngId": "TD-006",
+      "pdfId": "TD-006-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-007",
+      "pngId": "TD-007",
+      "pdfId": "TD-007-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-008",
+      "pngId": "TD-008",
+      "pdfId": "TD-008-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    },
+    {
+      "documentId": "TD-009",
+      "pngId": "TD-009",
+      "pdfId": "TD-009-pdf",
+      "width": 1200,
+      "height": 1500,
+      "relation": "Same original raster page; PDF has no text layer"
+    }
+  ],
+  "referenceOrigin": "Independently declared authoring ledger; never sent to agents"
+}

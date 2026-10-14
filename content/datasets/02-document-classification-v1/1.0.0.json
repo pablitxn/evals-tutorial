@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "02-document-classification-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "class-1040",
+      "input": {
+        "documentId": "TD-003",
+        "documentSetId": "tax-demo-v1"
+      },
+      "expected": {
+        "documentId": "TD-003",
+        "formType": "1040",
+        "readability": "readable"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "class-1040-good",
+          "output": {
+            "documentId": "TD-003",
+            "formType": "1040",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-003"
+            ]
+          },
+          "rationale": "Matches the independent page class and readability."
+        },
+        {
+          "id": "class-1040-wrong",
+          "output": {
+            "documentId": "TD-003",
+            "formType": "W2",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-003"
+            ]
+          },
+          "rationale": "A known 1040 was confidently mislabeled."
+        }
+      ]
+    },
+    {
+      "id": "class-w2",
+      "input": {
+        "documentId": "TD-001",
+        "documentSetId": "tax-demo-v1"
+      },
+      "expected": {
+        "documentId": "TD-001",
+        "formType": "W2",
+        "readability": "readable"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "class-w2-good",
+          "output": {
+            "documentId": "TD-001",
+            "formType": "W2",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-001"
+            ]
+          },
+          "rationale": "Matches the independent page class and readability."
+        },
+        {
+          "id": "class-legible-abstain",
+          "output": {
+            "documentId": "TD-001",
+            "formType": "unknown",
+            "readability": "unreadable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-001"
+            ]
+          },
+          "rationale": "Always abstaining loses a readable W2."
+        },
+        {
+          "id": "class-wrong-id",
+          "output": {
+            "documentId": "TD-002",
+            "formType": "W2",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-001"
+            ]
+          },
+          "rationale": "A different page cannot substitute for the requested page."
+        }
+      ]
+    },
+    {
+      "id": "class-interest",
+      "input": {
+        "documentId": "TD-007",
+        "documentSetId": "tax-demo-v1"
+      },
+      "expected": {
+        "documentId": "TD-007",
+        "formType": "1099INT",
+        "readability": "readable"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "class-interest-good",
+          "output": {
+            "documentId": "TD-007",
+            "formType": "1099INT",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-007"
+            ]
+          },
+          "rationale": "Matches the independent page class and readability."
+        }
+      ]
+    },
+    {
+      "id": "class-unknown",
+      "input": {
+        "documentId": "TD-008",
+        "documentSetId": "tax-demo-v1"
+      },
+      "expected": {
+        "documentId": "TD-008",
+        "formType": "unknown",
+        "readability": "readable"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "class-unknown-good",
+          "output": {
+            "documentId": "TD-008",
+            "formType": "unknown",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-008"
+            ]
+          },
+          "rationale": "Matches the independent page class and readability."
+        },
+        {
+          "id": "class-unknown-forced",
+          "output": {
+            "documentId": "TD-008",
+            "formType": "1040",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-008"
+            ]
+          },
+          "rationale": "An unrelated note was forced into a known tax class."
+        }
+      ]
+    },
+    {
+      "id": "class-unreadable",
+      "input": {
+        "documentId": "TD-009",
+        "documentSetId": "tax-demo-v1"
+      },
+      "expected": {
+        "documentId": "TD-009",
+        "formType": "unknown",
+        "readability": "unreadable"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "class-unreadable-good",
+          "output": {
+            "documentId": "TD-009",
+            "formType": "unknown",
+            "readability": "unreadable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-009"
+            ]
+          },
+          "rationale": "Matches the independent page class and readability."
+        },
+        {
+          "id": "class-unreadable-forced",
+          "output": {
+            "documentId": "TD-009",
+            "formType": "1040",
+            "readability": "readable"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "doc-class",
+              "TD-009"
+            ]
+          },
+          "rationale": "Class invented from unreadable material."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": {
+    "path": "documents/tax-demo-v1/manifest.json",
+    "sha256": "e0cd7d303e2644536d5b8f39d6fe193725eee85aaf02c4e95cb4886dc1dc2957"
+  },
+  "contentHash": "82bbebc99a33c541501653de772e438520f121c4760b40c90b2e1d194c91db61"
+}
