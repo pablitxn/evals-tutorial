@@ -1,7 +1,7 @@
 # Mac candidate handoff
 
 This candidate is ready for local installation and explicit live-provider testing
-after the parent clears the recorded integration merge gate. Cloud evidence covers
+with the published integration validation receipt. Cloud evidence covers
 locked installs, Code fixtures, restricted Docker and actual Phoenix persistence.
 The macOS/ARM64 wheels are available; actual Mac/browser/model acceptance is open.
 

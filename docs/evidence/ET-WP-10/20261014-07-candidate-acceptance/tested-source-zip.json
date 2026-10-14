@@ -1,0 +1,11 @@
+{
+  "sourceRevision": "e92b86c7bce9e6e0f08bda485300a9ae8e9870d1",
+  "file": "evals-tutorial-e92b86c7bce9.zip",
+  "sha256": "7f0aaf221b68411b714b23e989e7355f4012b409d2521300ce6e85932160d43f",
+  "bytes": 1962144,
+  "sourceFiles": 303,
+  "packagedTwiceIdentically": true,
+  "freshDirectory": "/tmp/Evals Tutorial Clean e92b86c/evals-tutorial",
+  "freshPhoenixProject": "evals-tutorial-clean-e92",
+  "inferenceCalls": 0
+}
