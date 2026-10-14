@@ -1,0 +1,26 @@
+{
+  "mode": "HTTP shell and installed-route evidence; browser not rendered",
+  "experimentLinks": {
+    "dataset": "http://127.0.0.1:16006/datasets/RGF0YXNldDox/examples",
+    "experiment": "http://127.0.0.1:16006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDo0"
+  },
+  "trace": {
+    "id": "VHJhY2U6Nw==",
+    "trace_id": "c91e423451e5e45c4daec9aa38c84c49",
+    "project_id": "UHJvamVjdDo2",
+    "start_time": "2026-10-14T13:35:09.344000+00:00",
+    "end_time": "2026-10-14T13:35:10.223989+00:00",
+    "token_count_prompt": 6,
+    "token_count_completion": 6,
+    "token_count_total": 12,
+    "spans": null
+  },
+  "traceLinks": {
+    "trace": "http://127.0.0.1:16006/projects/UHJvamVjdDo2/traces/c91e423451e5e45c4daec9aa38c84c49",
+    "traceRedirect": "http://127.0.0.1:16006/redirects/traces/c91e423451e5e45c4daec9aa38c84c49"
+  },
+  "uiAsset": "/assets/index-Dsvb4FMm.js",
+  "uiAssetSha256": "a8345844c3257d13d0eb19ba245c4471c5863f1660fce6f20da11acb97de05f0",
+  "routeContract": "projects/<GraphQL project ID>/traces/<OTel trace hex ID>; not GraphQL trace ID",
+  "lifetime": "Disposable server is removed after receipt; links are historical observations"
+}
