@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "task": "ET-WP-00",
+  "observedAt": "2026-10-14T13:39:27.113236+00:00",
+  "ownerRepo": "pablitxn/evals-tutorial",
+  "originalRoot": "/workspace/evals-tutorial",
+  "initialState": {
+    "branch": "work",
+    "head": null,
+    "remoteRefs": [],
+    "clean": true,
+    "defaultBranchName": "main",
+    "apiSize": 0
+  },
+  "publicationRoot": "/tmp/et-wp-00/publish",
+  "publicationBase": "d1cbedc55bd2ed346039fd8f6d70d9cca21bc7b6",
+  "publicationBranch": "docs/et-wp-00-readiness",
+  "integratorThread": "01a13a94-f55c-7187-bac7-8f4acaa910d2",
+  "sourceThread": "01a118ed-6bf7-7481-93e6-336de48270f7",
+  "ownedPaths": [
+    "docs/readiness/**",
+    "docs/evidence/ET-WP-00/**"
+  ],
+  "requestedExecutor": {
+    "model": "GPT-6.1 Sol",
+    "effort": "HIGH",
+    "speed": "FAST",
+    "actualSelection": "unverified; no exposed launch receipt",
+    "substituteSelected": false
+  },
+  "versions": {
+    "python": "3.12.14",
+    "node": "24.19.0",
+    "npm": "11.9.0",
+    "dockerClient": "28.4.0",
+    "dockerServer": "28.4.0",
+    "compose": "2.40.3",
+    "chromium": "154.0.8037.57",
+    "playwright": "1.62.0",
+    "platform": "linux/amd64"
+  },
+  "providerCalls": 0,
+  "providerTokens": 0,
+  "checks": [
+    {
+      "id": "saved-environment-restore",
+      "status": "pass",
+      "detail": "Original mounts and pip-only venv restored; no republish/persistence claim"
+    },
+    {
+      "id": "initial-repository-ownership",
+      "status": "pass",
+      "detail": "Clean unborn work; no local/remote refs; named integrator"
+    },
+    {
+      "id": "foundation-base",
+      "status": "pass",
+      "detail": "Integrator main appeared: d1cbedc55bd2ed346039fd8f6d70d9cca21bc7b6"
+    },
+    {
+      "id": "effective-git-identity",
+      "status": "pass",
+      "detail": "Corrected by approved repo-local guard; global remains conflicting"
+    },
+    {
+      "id": "requested-sol61-high-fast",
+      "status": "not-run",
+      "detail": "Active model/effort/speed metadata unavailable"
+    },
+    {
+      "id": "sdk-install-typecheck",
+      "status": "pass",
+      "detail": "pip check, strict TS NodeNext compile"
+    },
+    {
+      "id": "openai-responses-wire-png-pdf-typed-output",
+      "status": "pass",
+      "detail": "MockTransport only; no real perception"
+    },
+    {
+      "id": "azure-resource-v1-wire-png-pdf-typed-output",
+      "status": "pass",
+      "detail": "MockTransport only; explicit routes/deployment"
+    },
+    {
+      "id": "missing-provider-config-negative-test",
+      "status": "pass",
+      "detail": "SettingNotFoundError captured"
+    },
+    {
+      "id": "openai-live-agent-judge-format",
+      "status": "not-run",
+      "detail": "No existing key or selected model"
+    },
+    {
+      "id": "azure-live-agent-judge-format",
+      "status": "not-run",
+      "detail": "No key/endpoint/deployment/corporate access"
+    },
+    {
+      "id": "docker-pulls-daemon-isolation-timeout",
+      "status": "pass",
+      "detail": "Digest-pinned amd64 containers; restricted flags; no app mounts"
+    },
+    {
+      "id": "phoenix-dataset-idempotency-version-experiment",
+      "status": "pass",
+      "detail": "Actual localhost persistence; changed latest then old version pinned"
+    },
+    {
+      "id": "phoenix-evaluation-readback",
+      "status": "pass",
+      "detail": "Recorded score/label/explanation verified through CSV"
+    },
+    {
+      "id": "node-python-maf-trace-continuity",
+      "status": "pass",
+      "detail": "Node root plus 12 MAF spans, real OTLP ingestion/readback"
+    },
+    {
+      "id": "phoenix-links-http",
+      "status": "pass",
+      "detail": "SDK URLs plus installed frontend route; HTTP shell verified"
+    },
+    {
+      "id": "chromium-sandbox-render",
+      "status": "fail",
+      "detail": "Installed SUID sandbox helper misconfigured; no bypass"
+    },
+    {
+      "id": "official-docs-browsing-tool",
+      "status": "pass",
+      "detail": "Microsoft/Phoenix docs opened through browsing tool"
+    },
+    {
+      "id": "shell-official-docs-network",
+      "status": "fail",
+      "detail": "Proxy CONNECT 403"
+    },
+    {
+      "id": "pypi-npm-tls",
+      "status": "pass",
+      "detail": "Standard verified HTTPS"
+    },
+    {
+      "id": "docker-hub-tags-metadata",
+      "status": "fail",
+      "detail": "Proxy CONNECT 403; registry image pulls independently pass"
+    },
+    {
+      "id": "mac-arm64-azure-corporate-zip-rehearsal",
+      "status": "not-run",
+      "detail": "Separate host/release work"
+    },
+    {
+      "id": "frozen-application-contracts",
+      "status": "not-run",
+      "detail": "Minimal foundation references absent docs/contracts/v1.md"
+    }
+  ],
+  "gateAssessment": {
+    "isolatedSpecifications": "go",
+    "foundationFixtureDevelopment": "supported; integrator owns acceptance",
+    "G1": "needs frozen contracts and launch metadata",
+    "G2G3": "real providers, browser and host/release gates outstanding"
+  },
+  "evidence": {
+    "maf": "maf.json",
+    "docker": "docker.json",
+    "phoenix": "phoenix.json",
+    "links": "phoenix-links.json",
+    "browser": "browser.json",
+    "connectivity": "connectivity.json",
+    "sources": "sources.json"
+  },
+  "gitIdentity": {
+    "beforeEmail": "accounts@pablocoronel.com",
+    "afterAuthor": "Pablo Coronel <git@pablocoronel.com>",
+    "afterCommitter": "Pablo Coronel <git@pablocoronel.com>",
+    "correction": "repository-local guard only",
+    "globalUnchanged": true,
+    "futurePersistence": "not verified"
+  },
+  "limits": [
+    "No application implementation/shared manifest edit",
+    "Live provider and document accuracy unverified",
+    "Container probe is capability, not complete adversarial runner acceptance",
+    "Browser sandbox not weakened",
+    "Ephemeral Phoenix data removed after evidence capture"
+  ]
+}

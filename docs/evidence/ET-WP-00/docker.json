@@ -1,0 +1,19 @@
+{
+  "flags": [
+    "--network=none",
+    "--user=65534:65534",
+    "--read-only",
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges",
+    "--memory=128m",
+    "--memory-swap=128m",
+    "--cpus=0.5",
+    "--pids-limit=32",
+    "--tmpfs=/tmp:rw,noexec,nosuid,size=16m"
+  ],
+  "image": "node@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+  "exitCode": 0,
+  "stdout": "{\"status\":\"pass\",\"uid\":65534,\"rootReadOnly\":true,\"noCredentials\":true,\"noHostMounts\":true,\"externalNetworkBlocked\":true,\"memoryBytes\":134217728,\"pids\":32,\"cpu\":0.5,\"capabilitiesDropped\":true,\"noNewPrivileges\":true}",
+  "stderr": "",
+  "timeoutCleanup": "pass: deadline terminates and removes loop container"
+}
