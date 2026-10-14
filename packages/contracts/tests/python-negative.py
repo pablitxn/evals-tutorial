@@ -3,6 +3,13 @@ from tutorial_contracts import validate_contract
 from tutorial_contracts.generated import AgentRequest, EvalResult
 valid={'score':1,'label':'pass','explanation':'Supported reference'}
 validate_contract('EvalResult',valid)
+phoenix={'datasetId':'RGF0YXNldDox','datasetVersionId':'RGF0YXNldFZlcnNpb246MjU=','experimentId':'RXhwZXJpbWVudDo1OA=='}
+validate_contract('PhoenixLinks',phoenix)
+for field in phoenix:
+    for value in ['','a=b','abc===','a b','a\n','x'*129]:
+        try:validate_contract('PhoenixLinks',{**phoenix,field:value})
+        except Exception:pass
+        else:raise AssertionError('Invalid Phoenix ID was accepted')
 for value in [{**valid,'score':0},{**valid,'score':float('nan')},{**valid,'extra':1},{**valid,'explanation':''}]:
     try:validate_contract('EvalResult',value)
     except Exception:pass
