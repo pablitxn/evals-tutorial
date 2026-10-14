@@ -6,7 +6,7 @@ import subprocess
 import zipfile
 from pathlib import Path, PurePosixPath
 ROOT=Path(__file__).resolve().parents[1]
-TOP={'AGENTS.md','README.md','package.json','package-lock.json','turbo.json','tsconfig.base.json','compose.yaml','.env.example','.gitignore','.npmrc'}
+TOP={'AGENTS.md','README.md','package.json','package-lock.json','turbo.json','tsconfig.base.json','compose.yaml','.env.example','.gitignore','.npmrc','.dockerignore'}
 PREFIXES=('apps/','packages/','content/','scripts/','tests/','docs/')
 BAD_PARTS={'node_modules','.venv','.git','.local','.turbo','__pycache__','dist','coverage','.pytest_cache'}
 SECRET=re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bsk-(?:proj-)?[A-Za-z0-9_-]{24,}|\bgh[pousr]_[A-Za-z0-9]{30,}')

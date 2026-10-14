@@ -1,0 +1,19 @@
+{
+  "kind": "offline-integrated-http",
+  "sourceRevision": "e92b86c7bce9e6e0f08bda485300a9ae8e9870d1",
+  "compiledStarters": 7,
+  "introFixtureRows": 1,
+  "discriminatingFixtureRows": 4,
+  "unfinishedEvaluatorRows": 4,
+  "runId": "f96293a3-983f-4434-872f-786b39db4960",
+  "discriminatingRunId": "ec26593e-635d-4fae-80a8-8cbc079e2f7b",
+  "errorRunId": "1822bacc-e077-4da2-a830-fe2dbd1b1ff1",
+  "phoenix": {
+    "datasetId": "RGF0YXNldDoz",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246NA==",
+    "experimentId": "RXhwZXJpbWVudDoxNw==",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDoz/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDoz/compare?experimentId=RXhwZXJpbWVudDoxNw%3D%3D"
+  },
+  "inferenceCalls": 0
+}

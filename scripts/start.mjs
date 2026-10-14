@@ -1,7 +1,9 @@
-import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
+import { mkdirSync, existsSync, writeFileSync, readFileSync, unlinkSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { fail,loadLocalEnv,root,run,requireFile } from './lib.mjs';
+import { localDocker } from './docker-local.mjs';
 try {
   loadLocalEnv();
   run('npm',['run','env:check']);
@@ -10,12 +12,22 @@ try {
   requireFile('packages/evaluator-runtime/Dockerfile','Isolated runner');
   run('npm',['run','build']);
   if(existsSync(resolve(root,'.local/server.pid'))) throw new Error('A tutorial process record exists; run npm run stop before starting again');
-  run('docker',['compose','up','-d','phoenix']);
+  run('docker',['compose','up','-d','phoenix'],{env:localDocker(root).env});
+  console.log('Waiting for local Phoenix readiness; no inference requested.');
+  let healthy=false;
+  for(let attempt=0;attempt<45;attempt++){
+    try{healthy=(await fetch('http://127.0.0.1:6006/healthz',{signal:AbortSignal.timeout(1000)})).ok;}catch{}
+    if(healthy)break;await delay(1000);
+  }
+  if(!healthy)throw new Error('Local Phoenix did not become healthy; inspect Docker before starting again');
   mkdirSync(resolve(root,'.local'),{recursive:true});
   // The trusted Node process owns Python launches; startup itself does not infer.
-  const child=spawn(process.execPath,['--import','tsx','apps/server/src/main.ts'],{cwd:root,stdio:'inherit',env:process.env});
-  writeFileSync(resolve(root,'.local/server.pid'),String(child.pid));
-  child.on('exit',code=>{process.exitCode=code??1;});
+  const child=spawn(process.execPath,['--import','tsx',resolve(root,'apps/server/src/main.ts')],{cwd:root,stdio:'inherit',env:process.env});
+  const record=resolve(root,'.local/server.pid');
+  writeFileSync(record,String(child.pid),{flag:'wx',mode:0o600});
+  const cleanup=()=>{if(existsSync(record)&&readFileSync(record,'utf8')===String(child.pid))unlinkSync(record);};
+  child.on('exit',(code,signal)=>{cleanup();process.exitCode=code??(signal==='SIGTERM'||signal==='SIGINT'?0:1);});
+  child.on('error',error=>{cleanup();fail(error);});
   for(const signal of ['SIGINT','SIGTERM']) process.on(signal,()=>child.kill(signal));
   console.log('Starting http://127.0.0.1:3000 and Phoenix http://127.0.0.1:6006; readiness is reported by /api/status. No inference requested.');
 } catch(error){fail(error);}

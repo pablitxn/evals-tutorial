@@ -1,0 +1,184 @@
+{
+  "mode": "synthetic contract fixtures; real local Phoenix",
+  "inferenceCalls": 0,
+  "providerTokenSpend": 0,
+  "fixture": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo1OA==",
+    "tasks": [
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6ODA=",
+        "output": {
+          "label": "not-starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "7872e3a28bc6b24743da668dcc2f943d",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjoxNDM=",
+        "experiment_id": "RXhwZXJpbWVudDo1OA=="
+      },
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6Nzk=",
+        "output": {
+          "label": "starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "a2d809dd412f602c0d4707feea1cfb4b",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjoxNDI=",
+        "experiment_id": "RXhwZXJpbWVudDo1OA=="
+      }
+    ]
+  },
+  "restart": {
+    "sameExperiment": true,
+    "rows": 2
+  },
+  "concurrentProcesses": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo1OQ==",
+    "sameExperiment": true,
+    "rows": 2
+  },
+  "versioning": {
+    "oldVersion": "RGF0YXNldFZlcnNpb246MjU=",
+    "newVersion": "RGF0YXNldFZlcnNpb246MjY=",
+    "oldPinnedAfterChange": true
+  },
+  "cancelled": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo2MQ==",
+    "tasks": [
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6ODA=",
+        "output": null,
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "e73ed54f6db8357158036037ae21cb11",
+        "error": "cancelled:cancelled",
+        "id": "RXhwZXJpbWVudFJ1bjoxNDk=",
+        "experiment_id": "RXhwZXJpbWVudDo2MQ=="
+      },
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6Nzk=",
+        "output": {
+          "label": "starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "4d5dd6c2d5b2af621cf4bb9fe71e7651",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjoxNDg=",
+        "experiment_id": "RXhwZXJpbWVudDo2MQ=="
+      }
+    ]
+  },
+  "experimentRetry": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo2Mg==",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "rowRetry": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo2Mw==",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "evaluationRetry": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo2NA==",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "recordingCancellation": {
+    "datasetId": "RGF0YXNldDoyMA==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MjU=",
+    "experimentId": "RXhwZXJpbWVudDo2NQ==",
+    "retrySucceededByReadback": true,
+    "inferenceCalls": 0
+  },
+  "pythonContinuity": {
+    "datasetId": "RGF0YXNldDoyMQ==",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246Mjc=",
+    "experimentId": "RXhwZXJpbWVudDo2Nw==",
+    "sourceProjectName": "ET-WP07-synthetic-source-9b54fd5f-54c3-422e-b9a5-a5263851dd5a",
+    "traceId": "e8801cb2cbfc3ea2cca025ca5fa39752",
+    "spans": [
+      {
+        "id": "U3BhbjoxNzU=",
+        "name": "Tutorial stored row",
+        "context": {
+          "trace_id": "e8801cb2cbfc3ea2cca025ca5fa39752",
+          "span_id": "6a887fee0fb543d9"
+        },
+        "span_kind": "CHAIN",
+        "parent_id": null,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "status_code": "OK",
+        "status_message": "",
+        "attributes": {
+          "tutorial.code_hash": "389f6127b8b4358fc332ea99e50af2e8ae63823c6208fcf9d811925871b94573",
+          "tutorial.run_id": "python-agent-9b54fd5f-54c3-422e-b9a5-a5263851dd5a",
+          "tutorial.row_status": "completed",
+          "tutorial.span_origin": "stored_receipt",
+          "tutorial.example_id": "starred",
+          "tutorial.label": "pass",
+          "tutorial.mode": "agent",
+          "tutorial.dataset_hash": "6397e09fd8aa585dd04332bff8bccf3f95bc2322db0c52791be4e59e0d1ceab2",
+          "tutorial.score": 1
+        },
+        "events": []
+      },
+      {
+        "id": "U3BhbjoxNzQ=",
+        "name": "Synthetic Python agent",
+        "context": {
+          "trace_id": "e8801cb2cbfc3ea2cca025ca5fa39752",
+          "span_id": "182868b2a6d128db"
+        },
+        "span_kind": "AGENT",
+        "parent_id": "6a887fee0fb543d9",
+        "start_time": "2026-10-14T14:12:13.436320+00:00",
+        "end_time": "2026-10-14T14:12:13.441489+00:00",
+        "status_code": "UNSET",
+        "status_message": "",
+        "attributes": {},
+        "events": []
+      },
+      {
+        "id": "U3BhbjoxNzM=",
+        "name": "Synthetic model boundary; no inference",
+        "context": {
+          "trace_id": "e8801cb2cbfc3ea2cca025ca5fa39752",
+          "span_id": "cae27fe89a7b7062"
+        },
+        "span_kind": "LLM",
+        "parent_id": "182868b2a6d128db",
+        "start_time": "2026-10-14T14:12:13.436358+00:00",
+        "end_time": "2026-10-14T14:12:13.436369+00:00",
+        "status_code": "UNSET",
+        "status_message": "",
+        "attributes": {},
+        "events": []
+      }
+    ],
+    "inferenceCalls": 0,
+    "boundary": "real exporter; synthetic spans; no provider or MAF invocation"
+  },
+  "serviceReturn": "blocked: installed PhoenixLinks rejects actual padded GlobalIDs",
+  "serverVersion": "20.21.3"
+}

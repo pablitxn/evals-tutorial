@@ -1,0 +1,870 @@
+{
+  "provenance": {
+    "sourceRevision": "d9ab77508f6f6892f4de57594146abbd629ea471",
+    "sourcePath": "content/tutorial.json",
+    "fields": [
+      "inputSchema",
+      "outputSchema"
+    ]
+  },
+  "exercises": {
+    "intro": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "starred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "messageId",
+          "text",
+          "starred"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      }
+    },
+    "01-starred-classifier": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "starred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "messageId",
+          "text",
+          "starred"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      }
+    },
+    "02-document-classification": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "documentSetId": {
+            "enum": [
+              "tax-demo-v1"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "documentSetId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "formType": {
+            "enum": [
+              "1040",
+              "W2",
+              "1099INT",
+              "unknown"
+            ]
+          },
+          "readability": {
+            "enum": [
+              "readable",
+              "unreadable"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "formType",
+          "readability"
+        ]
+      }
+    },
+    "03-independent-tie-out": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentSetId": {
+            "enum": [
+              "tax-demo-v1"
+            ]
+          },
+          "documentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "taxYear": {
+            "const": 2025
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          }
+        },
+        "required": [
+          "documentSetId",
+          "documentIds",
+          "taxYear",
+          "currency"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "readings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "documentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "formType": {
+                  "enum": [
+                    "1040",
+                    "W2",
+                    "1099INT",
+                    "unknown"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "read",
+                    "unreadable",
+                    "unsupported"
+                  ]
+                },
+                "wagesCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "withholdingCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "interestCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "documentId",
+                "formType",
+                "status",
+                "wagesCents",
+                "withholdingCents",
+                "interestCents"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "wages": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          },
+          "withholding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          }
+        },
+        "required": [
+          "currency",
+          "readings",
+          "wages",
+          "withholding"
+        ]
+      }
+    },
+    "04-policy-recommendation": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "policyId": {
+            "enum": [
+              "workshop-equipment-v1"
+            ]
+          },
+          "policy": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "facts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "policyId",
+          "policy",
+          "question",
+          "facts"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "expense",
+              "capitalize",
+              "prepay",
+              "insufficient_evidence"
+            ]
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1200
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "clauseId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "quote": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "clauseId",
+                "quote"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "decision",
+          "recommendation",
+          "citations",
+          "evidenceIds"
+        ]
+      }
+    },
+    "05-package-readiness": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "requiredDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "presentDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "unresolvedDiscrepancyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "humanApproval": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          }
+        },
+        "required": [
+          "packageId",
+          "requiredDocumentIds",
+          "presentDocumentIds",
+          "unresolvedDiscrepancyIds",
+          "humanApproval"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "status": {
+            "enum": [
+              "incomplete",
+              "needs_reconciliation",
+              "ready_for_review",
+              "approved"
+            ]
+          },
+          "missingDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "unresolvedDiscrepancyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "humanApproval": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
+          "transmission": {
+            "enum": [
+              "not_sent",
+              "sent"
+            ]
+          }
+        },
+        "required": [
+          "packageId",
+          "status",
+          "missingDocumentIds",
+          "unresolvedDiscrepancyIds",
+          "humanApproval",
+          "transmission"
+        ]
+      }
+    },
+    "06-simulated-travel": {
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "enum": [
+              "AAA"
+            ]
+          },
+          "destination": {
+            "enum": [
+              "BBB"
+            ]
+          },
+          "departDate": {
+            "type": "string",
+            "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+          },
+          "returnDate": {
+            "type": "string",
+            "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+          },
+          "budgetCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "origin": {
+                  "enum": [
+                    "AAA"
+                  ]
+                },
+                "destination": {
+                  "enum": [
+                    "BBB"
+                  ]
+                },
+                "departDate": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+                },
+                "returnDate": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+                },
+                "fareCents": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "feesCents": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "destination",
+                "departDate",
+                "returnDate",
+                "fareCents",
+                "feesCents",
+                "currency"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departDate",
+          "returnDate",
+          "budgetCents",
+          "currency",
+          "options"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "recommendation",
+              "no_options"
+            ]
+          },
+          "optionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "departDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "returnDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "totalCents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "simulated": {
+            "type": "boolean"
+          },
+          "booked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "optionId",
+          "departDate",
+          "returnDate",
+          "totalCents",
+          "currency",
+          "simulated",
+          "booked"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "basis": "actual persisted dataset/experiment/project/trace IDs; evidence-only routes; production return remains contract blocked",
+  "browserRendering": "not verified",
+  "projectId": "UHJvamVjdDo3NA==",
+  "checks": [
+    {
+      "kind": "dataset",
+      "url": "http://127.0.0.1:6006/datasets/RGF0YXNldDoyMA==/examples",
+      "status": 200,
+      "phoenixShell": true
+    },
+    {
+      "kind": "experiment",
+      "url": "http://127.0.0.1:6006/datasets/RGF0YXNldDoyMA==/compare?experimentId=RXhwZXJpbWVudDo1OA%3D%3D",
+      "status": 200,
+      "phoenixShell": true
+    },
+    {
+      "kind": "pythonTrace",
+      "url": "http://127.0.0.1:6006/projects/UHJvamVjdDo3NA%3D%3D/traces/e8801cb2cbfc3ea2cca025ca5fa39752",
+      "status": 200,
+      "phoenixShell": true
+    }
+  ]
+}

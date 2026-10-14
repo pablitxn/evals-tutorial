@@ -1,0 +1,31 @@
+
+> evals-tutorial@0.1.0 typecheck
+> turbo run typecheck && npm run typecheck:content
+
+• Packages in scope: @evals-tutorial/contracts, @evals-tutorial/evaluator-runtime, @evals-tutorial/phoenix, @evals-tutorial/review, @evals-tutorial/server, @evals-tutorial/web
+• Running typecheck in 6 packages
+• Remote caching disabled
+@evals-tutorial/contracts:typecheck: cache miss, executing 8474a92268eb67b2
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/contracts:typecheck: > @evals-tutorial/contracts@0.1.0 typecheck
+@evals-tutorial/contracts:typecheck: > tsc --noEmit
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/review:typecheck: cache miss, executing 58bc9fe0ed6cb0e1
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/review:typecheck: > @evals-tutorial/review@0.1.0 typecheck
+@evals-tutorial/review:typecheck: > tsc --noEmit
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/server:typecheck: cache miss, executing 5f42af3e99e5c4f8
+@evals-tutorial/server:typecheck: 
+@evals-tutorial/server:typecheck: > @evals-tutorial/server@0.1.0 typecheck
+@evals-tutorial/server:typecheck: > tsc --noEmit
+@evals-tutorial/server:typecheck: 
+
+ Tasks:    3 successful, 3 total
+Cached:    0 cached, 3 total
+  Time:    3.768s 
+
+
+> evals-tutorial@0.1.0 typecheck:content
+> tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --esModuleInterop --resolveJsonModule content/authoring/*.ts content/intro/starter.ts content/exercises/*/starter.ts tests/integration/*.test.ts
+

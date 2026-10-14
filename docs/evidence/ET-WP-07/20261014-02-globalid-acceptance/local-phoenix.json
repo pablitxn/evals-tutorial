@@ -1,0 +1,233 @@
+{
+  "mode": "synthetic contract fixtures; real local Phoenix",
+  "inferenceCalls": 0,
+  "providerTokenSpend": 0,
+  "fixture": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDox",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDox",
+    "tasks": [
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6Mg==",
+        "output": {
+          "label": "not-starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "0f07bc3e8e3547ecb9bcc4baf85f58b2",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjoy",
+        "experiment_id": "RXhwZXJpbWVudDox"
+      },
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6MQ==",
+        "output": {
+          "label": "starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "15ef7236a69614a240d2adf57c1e3016",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjox",
+        "experiment_id": "RXhwZXJpbWVudDox"
+      }
+    ]
+  },
+  "successfulReturn": {
+    "phoenix": {
+      "datasetId": "RGF0YXNldDox",
+      "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+      "experimentId": "RXhwZXJpbWVudDox",
+      "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+      "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDox"
+    },
+    "rowLinks": [
+      {
+        "exampleId": "starred",
+        "fixtureId": "correct",
+        "phoenix": {
+          "datasetId": "RGF0YXNldDox",
+          "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+          "experimentId": "RXhwZXJpbWVudDox",
+          "traceId": "15ef7236a69614a240d2adf57c1e3016",
+          "traceUrl": "http://127.0.0.1:6006/projects/UHJvamVjdDoy/traces/15ef7236a69614a240d2adf57c1e3016"
+        }
+      },
+      {
+        "exampleId": "starred",
+        "fixtureId": "incorrect",
+        "phoenix": {
+          "datasetId": "RGF0YXNldDox",
+          "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+          "experimentId": "RXhwZXJpbWVudDox",
+          "traceId": "0f07bc3e8e3547ecb9bcc4baf85f58b2",
+          "traceUrl": "http://127.0.0.1:6006/projects/UHJvamVjdDoy/traces/0f07bc3e8e3547ecb9bcc4baf85f58b2"
+        }
+      }
+    ]
+  },
+  "restart": {
+    "sameExperiment": true,
+    "rows": 2
+  },
+  "concurrentProcesses": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDoz",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDoz",
+    "sameExperiment": true,
+    "rows": 2
+  },
+  "versioning": {
+    "oldVersion": "RGF0YXNldFZlcnNpb246MQ==",
+    "newVersion": "RGF0YXNldFZlcnNpb246NA==",
+    "oldPinnedAfterChange": true
+  },
+  "cancelled": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDo3",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDo3",
+    "tasks": [
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6Mg==",
+        "output": null,
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "471b49f9f6b3627926a99f8cd669faed",
+        "error": "cancelled:cancelled",
+        "id": "RXhwZXJpbWVudFJ1bjoxNQ==",
+        "experiment_id": "RXhwZXJpbWVudDo3"
+      },
+      {
+        "dataset_example_id": "RGF0YXNldEV4YW1wbGU6MQ==",
+        "output": {
+          "label": "starred"
+        },
+        "repetition_number": 1,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "trace_id": "8761c045a3b13e8c86876f1397dadb77",
+        "error": null,
+        "id": "RXhwZXJpbWVudFJ1bjoxMw==",
+        "experiment_id": "RXhwZXJpbWVudDo3"
+      }
+    ]
+  },
+  "experimentRetry": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDo4",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDo4",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "rowRetry": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDo5",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDo5",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "evaluationRetry": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDoxMA==",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDoxMA%3D%3D",
+    "experimentCreates": 1,
+    "inferenceCalls": 0
+  },
+  "recordingCancellation": {
+    "datasetId": "RGF0YXNldDox",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246MQ==",
+    "experimentId": "RXhwZXJpbWVudDoxMQ==",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDox/compare?experimentId=RXhwZXJpbWVudDoxMQ%3D%3D",
+    "retrySucceededByReadback": true,
+    "inferenceCalls": 0
+  },
+  "pythonContinuity": {
+    "datasetId": "RGF0YXNldDo2",
+    "datasetVersionId": "RGF0YXNldFZlcnNpb246Nw==",
+    "experimentId": "RXhwZXJpbWVudDoxNA==",
+    "datasetUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDo2/examples",
+    "experimentUrl": "http://127.0.0.1:6006/datasets/RGF0YXNldDo2/compare?experimentId=RXhwZXJpbWVudDoxNA%3D%3D",
+    "sourceProjectName": "ET-WP07-synthetic-source-a494d9fe-f864-4e39-bdcf-6924df05bbef",
+    "traceId": "ae931f0d58f37fb020fe7ba8b7017067",
+    "spans": [
+      {
+        "id": "U3BhbjozNw==",
+        "name": "Tutorial stored row",
+        "context": {
+          "trace_id": "ae931f0d58f37fb020fe7ba8b7017067",
+          "span_id": "6172ed246a77ed6f"
+        },
+        "span_kind": "CHAIN",
+        "parent_id": null,
+        "start_time": "2026-10-14T13:00:00+00:00",
+        "end_time": "2026-10-14T13:00:01+00:00",
+        "status_code": "OK",
+        "status_message": "",
+        "attributes": {
+          "tutorial.score": 1,
+          "tutorial.code_hash": "389f6127b8b4358fc332ea99e50af2e8ae63823c6208fcf9d811925871b94573",
+          "tutorial.example_id": "starred",
+          "tutorial.span_origin": "stored_receipt",
+          "tutorial.label": "pass",
+          "tutorial.dataset_hash": "104ff602f333449f02f58e41765f1b3233558868a3d1edfaeca6dddf23bfc105",
+          "tutorial.mode": "agent",
+          "tutorial.run_id": "python-agent-a494d9fe-f864-4e39-bdcf-6924df05bbef",
+          "tutorial.row_status": "completed"
+        },
+        "events": []
+      },
+      {
+        "id": "U3BhbjozNQ==",
+        "name": "Synthetic Python agent",
+        "context": {
+          "trace_id": "ae931f0d58f37fb020fe7ba8b7017067",
+          "span_id": "d0c17eabd1adc2d1"
+        },
+        "span_kind": "AGENT",
+        "parent_id": "6172ed246a77ed6f",
+        "start_time": "2026-10-14T15:03:47.356817+00:00",
+        "end_time": "2026-10-14T15:03:47.362690+00:00",
+        "status_code": "UNSET",
+        "status_message": "",
+        "attributes": {},
+        "events": []
+      },
+      {
+        "id": "U3BhbjozNA==",
+        "name": "Synthetic model boundary; no inference",
+        "context": {
+          "trace_id": "ae931f0d58f37fb020fe7ba8b7017067",
+          "span_id": "26299505b3db863f"
+        },
+        "span_kind": "LLM",
+        "parent_id": "d0c17eabd1adc2d1",
+        "start_time": "2026-10-14T15:03:47.356854+00:00",
+        "end_time": "2026-10-14T15:03:47.356867+00:00",
+        "status_code": "UNSET",
+        "status_message": "",
+        "attributes": {},
+        "events": []
+      }
+    ],
+    "inferenceCalls": 0,
+    "boundary": "real exporter; synthetic spans; no provider or MAF invocation"
+  },
+  "serviceReturn": "verified",
+  "serverVersion": "20.21.3"
+}

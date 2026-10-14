@@ -1,0 +1,29 @@
+✔ mocked run orchestration preserves snapshots, idempotency and fixture truth (128.63134ms)
+✔ syntax errors, stale binding and missing isolation precede all provider calls (13.835987ms)
+✔ wrong fixture verdict differs from evaluator execution failure (19.487065ms)
+✔ agent sees no references/fixtures/source; malformed response has no score (58.312023ms)
+✔ one active run, queued cancellation, bounded capacity and ignored late provider replies (45.805764ms)
+✔ run timeout is operational and unfinished rows remain in the receipt (38.202628ms)
+✔ host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget (4.692318ms)
+✔ actual Docker RunService validates before mocked paid calls and records real fixture verdicts (13548.14247ms)
+▶ actual restricted Docker boundary and compiler adversarial suite
+  ✔ syntax, exact types, exports, references and forbidden imports have source positions (22770.138544ms)
+  ✔ criterion failure is completed execution; thrown exception and malformed result are errors (11551.801306ms)
+  ✔ escaped Node APIs still see no host paths, socket, secrets or writable root (4770.351007ms)
+  ✔ network none rejects socket connection even through escaped Node APIs (5169.246491ms)
+  ✔ tmpfs size prevents unbounded filesystem growth (4454.723328ms)
+  ✔ infinite loop, heap pressure, stderr and protocol floods are bounded (19353.967457ms)
+  ✔ actual running container has recorded restrictions; abort removes it (4688.789002ms)
+  ✔ actual JSONL broker calls are bound and bounded; unknown methods terminate execution (22615.926422ms)
+  ✔ startup removes only abandoned containers for the exact owned session (1917.539372ms)
+  ✔ missing Docker fails closed without submitted-code execution (1.955172ms)
+✔ actual restricted Docker boundary and compiler adversarial suite (97298.3919ms)
+✔ virtual SDK wire declarations match the frozen public types exactly (1.158022ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 111714.578791

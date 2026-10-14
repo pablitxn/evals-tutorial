@@ -1,0 +1,34 @@
+
+> evals-tutorial@0.1.0 test:docker
+> node scripts/test-docker.mjs
+
+✔ mocked run orchestration preserves snapshots, idempotency and fixture truth (112.689945ms)
+✔ syntax errors, stale binding and missing isolation precede all provider calls (14.286941ms)
+✔ wrong fixture verdict differs from evaluator execution failure (23.843378ms)
+✔ agent sees no references/fixtures/source; malformed response has no score (56.441284ms)
+✔ one active run, queued cancellation, bounded capacity and ignored late provider replies (45.855338ms)
+✔ run timeout is operational and unfinished rows remain in the receipt (37.839313ms)
+✔ validation rejects concurrent compiles before allocating another isolated worker (1.108547ms)
+✔ host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget (1.65744ms)
+✔ actual Docker RunService validates before mocked paid calls and records real fixture verdicts (16783.400934ms)
+▶ actual restricted Docker boundary and compiler adversarial suite
+  ✔ syntax, exact types, exports, references and forbidden imports have source positions (29146.907197ms)
+  ✔ criterion failure is completed execution; thrown exception and malformed result are errors (15431.927349ms)
+  ✔ escaped Node APIs still see no host paths, socket, secrets or writable root (5288.260068ms)
+  ✔ network none rejects socket connection even through escaped Node APIs (5043.347759ms)
+  ✔ tmpfs size prevents unbounded filesystem growth (4682.212339ms)
+  ✔ infinite loop, heap pressure, stderr and protocol floods are bounded (28036.563733ms)
+  ✔ actual running container has recorded restrictions; abort removes it (4424.256434ms)
+  ✔ actual JSONL broker calls are bound and bounded; unknown methods terminate execution (30107.669751ms)
+  ✔ startup removes only abandoned containers for the exact owned session (2048.83038ms)
+  ✔ missing Docker fails closed without submitted-code execution (2.055821ms)
+✔ actual restricted Docker boundary and compiler adversarial suite (124218.383422ms)
+✔ virtual SDK wire declarations match the frozen public types exactly (2.02912ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 141849.673817

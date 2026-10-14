@@ -1,0 +1,26 @@
+▶ real local Phoenix persistence of owned synthetic contracts; zero inference
+  ✔ identical and concurrent imports reuse dataset/version and experiment without duplicate results (801.478695ms)
+  ✔ successful return preserves actual padded GlobalIDs and verified per-row links (129.191524ms)
+  ✔ fresh Node process resumes the same journal and persisted experiment (465.274618ms)
+  ✔ two separate Node processes serialize fresh experiment creation (1078.777231ms)
+  ✔ retry accepts previously attached fixture links and telemetry status changes (108.667331ms)
+  ✔ changed content creates a new version; original version stays pinned (516.93037ms)
+  ✔ reusing an application dataset version or run ID with different immutable evidence conflicts (11.20524ms)
+  ✔ cancelled execution preserves completed scores and operational error rows (387.850204ms)
+  ✔ lost experiment write response resumes by read-back without repeated execution (401.628747ms)
+  ✔ lost row write response resumes by read-back without repeated execution (422.894635ms)
+  ✔ lost evaluation write response resumes by read-back without repeated execution (462.427645ms)
+  ✔ cancellation during a committed recording write remains retryable without inference (482.690531ms)
+  ✔ missing completed-agent traces fail explicitly instead of returning fixture telemetry (49.721685ms)
+  ✔ experiment task points to the real Node/Python trace in its actual source project (538.283519ms)
+  ✔ incorrect evaluation read-back is rejected (373.129659ms)
+{"serviceReturn":"verified","serverVersion":"20.21.3","inferenceCalls":0}
+✔ real local Phoenix persistence of owned synthetic contracts; zero inference (6244.508326ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6557.115169

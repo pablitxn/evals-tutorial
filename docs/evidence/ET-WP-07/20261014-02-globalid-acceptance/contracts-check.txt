@@ -1,0 +1,4 @@
+
+> evals-tutorial@0.1.0 contracts:check
+> python3 scripts/generate-contracts.py --check && node scripts/generate-validators.mjs --check
+

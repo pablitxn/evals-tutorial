@@ -1,0 +1,15 @@
+✔ frozen snapshot/hash/row validation fails before a Phoenix request (37.711284ms)
+✔ explicit frozen loopback origin is required; no ambient endpoint fallback (0.273763ms)
+✔ unavailable Phoenix and HTML masquerading as JSON return sanitized typed failure (32.934171ms)
+✔ pre-aborted recording sends no network traffic (2.893823ms)
+✔ recording deadline aborts a hung transport and returns timeout independently of execution (12.024331ms)
+✔ W3C context is stable, row-bound and fixture-bound (1.278027ms)
+✔ CSV read-back handles quoted commas, quotes, newlines and CRLF (0.28483ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 380.386602

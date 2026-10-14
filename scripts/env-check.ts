@@ -1,16 +1,10 @@
 import { existsSync } from 'node:fs';
-if(existsSync('.env')) process.loadEnvFile('.env');
-const provider=process.env.TUTORIAL_PROVIDER;
-const errors:string[]=[];
-if(!['openai','azure_foundry'].includes(provider??'')) errors.push('TUTORIAL_PROVIDER must be openai or azure_foundry');
-if(!process.env.TUTORIAL_MODEL?.trim()) errors.push('TUTORIAL_MODEL is missing');
-if(!process.env.TUTORIAL_API_KEY?.trim()) errors.push('TUTORIAL_API_KEY is missing');
-if(provider==='azure_foundry') {
-  try {
-    const endpoint=new URL(process.env.TUTORIAL_AZURE_ENDPOINT??'');
-    if(endpoint.protocol!=='https:' || !endpoint.hostname.endsWith('.openai.azure.com') || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || !['/','/openai/v1','/openai/v1/'].includes(endpoint.pathname)) throw new Error();
-  } catch {errors.push('TUTORIAL_AZURE_ENDPOINT must be an HTTPS Azure OpenAI resource root or /openai/v1 URL');}
+import { profileFromEnv } from '../apps/server/src/providers/profile.js';
+if(existsSync('.env'))process.loadEnvFile('.env');
+try{
+  profileFromEnv(process.env);
+  console.log('Provider structure configured. No authentication or inference performed; credential values redacted.');
+}catch{
+  if(process.argv.includes('--require-provider')){console.error('Set an explicit TUTORIAL_PROVIDER, TUTORIAL_MODEL and existing TUTORIAL_API_KEY. Azure also requires a resource-root endpoint and API version.');process.exitCode=1;}
+  else console.log('Provider unavailable: read-only lessons, validation and Code fixtures remain available with Docker. No inference requested.');
 }
-if(!process.env.PHOENIX_IMAGE || !/(:[0-9][^\s]*|@sha256:[a-f0-9]{64})$/.test(process.env.PHOENIX_IMAGE)) errors.push('PHOENIX_IMAGE must be a readiness-verified version or digest pin');
-if(errors.length) {for(const message of errors) console.error(message);process.exitCode=1;}
-else console.log('Structural configuration valid. Credential values redacted. No authentication, inference, Docker or provider capability check performed.');

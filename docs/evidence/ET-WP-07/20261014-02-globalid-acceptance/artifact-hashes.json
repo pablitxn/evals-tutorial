@@ -1,0 +1,118 @@
+{
+  "previousHead": "eb50cf489b8a5ecb7904fa82e4e595ad839303a8",
+  "contractCorrectionHead": "d98a2247bf68338b1a2a5b37449816abc0ab4e7d",
+  "acceptedMain": "77f4940424d15ef079fd1cdba04c8ffef1735bd6",
+  "testedIntegrationParent": "0dae7c38f2df5746e17516fc5f1d4744292c27c9",
+  "artifacts": [
+    {
+      "path": "apps/server/src/telemetry/index.ts",
+      "bytes": 461,
+      "sha256": "8a66294d10adc6f1b25aa5080ba211a5b3cbba7f7111a305dd492d750ce1426b"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/contracts-check.txt",
+      "bytes": 137,
+      "sha256": "2b09af722fba9946fabf267983f48e537ed6986e195dc28c203bc11a4d0e9e8c"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/corpus-phoenix.json",
+      "bytes": 6095,
+      "sha256": "bcbdd79844ce0bde9a5e5208881e9483c610e0c2c690395eae908b0707474377"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/corpus-tests.txt",
+      "bytes": 1078,
+      "sha256": "4ed707dfddd3cc59730abff4d95477f6a758d1bc7c08ba36766a4e8361cd83fb"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/local-phoenix.json",
+      "bytes": 8635,
+      "sha256": "b3e5d0d27bd6f843374f69bc942fb50e6be6344ac87ec931af76eabe07d4cb97"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/local-tests-initial-startup.txt",
+      "bytes": 20044,
+      "sha256": "3e4348b2b7f449396773e0c4a4db8b712aba46fe2b2cfd38a6e807801a791da2"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/local-tests.txt",
+      "bytes": 1828,
+      "sha256": "e342ac3525152b364b5bee31d7cc36ab6aed75b7cd050b392be4b85bbe82d4b6"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/offline-tests.txt",
+      "bytes": 709,
+      "sha256": "2eae08c807db122d4484e526e2270a052de42914725e54ef3b16e86012b99a96"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/shared-tests.txt",
+      "bytes": 7010,
+      "sha256": "516f57d83249afd54b25d518dbf439fcdf5384d649117614ef4a4d65a8506419"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance/typecheck.txt",
+      "bytes": 1519,
+      "sha256": "6fca41f1e0dc6d88953828f166523ae58616b65e801fc4cacf0628f48944d2dc"
+    },
+    {
+      "path": "docs/evidence/ET-WP-07/20261014-02-globalid-acceptance.md",
+      "bytes": 7176,
+      "sha256": "04bdac4a6e835ee7efcce486bcf768c2151347c2167ae058e8a2a72c420cd50f"
+    },
+    {
+      "path": "packages/phoenix/README.md",
+      "bytes": 5997,
+      "sha256": "7696e150bbe7b70783ca6f386a0bc37488785c9c02c2493d2da82313689e434b"
+    },
+    {
+      "path": "packages/phoenix/src/context.ts",
+      "bytes": 669,
+      "sha256": "e946928c33a7816863b73a8da1804bf3dadb49484e9bed4d01768e50882e7cea"
+    },
+    {
+      "path": "packages/phoenix/src/index.ts",
+      "bytes": 25961,
+      "sha256": "250a7cfe0ba6016151fb59d7820a71b08cd2e5a0300014a826fcb0d8fd44ed11"
+    },
+    {
+      "path": "packages/phoenix/src/state.ts",
+      "bytes": 2153,
+      "sha256": "8f72f82ac51442736ffb027388385e7698b45e4fe63b27b818a4639b84ff425c"
+    },
+    {
+      "path": "packages/phoenix/tests/corpus-phoenix.test.ts",
+      "bytes": 5137,
+      "sha256": "e197795f9f13c5e784b3d0ed2a29bd65e9e7e66a0d04d4414f4da4e359f8351d"
+    },
+    {
+      "path": "packages/phoenix/tests/fixtures.ts",
+      "bytes": 2406,
+      "sha256": "d3bbcc4abdd2836b5555678c2dc5ee67b27a58f511e7d99b70616d102519d2d3"
+    },
+    {
+      "path": "packages/phoenix/tests/local-phoenix.test.ts",
+      "bytes": 16019,
+      "sha256": "e5856ed163beda758ea09bfbfa3e0029834eb2a47fdbac04ccf82c854caed0f8"
+    },
+    {
+      "path": "packages/phoenix/tests/python_trace.py",
+      "bytes": 1352,
+      "sha256": "e8ee4f591aa7cbc844c44676d3dccd1f8131a91e2c4ca7c12d2b320be2dd1b57"
+    },
+    {
+      "path": "packages/phoenix/tests/record.test.ts",
+      "bytes": 4786,
+      "sha256": "071dc6fa2467a899cc81509d3ebd119b876acf91e4990955cb92291df347bd7b"
+    },
+    {
+      "path": "packages/phoenix/tests/restart.ts",
+      "bytes": 310,
+      "sha256": "a5fc5a46fed50ae18ff8699e99bda59484983dcc536a92f451250fa73a844c2d"
+    },
+    {
+      "path": "packages/phoenix/tsconfig.json",
+      "bytes": 175,
+      "sha256": "2a751fe1a1b3df5fedbb845d54e52aa2057de506631c7d13cf34638cf7875b7e"
+    }
+  ]
+}

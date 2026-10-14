@@ -1,0 +1,21 @@
+{
+  "phoenixPlatforms": [
+    {
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "architecture": "unknown",
+      "os": "unknown"
+    },
+    {
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    {
+      "architecture": "unknown",
+      "os": "unknown"
+    }
+  ],
+  "runnerLocalImage": "sha256:291ae3ea80955f76a1373d8c17f5edc93b29832938956618c06788ab73470cf9"
+}

@@ -1,0 +1,17 @@
+▶ actual seven-exercise corpus imports and version pins; synthetic recording receipts only
+  ✔ intro: exact dataset hash, document manifest and persisted fixture rows (427.84542ms)
+  ✔ 01-starred-classifier: exact dataset hash, document manifest and persisted fixture rows (917.353029ms)
+  ✔ 02-document-classification: exact dataset hash, document manifest and persisted fixture rows (2067.728943ms)
+  ✔ 03-independent-tie-out: exact dataset hash, document manifest and persisted fixture rows (2692.450736ms)
+  ✔ 04-policy-recommendation: exact dataset hash, document manifest and persisted fixture rows (2122.835615ms)
+  ✔ 05-package-readiness: exact dataset hash, document manifest and persisted fixture rows (1982.423264ms)
+  ✔ 06-simulated-travel: exact dataset hash, document manifest and persisted fixture rows (2518.278209ms)
+✔ actual seven-exercise corpus imports and version pins; synthetic recording receipts only (12742.82511ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13043.704228

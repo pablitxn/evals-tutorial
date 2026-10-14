@@ -1,0 +1,7 @@
+
+> evals-tutorial@0.1.0 stop
+> node scripts/stop.mjs
+
+ Container evals-tutorial-clean-e92-phoenix-1  Stopping
+ Container evals-tutorial-clean-e92-phoenix-1  Stopped
+Tutorial stop requested. Phoenix volume retained.
