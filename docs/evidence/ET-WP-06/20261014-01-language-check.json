@@ -1,0 +1,19 @@
+{
+  "auditSummary": {
+    "tracked": 186,
+    "text": 167,
+    "binary_or_non_utf8": 19,
+    "absent": 0,
+    "symlinks": 0,
+    "candidate_files": 0,
+    "classes": {
+      "authored-content-or-external-data-review": 153,
+      "reviewed-instructions": 2,
+      "test-description-or-fixture-review": 12
+    }
+  },
+  "ownedCandidates": [],
+  "commitsChecked": 4,
+  "commitErrors": [],
+  "limit": "Atlas helper functions called with the tutorial root; bounded language markers require human review."
+}

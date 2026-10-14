@@ -1,0 +1,44 @@
+[
+  {
+    "exerciseId": "intro",
+    "codeHash": "87e009814ca50801e509e73c26f5be221eeacf296e462f580d2f656bbfc18b93",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "01-starred-classifier",
+    "codeHash": "78df22cadeedb4df182c5f5b41452a9b2c2e90977dbc4b7aba2d9607bc7df59e",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "02-document-classification",
+    "codeHash": "8954d7e8d2248f52ea60400bd3a0863e4ee0fb5813abccf69c3eb951bccb3e02",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "03-independent-tie-out",
+    "codeHash": "275535861b1bb5539093904058c6cfc486f68fd4f363bbf3ce1c061278896197",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "04-policy-recommendation",
+    "codeHash": "a622a47c891e6a88b83eb6702f0c769957c48478bdd92edef7f32bf4d8f01429",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "05-package-readiness",
+    "codeHash": "523ec11e16cc42daddc406cdb1807fad9bf4ecef8908b95eb22512883c925f36",
+    "valid": true,
+    "diagnostics": []
+  },
+  {
+    "exerciseId": "06-simulated-travel",
+    "codeHash": "dceb55abbe56acbff2586ddca045c1eb93aa387ace095958808a7b9b2bd4a379",
+    "valid": true,
+    "diagnostics": []
+  }
+]
