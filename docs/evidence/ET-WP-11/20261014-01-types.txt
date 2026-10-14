@@ -1,0 +1,48 @@
+
+> evals-tutorial@0.1.0 typecheck
+> turbo run typecheck && npm run typecheck:content
+
+turbo 2.5.8
+
+• Packages in scope: @evals-tutorial/contracts, @evals-tutorial/evaluator-runtime, @evals-tutorial/phoenix, @evals-tutorial/review, @evals-tutorial/server, @evals-tutorial/web
+• Running typecheck in 6 packages
+• Remote caching disabled
+@evals-tutorial/contracts:typecheck: cache hit, replaying logs f80eaadf69b85474
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/contracts:typecheck: > @evals-tutorial/contracts@0.1.0 typecheck
+@evals-tutorial/contracts:typecheck: > tsc --noEmit
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/web:typecheck: cache miss, executing 65a7de8a9409b69a
+@evals-tutorial/evaluator-runtime:typecheck: cache hit, replaying logs 8d7ecd47aa5997ed
+@evals-tutorial/evaluator-runtime:typecheck: 
+@evals-tutorial/evaluator-runtime:typecheck: > @evals-tutorial/evaluator-runtime@0.1.0 typecheck
+@evals-tutorial/evaluator-runtime:typecheck: > tsc --noEmit
+@evals-tutorial/evaluator-runtime:typecheck: 
+@evals-tutorial/phoenix:typecheck: cache hit, replaying logs efac5dcd01757673
+@evals-tutorial/phoenix:typecheck: 
+@evals-tutorial/phoenix:typecheck: > @evals-tutorial/phoenix@0.1.0 typecheck
+@evals-tutorial/phoenix:typecheck: > tsc --noEmit
+@evals-tutorial/phoenix:typecheck: 
+@evals-tutorial/review:typecheck: cache hit, replaying logs 15ebc7b2c981873c
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/review:typecheck: > @evals-tutorial/review@0.1.0 typecheck
+@evals-tutorial/review:typecheck: > tsc --noEmit
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/server:typecheck: cache hit, replaying logs 85b645ab694a03d8
+@evals-tutorial/server:typecheck: 
+@evals-tutorial/server:typecheck: > @evals-tutorial/server@0.1.0 typecheck
+@evals-tutorial/server:typecheck: > tsc --noEmit
+@evals-tutorial/server:typecheck: 
+@evals-tutorial/web:typecheck: 
+@evals-tutorial/web:typecheck: > @evals-tutorial/web@0.1.0 typecheck
+@evals-tutorial/web:typecheck: > tsc --noEmit -p tsconfig.json
+@evals-tutorial/web:typecheck: 
+
+ Tasks:    6 successful, 6 total
+Cached:    5 cached, 6 total
+  Time:    1.63s 
+
+
+> evals-tutorial@0.1.0 typecheck:content
+> tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck --esModuleInterop --resolveJsonModule content/authoring/*.ts content/intro/starter.ts content/exercises/*/starter.ts tests/integration/*.test.ts
+

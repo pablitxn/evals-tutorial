@@ -1,3 +1,4 @@
+import spanish from './locales/es.json' with { type: 'json' };
 import { LIMITS, validateContract } from '@evals-tutorial/contracts';
 import type { Dataset, ReviewAssessment } from '@evals-tutorial/contracts';
 import { canonicalJson, sha256 } from '@evals-tutorial/contracts/node';
@@ -6,6 +7,7 @@ import type { ProviderBroker, ReviewBrokerBinding } from '@evals-tutorial/contra
 import { deriveReviewBinding, rubricContext } from './evidence.js';
 
 export const EDUCATIONAL_NOTICE = 'This educational review is fallible. Inspect the cited evidence and retest changes.';
+export const EDUCATIONAL_NOTICE_ES = spanish.educationalNotice;
 export const REVIEW_LIMITS = Object.freeze({ inputBytes: 524288, outputBytes: 32768, outputTokens: 2048, timeoutMs: 60000 });
 
 const instructions = `You provide educational feedback on a TypeScript evaluator against the supplied rubric and saved run evidence.
@@ -27,10 +29,11 @@ function outputError(): never {
 export function validateReviewAssessment(value: unknown, material: ReviewBrokerBinding): ReviewAssessment {
   if (!validateContract('ReviewAssessment', value).valid) outputError();
   const assessment = value as ReviewAssessment;
+  const notice = material.feedbackLocale === 'es' ? EDUCATIONAL_NOTICE_ES : EDUCATIONAL_NOTICE;
   const criteria = new Set(material.exercise.criteria.map(c => c.id));
   const examples = new Set(material.agentRun.rows.map(row => row.exampleId));
   if (!assessment.summary.trim() || !assessment.findings.length ||
-    (assessment.summary.length > 3800 && !assessment.summary.endsWith(EDUCATIONAL_NOTICE))) outputError();
+    (assessment.summary.length > 3800 && !assessment.summary.endsWith(notice))) outputError();
   const covered = new Set<string>();
   for (const finding of assessment.findings) {
     if (!criteria.has(finding.criterionId) || !finding.exampleIds.length ||
@@ -44,9 +47,10 @@ export function validateReviewAssessment(value: unknown, material: ReviewBrokerB
   }
   if (assessment.status === 'ready' && [...criteria].some(id => !covered.has(id))) outputError();
   const prose = [assessment.summary, ...assessment.findings.flatMap(f => [f.feedback, f.nextAction])].join('\n');
+  if (/\b(tramp(?:a|as|oso|osa)|plagio|plagiar\w*|infalib\w*)\b|\bgarantiz\w*\b.{0,50}\bcorrect\w*|\b(?:siempre|100%) correct\w*\b/i.test(prose)) outputError();
   if (/\b(cheat(?:ing|er|ed)?|plagiari\w*|infallib\w*)\b|\b(?:guarantee\w*|prove[sn]?)\b.{0,50}\bcorrect\w*|\b(?:always|100%|certainly) correct\b/i.test(prose)) outputError();
-  return structuredClone({ ...assessment, summary: assessment.summary.endsWith(EDUCATIONAL_NOTICE)
-    ? assessment.summary : `${assessment.summary}\n\n${EDUCATIONAL_NOTICE}` });
+  return structuredClone({ ...assessment, summary: assessment.summary.endsWith(notice)
+    ? assessment.summary : `${assessment.summary}\n\n${notice}` });
 }
 
 /** Host-owned transport port. No tools, endpoint, credentials or code executor exist in this API. */
@@ -73,7 +77,11 @@ export function buildReviewPrompt(material: ReviewBrokerBinding, dataset: Datase
   if (Buffer.byteLength(content, 'utf8') > REVIEW_LIMITS.inputBytes) {
     throw new ServiceError({ code: 'resource_limit', message: 'Review evidence exceeds the bounded input size.', retryable: false }, 413);
   }
-  return [{ role: 'system', content: instructions }, { role: 'user', content }];
+  if (material.feedbackLocale !== undefined && !['en', 'es'].includes(material.feedbackLocale)) {
+    throw new ServiceError({ code: 'invalid_request', message: 'Invalid review feedback locale.', retryable: false });
+  }
+  const language = material.feedbackLocale === 'es' ? 'Spanish' : 'English';
+  return [{ role: 'system', content: `${instructions}\nWrite summary, feedback and nextAction in ${language}. Keep criterionId and exampleIds unchanged. Evidence must remain an exact original-language quote; never translate code, data, evidence or identifiers.` }, { role: 'user', content }];
 }
 
 /** ET-WP-05 can attach this operation to its shared-profile ProviderBroker. Zero automatic retries. */

@@ -42,3 +42,18 @@ failures. A successful intro is not the full Mac, corporate Azure or 150–180 m
 workshop gate. Azure requires an explicitly configured resource-root endpoint and
 API version, existing corporate access and its own live evidence. There is no
 cross-provider fallback, hosted deployment, booking, filing or transmission.
+
+The header language selector offers English and Spanish. The saved browser
+preference takes priority over supported browser languages; English is the fallback.
+Switching retains edited TypeScript, progress and run results. Inspect all seven
+lessons, accessibility labels, long Spanish text at narrow widths and 200% zoom.
+The browser language preference survives exercise/tutorial resets. If storage is
+blocked, keep the tab open; selection and edits remain in memory with visible notices.
+
+New explicit educational reviews request feedback in the selected language.
+Existing feedback remains unchanged and displays its requested language, or an
+unknown-language notice for older receipts. Provider language compliance requires
+live rehearsal. Language switching never requests paid review or translates stored
+feedback. Raw diagnostics, JSON, code and quoted review evidence retain their
+original text. This Cloud candidate's sandboxed visual check is blocked by the
+Chromium sandbox configuration; Mac/browser and live-provider gates remain pending.

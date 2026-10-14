@@ -1,0 +1,76 @@
+{
+  "intro": {
+    "exerciseVersion": "1.0.0",
+    "title": "Introducción",
+    "lessonMarkdown": "Pulsa **Ejecutar introducción** para ver cómo una entrada se convierte en una respuesta. El evaluador la compara con una referencia escrita de forma independiente. Inspecciona lo esperado, lo observado y la evaluación; luego abre el experimento y la traza registrados en Phoenix.\n\nLa entrada es lo que ve el agente; la respuesta, lo que devuelve; la referencia, la respuesta independiente; el evaluador explica la puntuación. Un conjunto de datos contiene ejemplos fijos, un experimento registra una ejecución y una traza registra sus pasos.\n\nEsta es la única introducción de solo lectura. Navegar no llama al modelo. Ejecutar introducción consume una llamada al agente; los enlaces aparecen únicamente después de registrar la ejecución real.",
+    "criteria": {
+      "star-flag": "Compara la etiqueta real con el booleano explícito y la referencia independiente."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "01-starred-classifier": {
+    "exerciseVersion": "1.0.0",
+    "title": "Clasificador de mensajes destacados",
+    "lessonMarkdown": "Una estrella es un booleano explícito, no una suposición sobre la urgencia. Comprueba las respuestas conocidas para mensajes destacados y no destacados antes de ejecutar el agente.\n\nLee el criterio y la referencia, completa el TODO de TypeScript, pulsa Validar y luego Probar respuestas preparadas. Un evaluador correcto debe aprobar las respuestas correctas y rechazar las etiquetas incorrectas. Ejecuta el agente con este mismo conjunto de datos e inspecciona Phoenix después. Python y el JSON del conjunto de datos son de solo lectura. Las pruebas con código no llaman al proveedor.",
+    "criteria": {
+      "star-flag": "Usa el booleano starred explícito; la urgencia no implica una estrella."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "02-document-classification": {
+    "exerciseVersion": "1.0.0",
+    "title": "Clasificación de documentos",
+    "lessonMarkdown": "Lee la página sintética y evalúa su clase normalizada: 1040, W2, 1099INT o unknown. Una nota legible de tipo desconocido corresponde a unknown/readable; una página ilegible, a unknown/unreadable. Una etiqueta incorrecta emitida con confianza debe fallar.\n\nUsa la misma vista previa de página que recibe la inferencia. Prueba primero las respuestas correctas e incorrectas y luego ejecuta el agente preparado con el conjunto de datos fijo. No hace falta una etapa de OCR. Un formato de imagen no disponible es un error de servicio, no un resultado unknown inventado. Las pruebas con código no llaman al proveedor.",
+    "criteria": {
+      "doc-class": "Comprueba el ID exacto de página, la clase normalizada y la legibilidad frente a la referencia independiente."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "03-independent-tie-out": {
+    "exerciseVersion": "1.0.0",
+    "title": "Conciliación independiente de salarios y retenciones",
+    "lessonMarkdown": "Comprueba lo extraído antes de confiar en un total. Los salarios W2 son 4200000 + 1850000 = **6050000 centavos de USD**; las retenciones son 420000 + 185000 = **605000 centavos**. Los intereses van por separado. Compara cada suma con la referencia 1040 escrita de forma independiente, con tolerancia cero y delta = suma W2 menos 1040.\n\nUn informe honesto de discrepancia o resultado indeterminado debe aprobarse. Inventar importes para que los totales del propio agente coincidan debe fallar. Inspecciona las páginas compartidas y los valores null, completa el evaluador, prueba las respuestas preparadas y luego ejecuta el agente con este mismo conjunto de datos. Python es solo para consulta.",
+    "criteria": {
+      "extract-fields": "Compara cada campo e ID extraídos de la página con lecturas de referencia escritas de forma independiente.",
+      "tie-wages": "Recalcula la suma de salarios W2 frente a los salarios 1040; delta con signo y tolerancia cero.",
+      "tie-withholding": "Recalcula las retenciones por separado; aprobar salarios no puede ocultar una discrepancia en retenciones.",
+      "tie-evidence": "Conjuntos exactos de documentos fuente; conserva null o indeterminado en lugar de cero."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "04-policy-recommendation": {
+    "exerciseVersion": "1.0.0",
+    "title": "Política contable ficticia",
+    "lessonMarkdown": "Usa únicamente esta **Workshop Equipment Policy ficticia** y los hechos suministrados. Comprueba con código los IDs de citas, las citas textuales exactas y los IDs de evidencia; un **juez LLM** evalúa si la recomendación se desprende de ellos. Una cita real aplicada incorrectamente debe fallar.\n\nTodos los puntos obligatorios respaldados: 1/pass. Decisión incorrecta, hechos contradichos o inventados, o evidencia faltante ignorada: 0/fail. Decisión correcta sin afirmaciones falsas pero con justificación incompleta: 0.5/partial. El desacuerdo del juez es inconcluso, no una prueba.\n\n**Probar respuestas preparadas puede consumir tokens:** como máximo siete llamadas al juez, una por respuesta que apruebe la comprobación con código, sin reintentos automáticos y con una propuesta de 600 tokens de salida por llamada. Los fallos de código detienen la evaluación antes del juez. Ejecutar agente usa por separado tres llamadas al agente y como máximo tres al juez. La revisión final lee posteriormente el código del evaluador sin ejecutarlo; es una acción independiente.",
+    "criteria": {
+      "policy-evidence": "Código: citas textuales exactas de cláusulas suministradas, IDs de evidencia existentes y obligatorios, y citas únicas.",
+      "policy-quality": "Juez LLM: decisión correcta, aplicación fiel de política y hechos, y reconocimiento de evidencia faltante. Una decisión incorrecta o un hecho inventado falla; una respuesta vaga pero correcta es parcial."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "05-package-readiness": {
+    "exerciseVersion": "1.0.0",
+    "title": "Preparación del paquete y aprobación humana",
+    "lessonMarkdown": "Comprueba los contenidos obligatorios y las discrepancias antes de declarar que el paquete está listo para revisión humana. La preparación y la aprobación humana simulada son independientes. Incluso un paquete aprobado conserva **not_sent**: este tutorial no tiene una herramienta de transmisión.\n\nLos archivos faltantes tienen prioridad; después, las discrepancias sin resolver o la aprobación rechazada. Un paquete limpio pendiente corresponde a ready_for_review; uno limpio aprobado puede indicar approved. Un rechazo agrega approval-rejected. Prueba los casos incorrectos conocidos antes de ejecutar el agente real; Python y JSON siguen siendo de solo lectura. Completar la revisión final no equivale a la aprobación humana del escenario.",
+    "criteria": {
+      "package-status": "Faltantes → incomplete; sin resolver o rechazado → needs_reconciliation; limpio pendiente → ready_for_review; limpio aprobado → approved.",
+      "package-contents": "Conjuntos exactos de obligatorios menos presentes y de discrepancias sin resolver; un rechazo agrega approval-rejected.",
+      "package-approval": "La decisión humana es una entrada simulada suministrada; nunca se deriva de la preparación ni de completar la revisión.",
+      "package-no-send": "Toda respuesta debe indicar not_sent; no hay herramienta de transmisión ni efectos externos."
+    },
+    "rubricVersion": "1.0.0"
+  },
+  "06-simulated-travel": {
+    "exerciseVersion": "1.0.0",
+    "title": "Recomendación de viaje simulado",
+    "lessonMarkdown": "Recomienda un viaje de ida y vuelta **simulado** entre los suministrados, para las fechas exactas de salida y regreso y dentro del presupuesto total. Cuenta la tarifa más las tasas obligatorias; se admite la igualdad con el presupuesto. Un vuelo más barato en una fecha incorrecta debe fallar. Cualquier opción elegible puede aprobarse; no tiene que ser la más barata.\n\nSi ninguna opción cumple, indica no_options con los campos del itinerario en null. Nunca inventes un vuelo, afirmes haber reservado ni llames a una API de viajes real. Completa y prueba primero el evaluador de TypeScript; luego ejecuta el agente preparado con este mismo JSON fijo. Las pruebas con código no llaman al proveedor.",
+    "criteria": {
+      "travel-membership": "Recomienda solo una opción del catálogo sintético suministrado.",
+      "travel-dates": "Ambas fechas deben coincidir con la solicitud, con el regreso después de la salida.",
+      "travel-budget": "Tarifa completa más tasas obligatorias en centavos de USD, menor o igual al presupuesto.",
+      "travel-no-options": "no_options solo cuando no hay una opción suministrada elegible; campos de itinerario en null.",
+      "travel-no-booking": "simulated true y booked false en toda respuesta; no hay capacidad de reservar."
+    },
+    "rubricVersion": "1.0.0"
+  }
+}

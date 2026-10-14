@@ -1569,6 +1569,13 @@
           "minLength": 1,
           "maxLength": 128,
           "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$"
+        },
+        "feedbackLocale": {
+          "type": "string",
+          "enum": [
+            "en",
+            "es"
+          ]
         }
       },
       "required": [
@@ -1821,6 +1828,13 @@
         },
         "error": {
           "$ref": "#/$defs/OperationError"
+        },
+        "feedbackLocale": {
+          "type": "string",
+          "enum": [
+            "en",
+            "es"
+          ]
         }
       },
       "required": [

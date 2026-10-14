@@ -1,0 +1,58 @@
+
+> evals-tutorial@0.1.0 build
+> turbo run build
+
+turbo 2.5.8
+
+• Packages in scope: @evals-tutorial/contracts, @evals-tutorial/evaluator-runtime, @evals-tutorial/phoenix, @evals-tutorial/review, @evals-tutorial/server, @evals-tutorial/web
+• Running build in 6 packages
+• Remote caching disabled
+@evals-tutorial/contracts:build: cache hit, replaying logs 05a508b0b633bc3f
+@evals-tutorial/contracts:build: 
+@evals-tutorial/contracts:build: > @evals-tutorial/contracts@0.1.0 build
+@evals-tutorial/contracts:build: > tsc --noEmit
+@evals-tutorial/contracts:build: 
+@evals-tutorial/phoenix:build: cache hit, replaying logs a0d25def9c802bae
+@evals-tutorial/phoenix:build: 
+@evals-tutorial/phoenix:build: > @evals-tutorial/phoenix@0.1.0 build
+@evals-tutorial/phoenix:build: > tsc --noEmit
+@evals-tutorial/phoenix:build: 
+@evals-tutorial/evaluator-runtime:build: cache hit, replaying logs 4ea92853ab8009a0
+@evals-tutorial/evaluator-runtime:build: 
+@evals-tutorial/evaluator-runtime:build: > @evals-tutorial/evaluator-runtime@0.1.0 build
+@evals-tutorial/evaluator-runtime:build: > tsc --noEmit
+@evals-tutorial/evaluator-runtime:build: 
+@evals-tutorial/review:build: cache hit, replaying logs f3e657dde27b02b0
+@evals-tutorial/review:build: 
+@evals-tutorial/review:build: > @evals-tutorial/review@0.1.0 build
+@evals-tutorial/review:build: > tsc --noEmit
+@evals-tutorial/review:build: 
+@evals-tutorial/web:build: cache miss, executing db3034a86a995603
+@evals-tutorial/server:build: cache hit, replaying logs 376b043d89a1c3bd
+@evals-tutorial/server:build: 
+@evals-tutorial/server:build: > @evals-tutorial/server@0.1.0 build
+@evals-tutorial/server:build: > tsc --noEmit
+@evals-tutorial/server:build: 
+@evals-tutorial/web:build: 
+@evals-tutorial/web:build: > @evals-tutorial/web@0.1.0 build
+@evals-tutorial/web:build: > vite build
+@evals-tutorial/web:build: 
+@evals-tutorial/web:build: vite v7.1.10 building for production...
+@evals-tutorial/web:build: transforming...
+@evals-tutorial/web:build: ✓ 175 modules transformed.
+@evals-tutorial/web:build: rendering chunks...
+@evals-tutorial/web:build: computing gzip size...
+@evals-tutorial/web:build: dist/index.html                   0.50 kB │ gzip:   0.30 kB
+@evals-tutorial/web:build: dist/assets/index-BnP6MNMW.css   16.38 kB │ gzip:   4.34 kB
+@evals-tutorial/web:build: dist/assets/index-CtY6AI1F.js   755.00 kB │ gzip: 153.39 kB
+@evals-tutorial/web:build: 
+@evals-tutorial/web:build: (!) Some chunks are larger than 500 kB after minification. Consider:
+@evals-tutorial/web:build: - Using dynamic import() to code-split the application
+@evals-tutorial/web:build: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+@evals-tutorial/web:build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+@evals-tutorial/web:build: ✓ built in 1.75s
+
+ Tasks:    6 successful, 6 total
+Cached:    5 cached, 6 total
+  Time:    2.051s 
+

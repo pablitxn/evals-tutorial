@@ -71,3 +71,25 @@ test('shared provider transport attaches WP09 grounded review operation without 
   const malformed = createProviderBroker(async () => ({ ...groundedAssessment(), findings: [{ ...groundedAssessment().findings[0]!, evidence: 'invented quote' }] }), { dataset: async () => evidence.dataset });
   await assert.rejects(malformed.review(brokerMaterial(evidence)));
 });
+
+test('Spanish review uses the shared grounded transport without changing evidence or increasing call budget', async () => {
+  const evidence = sample();
+  let calls = 0;
+  const broker = createProviderBroker(async request => {
+    calls++;
+    const material = request.material as { trustedSystem: string; evidence: unknown };
+    assert.match(material.trustedSystem, /nextAction in Spanish/);
+    assert.match(material.trustedSystem, /Evidence must remain an exact original-language quote/);
+    return groundedAssessment();
+  }, { dataset: async () => evidence.dataset });
+  const material = { ...brokerMaterial(evidence), feedbackLocale: 'es' as const };
+  const output = await broker.review(material);
+  assert.equal(output.status, 'ready');
+  assert.equal(output.findings[0]!.evidence, groundedAssessment().findings[0]!.evidence);
+  assert.match(output.summary, /Esta revisión educativa/);
+  await assert.rejects(broker.review(material));
+  assert.equal(calls, 1);
+  const invalid = createProviderBroker(async () => { calls++; return groundedAssessment(); }, { dataset: async () => evidence.dataset });
+  await assert.rejects(invalid.review({ ...material, feedbackLocale: 'fr' as any }), (error: any) => error.detail.code === 'invalid_request');
+  assert.equal(calls, 1);
+});
