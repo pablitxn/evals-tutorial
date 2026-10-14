@@ -1,0 +1,10 @@
+**
+!node_modules/
+!node_modules/typescript/
+!node_modules/typescript/lib/
+!node_modules/typescript/lib/**
+!packages/
+!packages/evaluator-runtime/
+!packages/evaluator-runtime/Dockerfile
+!packages/evaluator-runtime/worker/
+!packages/evaluator-runtime/worker/**
