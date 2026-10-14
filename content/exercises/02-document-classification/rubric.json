@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "doc-class",
+      "description": "Check exact page ID, normalized class and readability against independent truth.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}
