@@ -18,7 +18,7 @@ locked dependency/image downloads. Do not disable TLS verification for a proxy.
 
 ```sh
 cp .env.example .env
-# Fill an existing backend credential, selected provider/model and verified image.
+# Fill an existing backend credential and selected provider/model. Image is pinned.
 npm run install:all
 npm run env:check
 npm run start
@@ -26,7 +26,7 @@ npm run start
 
 `install:all` installs locked npm and hashed Python dependencies into `.venv`,
 checks/builds the application and prepares Phoenix/runner images. During foundation
-work it reports missing image/producer prerequisites precisely. `start` uses
+work it reports missing producer prerequisites precisely. `start` uses
 http://127.0.0.1:3000 and local Phoenix http://127.0.0.1:6006. Python is invoked by
 the trusted server per explicit agent action. Navigation/startup never infer.
 Credentials stay in backend `.env`; do not put them into source, browser variables,
