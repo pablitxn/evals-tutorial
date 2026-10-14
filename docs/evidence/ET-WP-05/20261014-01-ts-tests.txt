@@ -1,0 +1,31 @@
+✔ Code mode and malicious worker-selected routing cannot invoke provider (16.890439ms)
+✔ lifetime budget is atomic under concurrency and persists across rebinds (8.197336ms)
+✔ binding is an immutable row snapshot, preserves reference for judge only (2.80806ms)
+✔ failed/refused provider attempts consume budget and expose only typed errors (1.604313ms)
+✔ normalized judge validation rejects malformed, nonfinite and contradictory results (4.154898ms)
+✔ deadline and cancellation finish even when provider ignores abort (29.18132ms)
+✔ host bounds reject token budget, expired deadline and wrong row correlation (0.764105ms)
+✔ private response envelope keeps refusal and malformed output separate from scores (2.69227ms)
+✔ review passes code as quoted data with frozen evidence and one lifetime call (73.112691ms)
+✔ review rejects unknown evidence references, schema failure and source mismatch (2.422254ms)
+✔ review operational failure consumes attempt; cancellation/late reply cannot complete (33.916108ms)
+✔ broker bounds combined concurrent judge/review requests (31.220745ms)
+✔ shared provider transport attaches WP09 grounded review operation without executing source (29.431355ms)
+✔ actual corpus schemas, all rows, document resolver and agent boundary are compatible (403.807032ms)
+✔ profile has no ambient fallback and revision excludes secret (2.971551ms)
+✔ Azure requires explicit resource routing, rejects arbitrary paths and credentials (0.485903ms)
+✔ agent rejects input references, unknown variants and domain mismatch before inference (24.168085ms)
+✔ agent validates output schema and correlation and preserves operational refusal (9.081972ms)
+✔ agent cancellation and timeout reject transport that ignores signal (30.977198ms)
+✔ agent document boundary verifies manifest, root, media, digest and duplicates (9.391143ms)
+✔ supervisor passes allowlisted environment only and emits one bounded JSON response (39.718398ms)
+✔ supervisor rejects extra stdout, malformed JSON and over-limit protocol (55.645253ms)
+✔ supervisor bounds hanging process and cancellation with no stderr secrets (65.465829ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1056.818468
