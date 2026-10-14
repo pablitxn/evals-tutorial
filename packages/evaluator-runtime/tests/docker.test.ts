@@ -17,7 +17,7 @@ const code = (expected: string) => (error: unknown) => error instanceof ServiceE
 const forbiddenJudge = async (): Promise<JudgeRpcResponse> => { throw new Error('No paid calls in Docker tests'); };
 
 test('actual restricted Docker boundary and compiler adversarial suite', { skip: !image, timeout: 180000 }, async t => {
-  const executor = new DockerExecutor({ imageDigest: image! });
+  const executor = new DockerExecutor({ dockerHost: process.env.ET_RUNNER_DOCKER_HOST, imageDigest: image! });
   const evaluate = async (body: string, timeoutMs = 3000, signal?: AbortSignal) => {
     const compiled = await executor.compile(source(body));
     assert.equal(compiled.valid, true, JSON.stringify(compiled.diagnostics));
@@ -110,13 +110,13 @@ test('actual restricted Docker boundary and compiler adversarial suite', { skip:
   await t.test('startup removes only abandoned containers for the exact owned session', async () => {
     const sessionKey = 'synthetic-recovery-session';
     const orphan = (await exec('docker', ['--config', '/tmp/et-wp06-docker', 'create', '--label', 'evals-tutorial.owner=et-wp06', '--label', 'evals-tutorial.session=' + sessionKey, ...dockerSecurityArgs, image!])).stdout.trim();
-    const recovered = new DockerExecutor({ imageDigest: image!, sessionKey });
+    const recovered = new DockerExecutor({ dockerHost: process.env.ET_RUNNER_DOCKER_HOST, imageDigest: image!, sessionKey });
     await recovered.available();
     await assert.rejects(exec('docker', ['inspect', orphan]));
     await recovered.shutdown();
   });
   await t.test('missing Docker fails closed without submitted-code execution', async () => {
-    const missing = new DockerExecutor({ imageDigest: image!, dockerBinary: '/nonexistent-et-wp06-docker' });
+    const missing = new DockerExecutor({ dockerHost: process.env.ET_RUNNER_DOCKER_HOST, imageDigest: image!, dockerBinary: '/nonexistent-et-wp06-docker' });
     await assert.rejects(missing.compile(source("return {score:1,label:'pass',explanation:'fixture'};")), code('isolation_unavailable'));
   });
   await executor.shutdown();

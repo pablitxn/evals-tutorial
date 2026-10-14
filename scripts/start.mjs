@@ -2,6 +2,7 @@ import { mkdirSync, existsSync, writeFileSync, readFileSync, unlinkSync } from '
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fail,loadLocalEnv,root,run,requireFile } from './lib.mjs';
+import { localDocker } from './docker-local.mjs';
 try {
   loadLocalEnv();
   run('npm',['run','env:check']);
@@ -10,7 +11,7 @@ try {
   requireFile('packages/evaluator-runtime/Dockerfile','Isolated runner');
   run('npm',['run','build']);
   if(existsSync(resolve(root,'.local/server.pid'))) throw new Error('A tutorial process record exists; run npm run stop before starting again');
-  run('docker',['compose','up','-d','phoenix']);
+  run('docker',['compose','up','-d','phoenix'],{env:localDocker(root).env});
   mkdirSync(resolve(root,'.local'),{recursive:true});
   // The trusted Node process owns Python launches; startup itself does not infer.
   const child=spawn(process.execPath,['--import','tsx',resolve(root,'apps/server/src/main.ts')],{cwd:root,stdio:'inherit',env:process.env});

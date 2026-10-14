@@ -1,6 +1,7 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fail, loadLocalEnv, python, root, run, requireFile, readJSON } from './lib.mjs';
+import { localDocker } from './docker-local.mjs';
 try {
   if(Number(process.versions.node.split('.')[0])!==24) throw new Error('Node 24.x is required');
   run('python3',['-c','import sys; assert sys.version_info[:2] == (3,12), "Python 3.12 is required"']);
@@ -15,11 +16,13 @@ try {
   loadLocalEnv();
   const pins=readJSON('scripts/runtime-pins.json');
   process.env.PHOENIX_IMAGE ||= pins.phoenixImage;
-  run('docker',['info'],{stdio:'ignore'});
+  const docker=localDocker(root);
+  const dockerRun=(args,options={})=>run('docker',args,{...options,env:docker.env});
+  dockerRun(['info'],{stdio:'ignore'});
   if(!process.env.PHOENIX_IMAGE) throw new Error('Both language dependencies installed; pinned PHOENIX_IMAGE is missing. Image preparation is incomplete.');
   requireFile('packages/evaluator-runtime/Dockerfile','Isolated runner image');
-  run('docker',['compose','pull','phoenix']);
-  run('docker',['pull',pins.runnerBaseImage]);
-  run('docker',['build','--network=none','--tag','evals-tutorial-runner:0.1.0','--build-arg',`RUNNER_BASE_IMAGE=${pins.runnerBaseImage}`,'--file','packages/evaluator-runtime/Dockerfile','.']);
+  dockerRun(['compose','pull','phoenix']);
+  dockerRun(['pull',pins.runnerBaseImage]);
+  dockerRun(['build','--network=none','--tag','evals-tutorial-runner:0.1.0','--build-arg',`RUNNER_BASE_IMAGE=${pins.runnerBaseImage}`,'--file','packages/evaluator-runtime/Dockerfile','.']);
   console.log('Both dependency stacks and local images prepared; no inference requested.');
 } catch(error){fail(error);}

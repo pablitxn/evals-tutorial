@@ -1,13 +1,18 @@
 """Production-build browser rehearsal with synthetic, schema-checked v1 API data.
 Run Vite preview at 127.0.0.1:4173 first. No real inference or Phoenix recording.
 """
-import copy, hashlib, json, subprocess, time
+import argparse, copy, hashlib, json, os, shutil, subprocess, time, uuid
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parents[3]
-ARTIFACTS = ROOT / '.local/browser-evidence'
-ARTIFACTS.mkdir(parents=True, exist_ok=True)
+parser = argparse.ArgumentParser()
+parser.add_argument('--artifacts', type=Path)
+parser.add_argument('--chromium-executable', default=os.environ.get('CHROMIUM_EXECUTABLE') or shutil.which('chromium'))
+args = parser.parse_args()
+ARTIFACTS = args.artifacts or ROOT / '.local' / 'ui-browser' / str(uuid.uuid4())
+# Never replace a published receipt or an earlier rehearsal's artifacts.
+ARTIFACTS.mkdir(parents=True, exist_ok=False)
 MOCK = json.loads(subprocess.check_output(['node', '--import', 'tsx', 'apps/web/tests/mock-data.ts'], cwd=ROOT))
 checks = []
 
@@ -80,7 +85,7 @@ class Backend:
 def record(name): checks.append({'check':name,'result':'passed','evidence':'synthetic production-build UI; no live inference'})
 
 with sync_playwright() as p:
-    browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+    browser=p.chromium.launch(executable_path=args.chromium_executable,headless=True,chromium_sandbox=True)
     context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
     page=context.new_page(); backend=Backend(); errors=[]
     page.on('pageerror',lambda error: errors.append(str(error)))

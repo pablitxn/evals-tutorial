@@ -13,7 +13,7 @@ import { createRunnerServices } from '../runs/index.js';
 import { createReviewServices } from '../review/index.js';
 import { createTelemetryService, createTelemetryContext } from '../telemetry/index.js';
 
-export async function createTutorialServices(options:{root:string;repositoryRevision:string;imageDigest?:string;env:NodeJS.ProcessEnv}){
+export async function createTutorialServices(options:{root:string;repositoryRevision:string;imageDigest?:string;dockerHost?:string;env:NodeJS.ProcessEnv}){
   const {root,env}=options;const contentRoot=resolve(root,'content');
   const content=await withPreparedConsultation(await createContentService(contentRoot),root);
   const missing={available:false,reason:'Configure an existing provider credential and explicit model to enable this action'};
@@ -34,7 +34,7 @@ export async function createTutorialServices(options:{root:string;repositoryRevi
   }};
   let stopReview=()=>{};
   if(options.imageDigest){
-    const executor=new DockerExecutor({imageDigest:options.imageDigest,sessionKey:sha256(resolve(root,'.local/runs'))});
+    const executor=new DockerExecutor({imageDigest:options.imageDigest,dockerHost:options.dockerHost,sessionKey:sha256(resolve(root,'.local/runs'))});
     try{
       await executor.available();
       const runner=createRunnerServices({content,executor,imageDigest:options.imageDigest,repositoryRevision:options.repositoryRevision,dependencyLockHash:sha256(await readFile(resolve(root,'package-lock.json'))),receiptDirectory:resolve(root,'.local/runs'),...(provider?{agent:provider.agents,judge:provider.broker,provider:provider.provider}:{}),createTelemetryContext,resolveDocuments:async({exerciseId,input})=>{
