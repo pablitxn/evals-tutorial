@@ -1,0 +1,115 @@
+{
+  "mockOnly": true,
+  "browser": "154.0.8037.57",
+  "base": "d54fe4add6c0e3be74f2e660e990a7c9c19d5e3d",
+  "checks": [
+    {
+      "check": "Seven destinations; read-only intro; navigation causes zero POSTs",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Draft survives navigation/back/refresh without inference",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Syntax/type positions focus source; validation causes no run",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Known bad response fail/0 passes fixture assertion independently",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Agent criterion failure can be reviewed; absent Phoenix links stay unavailable",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Current bound review restores by GET after refresh; no duplicate paid request",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Edit immediately invalidates review and evidence",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Review operational retry, specific criterion/row feedback, and inconclusive status",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Review cancellation retains a cancelled receipt and never grants completion",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Active run locks mutation; refresh GET-only recovery; cancellation retains receipt",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Definitively missing accepted receipt after backend restart removes completion and unlocks local recovery",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Timeout/runtime errors are displayed without invented scores",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Lost accepted response recovery reuses original idempotent request ID",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Provider outage leaves healthy Code fixtures usable and prevents paid action",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Reset cancel/confirm scopes local work and preserves unrelated storage",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Mixed per-criterion badges/cost; reference keyboard tabs; editor Tab escape",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "1024/390/320 layouts avoid document overflow and allow editor keyboard escape",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "200% font zoom with narrow viewport keeps page width bounded",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Changed content version retains inspectable old source without inheriting progress",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Storage failure stays visible and preserves in-memory edits with copy control",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    },
+    {
+      "check": "Production bundle runs without browser page errors",
+      "result": "passed",
+      "evidence": "synthetic production-build UI; no live inference"
+    }
+  ],
+  "postCount": 21,
+  "liveProviderCalls": 0,
+  "livePhoenixArtifacts": 0
+}
