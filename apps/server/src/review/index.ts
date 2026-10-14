@@ -61,7 +61,7 @@ export function createReviewServices(deps: ReviewServiceDependencies): ReviewSer
     entry.record.updatedAt = new Date().toISOString();
     const deadlineEpochMs = Date.now() + timeoutMs;
     const timer = setTimeout(() => fail(entry, { code: 'timeout', message: 'Review deadline exceeded.', retryable: true }), timeoutMs);
-    const material: ReviewBrokerBinding = { reviewId: entry.record.reviewId, binding: structuredClone(entry.record.binding),
+    const material: ReviewBrokerBinding = { reviewId: entry.record.reviewId, feedbackLocale: entry.record.feedbackLocale, binding: structuredClone(entry.record.binding),
       exercise: structuredClone(evidence.exercise), source: evidence.request.snapshot.source,
       fixtureRun: structuredClone(evidence.fixtureRun), agentRun: structuredClone(evidence.agentRun),
       maxOutputTokens: REVIEW_LIMITS.outputTokens, deadlineEpochMs, signal: entry.controller.signal };
@@ -122,7 +122,7 @@ export function createReviewServices(deps: ReviewServiceDependencies): ReviewSer
         const reviewId = randomUUID();
         const timestamp = new Date().toISOString();
         const entry: Entry = { controller: new AbortController(), record: { schemaVersion: '1.0.0', reviewId,
-          requestId: request.requestId, bindingHash: reviewBindingHash(binding), binding,
+          requestId: request.requestId, feedbackLocale: request.feedbackLocale ?? 'en', bindingHash: reviewBindingHash(binding), binding,
           status: 'pending', createdAt: timestamp, updatedAt: timestamp } };
         records.set(reviewId, entry);
         setImmediate(() => { void execute(entry, evidence); });

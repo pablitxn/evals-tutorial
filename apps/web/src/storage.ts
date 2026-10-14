@@ -45,7 +45,7 @@ export function loadWork(tutorial: Tutorial, exercise: Exercise): { work: SavedW
 }
 export function resetStorage(exerciseId?: ExerciseId): boolean {
   try {
-    for (const key of Object.keys(localStorage)) if (key.startsWith(PREFIX) && (!exerciseId || key.includes(`:${exerciseId}:`))) localStorage.removeItem(key);
+    for (const key of Object.keys(localStorage)) if (key !== `${PREFIX}locale` && key.startsWith(PREFIX) && (!exerciseId || key.includes(`:${exerciseId}:`))) localStorage.removeItem(key);
     return true;
   } catch { return false; }
 }

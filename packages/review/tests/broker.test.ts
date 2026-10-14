@@ -94,3 +94,17 @@ test('abort and timeout settle even when transport ignores its signal and replie
     late.resolve(JSON.stringify(assessment()));
   }
 });
+
+test('feedback locale changes only trusted prose instructions; exact quotes and eligibility remain required', () => {
+  const material = brokerMaterial();
+  const evidence = sample();
+  const spanish = { ...material, feedbackLocale: 'es' as const };
+  const english = buildReviewPrompt(material, evidence.dataset);
+  const messages = buildReviewPrompt(spanish, evidence.dataset);
+  assert.equal(messages[1].content, english[1].content);
+  assert.match(messages[0].content, /nextAction in Spanish/);
+  assert.match(messages[0].content, /Evidence must remain an exact original-language quote/);
+  assert.throws(() => buildReviewPrompt({ ...material, feedbackLocale: 'fr' as any }, evidence.dataset));
+  assert.throws(() => validateReviewAssessment({ ...assessment(), findings: assessment().findings.map(f => ({ ...f, evidence: 'discrepancia de clasificación' })) }, spanish));
+  assert.throws(() => validateReviewAssessment({ ...assessment(), summary: 'Garantiza un resultado correcto.' }, spanish));
+});

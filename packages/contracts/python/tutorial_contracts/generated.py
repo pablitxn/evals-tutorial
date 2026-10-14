@@ -272,6 +272,7 @@ class ReviewRequest(TypedDict):
     codeHash: str
     fixtureRunId: str
     agentRunId: str
+    feedbackLocale: NotRequired[Literal['en', 'es']]
 
 class ReviewBinding(TypedDict):
     tutorialVersion: str
@@ -314,6 +315,7 @@ class ReviewRecord(TypedDict):
     updatedAt: str
     assessment: NotRequired[ReviewAssessment]
     error: NotRequired[OperationError]
+    feedbackLocale: NotRequired[Literal['en', 'es']]
 
 class AcceptedRun(TypedDict):
     runId: str

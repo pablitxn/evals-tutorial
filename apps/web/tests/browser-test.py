@@ -58,7 +58,7 @@ class Backend:
                 data['completedRows']=0
             return fulfill(data)
         if path=='reviews':
-            self.serial+=1; data=copy.deepcopy(MOCK['review']); data.update(reviewId=f'mock-review-{self.serial}',requestId=body['requestId'])
+            self.serial+=1; data=copy.deepcopy(MOCK['review']); data.update(reviewId=f'mock-review-{self.serial}',requestId=body['requestId'],feedbackLocale=body.get('feedbackLocale','en'))
             fixture=self.runs[body['fixtureRunId']]; agent=self.runs[body['agentRunId']]
             data['binding'].update(body['snapshot']); data['binding'].pop('source')
             data['binding'].update(codeHash=body['codeHash'],fixtureRunId=fixture['runId'],agentRunId=agent['runId'],agentVariant=agent['request']['agentVariant'])
@@ -92,6 +92,18 @@ with sync_playwright() as p:
     expect(page.get_by_role('textbox',name='Read-only TypeScript evaluator')).to_have_attribute('readonly','')
     for e in MOCK['tutorial']['exercises']: page.locator(f'nav a[href="#{e["id"]}"]').click()
     assert not backend.posts; record('Seven destinations; read-only intro; navigation causes zero POSTs')
+    # Locale is independent from work/progress; switching never issues a POST.
+    language=page.get_by_role('combobox',name='Language',exact=True)
+    before=len(backend.posts)
+    language.select_option('es')
+    expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+    expect(page.locator('html')).to_have_attribute('lang','es')
+    expect(page.get_by_role('navigation',name='Lecciones del tutorial')).to_be_visible()
+    assert len(backend.posts)==before
+    page.reload();expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
+    record('Accessible selector updates document language, persists on refresh, and issues no inference')
+
     page.locator('nav a[href="#01-starred-classifier"]').click()
     editor=page.get_by_role('textbox',name='Editable TypeScript evaluator')
     editor.fill(MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
@@ -122,6 +134,27 @@ with sync_playwright() as p:
     expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
     before=len(backend.posts); page.reload();expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
     assert len(backend.posts)==before;record('Current bound review restores by GET after refresh; no duplicate paid request')
+    old_source=editor.input_value(); old_receipts=copy.deepcopy(backend.reviews)
+    before=len(backend.posts)
+    page.get_by_role('combobox',name='Language',exact=True).select_option('es')
+    expect(page.get_by_role('textbox',name='Evaluador TypeScript editable')).to_have_value(old_source)
+    expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
+    expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
+    expect(page.get_by_text('Idioma solicitado para los comentarios: Inglés.',exact=False)).to_be_visible()
+    assert backend.reviews==old_receipts and len(backend.posts)==before
+    page.reload()
+    expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
+    expect(page.get_by_role('textbox',name='Evaluador TypeScript editable')).to_have_value(old_source)
+    assert len(backend.posts)==before
+    # Only the explicit new review captures Spanish; its English mock feedback remains honest.
+    page.get_by_role('button',name='Revisar de nuevo',exact=True).click()
+    expect(page.get_by_text('Idioma solicitado para los comentarios: Español.',exact=False)).to_be_visible()
+    assert backend.posts[-1][0]=='reviews' and backend.posts[-1][1]['feedbackLocale']=='es'
+    expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
+    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
+    expect(editor).to_have_value(old_source)
+    record('Language switch preserves source, validation, run evidence, progress and original feedback; only explicit review requests capture locale')
+
     editor.fill(MOCK['fixtures']['request']['snapshot']['source']+'// new version')
     expect(page.get_by_text('Previous review is stale',exact=True)).to_be_visible()
     expect(page.get_by_role('button',name='Review Again',exact=True)).to_be_disabled();record('Edit immediately invalidates review and evidence')
@@ -180,6 +213,19 @@ with sync_playwright() as p:
             page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
             page.screenshot(path=str(ARTIFACTS/'narrow-ui-mock.png'),full_page=True)
     record('1024/390/320 layouts avoid document overflow and allow editor keyboard escape')
+    page.get_by_role('combobox',name='Language',exact=True).select_option('es')
+    for width in [1440,1024,390,320]:
+        page.set_viewport_size({'width':width,'height':1000});page.reload()
+        expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+        assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'),width
+        page.get_by_role('textbox',name='Evaluador TypeScript editable').focus()
+        page.get_by_role('textbox',name='Evaluador TypeScript editable').press('Tab')
+        if width in [1440,390]:
+            page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
+            page.screenshot(path=str(ARTIFACTS/f'spanish-{width}-ui-mock.png'),full_page=True)
+    record('Spanish labels and long help text fit 1440/1024/390/320 widths with keyboard editor escape')
+    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
+
     page.set_viewport_size({'width':720,'height':700});page.evaluate("document.documentElement.style.fontSize='200%'")
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth');record('200% font zoom with narrow viewport keeps page width bounded')
     old_context=browser.new_context(viewport={'width':390,'height':900})
@@ -189,6 +235,28 @@ with sync_playwright() as p:
     expect(old_page.get_by_text('Saved work belongs to an older version.',exact=True)).to_be_visible()
     expect(old_page.get_by_role('textbox',name='Editable TypeScript evaluator')).to_have_value(MOCK['fixtures']['request']['snapshot']['source'])
     old_context.close();record('Changed content version retains inspectable old source without inheriting progress')
+    # Use the actual credential-free lesson corpus for all seven localized descriptions.
+    actual=json.loads((ROOT/'content/tutorial.json').read_text())
+    actual_context=browser.new_context(viewport={'width':390,'height':900},locale='es-AR')
+    actual_page=actual_context.new_page()
+    def actual_route(route):
+        if route.request.url.endswith('/api/tutorial'):
+            route.fulfill(content_type='application/json',body=json.dumps(actual))
+        else: backend.route(route)
+    actual_page.route('**/api/**',actual_route)
+    before=len(backend.posts)
+    actual_page.goto('http://127.0.0.1:4173/')
+    expect(actual_page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+    translations=json.loads((ROOT/'apps/web/src/locales/lessons.es.json').read_text())
+    for exercise in actual['exercises']:
+        actual_page.locator(f'nav a[href="#{exercise["id"]}"]').click()
+        expect(actual_page.get_by_role('heading',name=translations[exercise['id']]['title'],exact=True)).to_be_visible()
+        expect(actual_page.get_by_role('textbox',name='Evaluador TypeScript de solo lectura' if exercise['readOnly'] else 'Evaluador TypeScript editable')).to_have_value(exercise['starterSource'])
+        assert actual_page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
+    assert len(backend.posts)==before
+    actual_context.close()
+    record('Spanish browser preference selects all seven actual translated lessons with unchanged starter code and zero POSTs')
+
     blocked_context=browser.new_context(viewport={'width':390,'height':900})
     blocked_page=blocked_context.new_page();blocked_page.route('**/api/**',backend.route)
     blocked_page.add_init_script("Storage.prototype.setItem = function(){throw new Error('Synthetic full storage')};")

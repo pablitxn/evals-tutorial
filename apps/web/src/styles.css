@@ -1167,3 +1167,12 @@ dialog p{
 .document-previews>div {
   margin-top: 18px;
 }
+
+.language-control { min-width: 0; max-width: 100%; font-size: 13px; }
+.language-control label { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.language-control select { padding: 6px 10px; max-width: 100%; background: white; color: #172033; border: 1px solid var(--border); border-radius: 8px; }
+.app-header { height: auto; min-height: 76px; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
+.brand, .provider-status, .panel-heading > *, .lesson-link > span { min-width: 0; }
+.panel-heading { flex-wrap: wrap; }
+.eyebrow, .action-buttons, .editor-footer { flex-wrap: wrap; }
+button, .lesson-link, .lesson-footer { overflow-wrap: anywhere; }
