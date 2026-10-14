@@ -39,7 +39,7 @@ export class ServiceError extends Error {
 
 /** Trusted reviewer material; never supplied by the browser as evidence authority. */
 export interface ReviewBrokerBinding {
-  reviewId: string; binding: ReviewBinding; exercise: Exercise; source: string;
+  reviewId: string; feedbackLocale?: ReviewRequest['feedbackLocale']; binding: ReviewBinding; exercise: Exercise; source: string;
   fixtureRun: RunRecord; agentRun: RunRecord; maxOutputTokens: number;
   deadlineEpochMs: number; signal: AbortSignal;
 }

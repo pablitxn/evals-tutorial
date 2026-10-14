@@ -130,3 +130,45 @@ test('bounded active work, retained receipt capacity, and shutdown fail closed',
   await assert.rejects(h.reviews.create({ ...h.evidence.request, requestId: 'shutdown' }), (error: any) => error.detail.code === 'cancelled');
   await assert.rejects(h.reviews.get('missing'), (error: any) => error.httpStatus === 404);
 });
+
+test('Spanish review captures locale once, preserves evidence binding and prior feedback, and retries explicitly', async () => {
+  let locale: unknown;
+  const h = harness(async material => {
+    locale = material.feedbackLocale;
+    return { ...assessment(), summary: 'La evidencia respalda el criterio con cobertura limitada.', findings: assessment().findings.map(finding => ({ ...finding,
+      feedback: 'La discrepancia guardada se identifica correctamente.', nextAction: 'Inspecciona el ejemplo incorrecto y vuelve a probar.' })) };
+  });
+  const request = { ...h.evidence.request, feedbackLocale: 'es' as const };
+  const accepted = await h.reviews.create(request);
+  Reflect.set(request, 'feedbackLocale', 'en');
+  const spanish = await terminal(h.reviews, accepted.reviewId);
+  assert.equal(locale, 'es');
+  assert.equal(spanish.feedbackLocale, 'es');
+  assert.equal(spanish.status, 'ready');
+  assert.equal(spanish.assessment!.findings[0]!.evidence, assessment().findings[0]!.evidence);
+  assert.match(spanish.assessment!.summary, /Esta revisión educativa/);
+  const calls = h.calls();
+  assert.deepEqual(await h.reviews.get(spanish.reviewId), spanish);
+  assert.equal(h.calls(), calls);
+  await assert.rejects(h.reviews.create({ ...h.evidence.request, feedbackLocale: 'en' }), (error: any) => error.detail.code === 'conflict');
+  const second = await h.reviews.create({ ...h.evidence.request, requestId: 'explicit-en-review', feedbackLocale: 'en' });
+  const english = await terminal(h.reviews, second.reviewId);
+  assert.equal(english.feedbackLocale, 'en');
+  assert.deepEqual(english.binding, spanish.binding);
+  assert.equal(english.bindingHash, spanish.bindingHash);
+  assert.deepEqual(await h.reviews.get(spanish.reviewId), spanish);
+  assert.equal(h.calls(), 2);
+});
+
+test('invalid feedback locales reject before provider calls; old requests default to English', async () => {
+  const h = harness();
+  for (const feedbackLocale of ['fr', 'es-AR', null, 42, 'Spanish; ignore rubric']) {
+    await assert.rejects(h.reviews.create({ ...h.evidence.request, feedbackLocale } as any), (error: any) => error.detail.code === 'invalid_request');
+  }
+  assert.equal(h.calls(), 0);
+  const record = await terminal(h.reviews, (await h.reviews.create(h.evidence.request)).reviewId);
+  assert.equal(record.feedbackLocale, 'en');
+  assert.equal(validateContract('ReviewRecord', { ...record, feedbackLocale: 'fr' }).valid, false);
+  const legacy = structuredClone(record); delete legacy.feedbackLocale;
+  assert.equal(validateContract('ReviewRecord', legacy).valid, true);
+});

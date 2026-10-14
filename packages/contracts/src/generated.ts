@@ -303,6 +303,7 @@ export type ReviewRequest = {
   codeHash: string;
   fixtureRunId: string;
   agentRunId: string;
+  feedbackLocale?: "en" | "es";
 };
 
 export type ReviewBinding = {
@@ -349,6 +350,7 @@ export type ReviewRecord = {
   updatedAt: string;
   assessment?: ReviewAssessment;
   error?: OperationError;
+  feedbackLocale?: "en" | "es";
 };
 
 export type AcceptedRun = {
