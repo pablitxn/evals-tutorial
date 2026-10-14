@@ -1,7 +1,7 @@
 name: evals-tutorial
 services:
   phoenix:
-    image: ${PHOENIX_IMAGE:?A readiness-verified pinned Phoenix image is required}
+    image: ${PHOENIX_IMAGE:-arizephoenix/phoenix:version-20.21.3@sha256:333ae941c99a366f90542cacfa5fa0745a331f13c2e66857de5e44c19a46f6e0}
     ports:
       - "127.0.0.1:6006:6006"
       - "127.0.0.1:4317:4317"
