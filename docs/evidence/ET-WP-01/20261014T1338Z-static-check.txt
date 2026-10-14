@@ -1,0 +1,10 @@
+C1: starred classifier - Code: 2 positive, 2 negative, 0 partial
+C2: document classification - Code: 5 positive, 5 negative, 0 partial
+C3: extraction and independent tie-out - Code: 5 positive, 8 negative, 0 partial
+C4: fictitious accounting recommendation - Mixed: 3 positive, 6 negative, 1 partial
+C5: package completeness and approval boundary - Code: 5 positive, 5 negative, 0 partial
+C6: simulated flight dates, total and no options - Code: 4 positive, 8 negative, 0 partial
+Independent authoring arithmetic and budget boundaries: PASS
+Markdown fences, ASCII, local links, whitespace: PASS
+Declared 59-fixture coverage: 24 positive, 34 negative, 1 partial
+No evaluator, agent, response judge or educational review was executed
