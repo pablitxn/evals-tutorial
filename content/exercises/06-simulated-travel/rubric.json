@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "travel-membership",
+      "description": "Recommend only an option from this supplied synthetic catalog.",
+      "mode": "Code"
+    },
+    {
+      "id": "travel-dates",
+      "description": "Both calendar dates must equal the request, with return after outbound.",
+      "mode": "Code"
+    },
+    {
+      "id": "travel-budget",
+      "description": "Full fare plus mandatory fees in USD cents, less than or equal to budget.",
+      "mode": "Code"
+    },
+    {
+      "id": "travel-no-options",
+      "description": "No-options only when no supplied eligible option; null itinerary fields.",
+      "mode": "Code"
+    },
+    {
+      "id": "travel-no-booking",
+      "description": "simulated true and booked false in every response; no booking capability.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

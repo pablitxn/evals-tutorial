@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "intro-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "intro-star",
+      "input": {
+        "messageId": "intro-message",
+        "text": "Workshop reminder",
+        "starred": true
+      },
+      "expected": {
+        "label": "starred"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0"
+      },
+      "fixtures": [
+        {
+          "id": "intro-good",
+          "output": {
+            "label": "starred"
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "star-flag",
+              "intro-star"
+            ]
+          },
+          "rationale": "Read-only demonstration of independent reference comparison."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": null,
+  "contentHash": "744048d2a108b02d5a3f11f081be40500a550136a04ab15d8bc48b7a94991772"
+}
