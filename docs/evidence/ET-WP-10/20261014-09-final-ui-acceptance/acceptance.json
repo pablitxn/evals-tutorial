@@ -1,0 +1,35 @@
+{
+  "integratedMerge": "a30d11131441b314fc00433d6dc6de0eb58cd40c",
+  "uiProducerHead": "29466d3e86662829d40a1ef04c6898ce57208450",
+  "cleanInstallRehearsalRevision": "e92b86c7bce9e6e0f08bda485300a9ae8e9870d1",
+  "productionRuntimeDependencyInstallerChangesSinceRehearsal": [],
+  "acceptedDevProxyChanges": [
+    "apps/web/dev-proxy.ts",
+    "apps/web/vite.config.ts"
+  ],
+  "node": {
+    "passed": 131,
+    "skipped": 1,
+    "failed": 0
+  },
+  "pythonAgentsPassed": 15,
+  "pythonBrowserHarnessPassed": 3,
+  "typecheck": "passed",
+  "build": "passed",
+  "browserInteraction": "unverified: sandboxed browser launch blocked",
+  "liveProviderCalls": 0,
+  "files": [
+    {
+      "path": "docs/evidence/ET-WP-10/20261014-09-final-ui-acceptance/build.txt",
+      "sha256": "b027dc292ee69528a195e6cb8eb624512f80cefb9a9c71938cc0ebbe63d5ab53"
+    },
+    {
+      "path": "docs/evidence/ET-WP-10/20261014-09-final-ui-acceptance/tests.txt",
+      "sha256": "ed2d6f8b3843ae94afce983d7d1e0103c533f8ad451a004247d1566462ddd88a"
+    },
+    {
+      "path": "docs/evidence/ET-WP-10/20261014-09-final-ui-acceptance/types.txt",
+      "sha256": "da5ea9754124e285d2667cd45cb620855f078285c73942db626a4d50d4ffc96a"
+    }
+  ]
+}
