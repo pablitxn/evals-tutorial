@@ -145,6 +145,15 @@ test('run timeout is operational and unfinished rows remain in the receipt', asy
   assert(record.rows.every(row => row.status === 'timed_out' && !row.evaluation)); await runs.shutdown();
 });
 
+test('validation rejects concurrent compiles before allocating another isolated worker', async () => {
+  const { validation, runs, executor } = await setup();
+  let release: () => void = () => {};
+  executor.compile = async source => { await new Promise<void>(resolve => { release = resolve; }); return { codeHash: sha256(source), valid: true, diagnostics: [], javascript: 'explicit mock' }; };
+  const first = validation.validate(request('compiler').snapshot);
+  await assert.rejects(validation.validate(request('duplicate-compiler').snapshot), matches('resource_limit'));
+  release(); assert.equal((await first).valid, true); await runs.shutdown();
+});
+
 test('host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget', async () => {
   const executor = new MockExecutor();
   const row = { input: {}, output: {}, expected: {}, metadata: { exampleId: 'example', exerciseId: exercise.id, datasetVersion: '1' } };

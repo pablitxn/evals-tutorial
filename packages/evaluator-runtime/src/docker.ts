@@ -83,7 +83,9 @@ export class DockerExecutor implements IsolatedExecutor {
     return frame.result as EvalResult;
   }
   private async exchange(input: object, completionType: string, timeoutMs: number, judge: ((request: JudgeRpcRequest) => Promise<JudgeRpcResponse>) | undefined, signal?: AbortSignal): Promise<Record<string, unknown>> {
+    if (this.active.size >= LIMITS.rowConcurrency) throw fault('resource_limit', 'Isolated worker concurrency limit reached');
     await this.available(signal);
+    if (this.active.size >= LIMITS.rowConcurrency) throw fault('resource_limit', 'Isolated worker concurrency limit reached');
     const payload = JSON.stringify(input) + '\n';
     if (Buffer.byteLength(payload) > LIMITS.protocolBytes) throw fault('resource_limit', 'Worker input exceeds the protocol limit');
     const controller = new AbortController();
