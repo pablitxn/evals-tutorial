@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "star-flag",
+      "description": "Compare the actual label with the explicit boolean and independent reference.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

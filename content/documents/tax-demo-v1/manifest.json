@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "1.0.0",
+  "manifestId": "tax-demo-v1",
+  "version": "1.0.0",
+  "provenance": "Original project-authored teaching pages, 2026-10-14; generated from content/authoring/build.py with Pillow and ReportLab. PNG first; matching raster PDFs require separately verified provider support. No external dataset, corporate imagery, real identifiers, OCR or model-derived ground truth.",
+  "documents": [
+    {
+      "id": "TD-001",
+      "path": "documents/tax-demo-v1/TD-001.png",
+      "sha256": "9698c5c746d9e8ff4044ba1d953ed85f178e8b20ec9d6c72843b57a2bf033993",
+      "mimeType": "image/png",
+      "bytes": 60504,
+      "pageIds": [
+        "TD-001-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-001-pdf",
+      "path": "documents/tax-demo-v1/TD-001.pdf",
+      "sha256": "fa36a0127d649f1dd6d0739c5f8d92c9d2fa78958219cb218e91c8db93c148d7",
+      "mimeType": "application/pdf",
+      "bytes": 70101,
+      "pageIds": [
+        "TD-001-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-002",
+      "path": "documents/tax-demo-v1/TD-002.png",
+      "sha256": "77f961b4bd300e04f32dcd7c705c5d1b9e0e15f30b3e8de146119b44503a522c",
+      "mimeType": "image/png",
+      "bytes": 62288,
+      "pageIds": [
+        "TD-002-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-002-pdf",
+      "path": "documents/tax-demo-v1/TD-002.pdf",
+      "sha256": "2b22b4ebc01daac3bd374c6aaa3939830391906c2bebe35bace0748a18bea040",
+      "mimeType": "application/pdf",
+      "bytes": 71570,
+      "pageIds": [
+        "TD-002-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-003",
+      "path": "documents/tax-demo-v1/TD-003.png",
+      "sha256": "480fadce88090321a01410c59f01a0178ead56e6da02b44d0c7d3d3f5ff09e91",
+      "mimeType": "image/png",
+      "bytes": 64114,
+      "pageIds": [
+        "TD-003-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-003-pdf",
+      "path": "documents/tax-demo-v1/TD-003.pdf",
+      "sha256": "c1a78c4129df59c8c845f052d8ac609240c87767328b79e93d9a0737474a7741",
+      "mimeType": "application/pdf",
+      "bytes": 73354,
+      "pageIds": [
+        "TD-003-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-004",
+      "path": "documents/tax-demo-v1/TD-004.png",
+      "sha256": "d95527973b6eca09dfdde305d2854d541d6c0b990ba235dfac174bac142098db",
+      "mimeType": "image/png",
+      "bytes": 63948,
+      "pageIds": [
+        "TD-004-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-004-pdf",
+      "path": "documents/tax-demo-v1/TD-004.pdf",
+      "sha256": "56ed937e07874b34654704e2990e0da1eabe329ff342abced921e901445533e2",
+      "mimeType": "application/pdf",
+      "bytes": 73147,
+      "pageIds": [
+        "TD-004-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-005",
+      "path": "documents/tax-demo-v1/TD-005.png",
+      "sha256": "ac35bc98264211606201929f3f818a972a88e433c9875215945e9ab3f4fd84d6",
+      "mimeType": "image/png",
+      "bytes": 64072,
+      "pageIds": [
+        "TD-005-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-005-pdf",
+      "path": "documents/tax-demo-v1/TD-005.pdf",
+      "sha256": "066b1c4617a7a6d19bd6be5c9dea04708a0363094a06832cbebbe561dace1d8a",
+      "mimeType": "application/pdf",
+      "bytes": 73246,
+      "pageIds": [
+        "TD-005-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-006",
+      "path": "documents/tax-demo-v1/TD-006.png",
+      "sha256": "6cc6a39c073537108546e270804c1859c18d2ae477403c60073ab1324c1c5490",
+      "mimeType": "image/png",
+      "bytes": 64341,
+      "pageIds": [
+        "TD-006-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-006-pdf",
+      "path": "documents/tax-demo-v1/TD-006.pdf",
+      "sha256": "16abf066e8a92fea5396d34558b5c198a1530cd7f87afd5e3c4f4e21fa6a8ed8",
+      "mimeType": "application/pdf",
+      "bytes": 73480,
+      "pageIds": [
+        "TD-006-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-007",
+      "path": "documents/tax-demo-v1/TD-007.png",
+      "sha256": "5dbf44fb1564da3a18d4c4b8f2a428d5102d14f9c0a1c8dc43b3b2691b057a5d",
+      "mimeType": "image/png",
+      "bytes": 55084,
+      "pageIds": [
+        "TD-007-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-007-pdf",
+      "path": "documents/tax-demo-v1/TD-007.pdf",
+      "sha256": "87f20d39f59af034021c69a6e456227e0c4bd183549f4bf5797ed8fd5031b889",
+      "mimeType": "application/pdf",
+      "bytes": 64314,
+      "pageIds": [
+        "TD-007-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-008",
+      "path": "documents/tax-demo-v1/TD-008.png",
+      "sha256": "1bb83d24aeba29fac849f423a7e8be4b662a746daf53308bd01f042d208b0813",
+      "mimeType": "image/png",
+      "bytes": 52448,
+      "pageIds": [
+        "TD-008-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-008-pdf",
+      "path": "documents/tax-demo-v1/TD-008.pdf",
+      "sha256": "186f716a77225fa9593dafcdbd75a07f738dab440a03818fe4c212a1c6ad60cd",
+      "mimeType": "application/pdf",
+      "bytes": 61365,
+      "pageIds": [
+        "TD-008-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-009",
+      "path": "documents/tax-demo-v1/TD-009.png",
+      "sha256": "8c2e8b6e3ca2f75bdbff62e0edd0e12ac446a6b9f0cd1b0e1390f919bca75a1c",
+      "mimeType": "image/png",
+      "bytes": 25638,
+      "pageIds": [
+        "TD-009-page-1"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "TD-009-pdf",
+      "path": "documents/tax-demo-v1/TD-009.pdf",
+      "sha256": "8e0db67bcc843392e318c7569da12e7e590bde064ad5c8b789c5ebefb96610ec",
+      "mimeType": "application/pdf",
+      "bytes": 39017,
+      "pageIds": [
+        "TD-009-page-1"
+      ],
+      "synthetic": true
+    }
+  ]
+}
