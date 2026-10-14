@@ -21,7 +21,7 @@
     "contracts:check": "python3 scripts/generate-contracts.py --check && node scripts/generate-validators.mjs --check",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck && npm run typecheck:content",
-    "test": "node --import tsx --test packages/*/tests/*.test.ts apps/server/tests/*.test.ts content/authoring/content.test.ts tests/integration/*.test.ts",
+    "test": "node --import tsx --test packages/*/tests/*.test.ts apps/server/tests/*.test.ts content/authoring/content.test.ts tests/integration/*.test.ts apps/web/tests/model.test.ts",
     "install:all": "node scripts/install-all.mjs",
     "env:check": "node --import tsx scripts/env-check.ts",
     "start": "node scripts/start.mjs",
