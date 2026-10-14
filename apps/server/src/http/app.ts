@@ -51,6 +51,8 @@ export function createApp(services: TutorialServices, options: { port?: number; 
       if (req.method === 'POST' && path === '/api/validate') return json(res,await need(services.validation,'Validation').validate(await body(req,'ValidateRequest') as SourceSnapshot),200,'ValidationResult');
       if (req.method === 'POST' && path === '/api/runs') return json(res,await need(services.runs,'Runs').create(await body(req,'RunRequest') as RunRequest),202,'AcceptedRun');
       if (req.method === 'POST' && path === '/api/reviews') return json(res,await need(services.reviews,'Review').create(await body(req,'ReviewRequest') as ReviewRequest),202,'AcceptedReview');
+      const recording=path.match(/^\/api\/runs\/([a-zA-Z0-9._:-]+)\/telemetry$/);
+      if(req.method==='POST' && recording){await body(req);return json(res,await need(services.recordRun,'Telemetry recording')(recording[1]!),202,'RunRecord');}
       const record = path.match(/^\/api\/(runs|reviews)\/([a-zA-Z0-9._:-]+)(\/cancel)?$/);
       if (record) {
         const svc = record[1] === 'runs' ? need(services.runs,'Runs') : need(services.reviews,'Review');

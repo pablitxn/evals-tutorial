@@ -9,5 +9,9 @@
   "dependencies": {
     "@evals-tutorial/contracts": "0.1.0",
     "typescript": "5.9.3"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
   }
 }
