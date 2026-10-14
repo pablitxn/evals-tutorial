@@ -14,6 +14,6 @@ try {
     if(command) process.kill(pid,'SIGTERM');
     unlinkSync(record);
   }
-  if(process.env.PHOENIX_IMAGE) run('docker',['compose','stop','phoenix']);
+  run('docker',['compose','stop','phoenix']);
   console.log('Tutorial stop requested. Phoenix volume retained.');
 } catch(error){fail(error);}

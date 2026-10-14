@@ -5,6 +5,11 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
   "jsonschema==4.25.1",
   "rfc8785==0.1.4",
+  "agent-framework-openai==1.16.0",
+  "agent-framework-core==1.21.0",
+  "openai==3.31.0",
+  "pydantic==2.14.1",
+  "opentelemetry-api==1.45.1",
+  "opentelemetry-sdk==1.45.1",
+  "opentelemetry-exporter-otlp-proto-http==1.45.1",
 ]
-# ET-INTEGRATOR adds MAF/provider/OTel pins after the ET-WP-00 receipt.
-# This core lock validates contracts only; it does not claim provider readiness.
