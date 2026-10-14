@@ -1,0 +1,156 @@
+TUTORIAL_TEST_PYTHON=/tmp/et-wp05-venv/bin/python npm test
+
+> evals-tutorial@0.1.0 test
+> node --import tsx --test packages/*/tests/*.test.ts apps/server/tests/*.test.ts
+
+✔ content loader verifies immutable hashes and rejects modified data/documents (387.865831ms)
+✔ loopback API does not infer; errors and origin checks fail closed (134.87167ms)
+✔ invalid snapshots never reach a producer (12.411379ms)
+✔ scores reject contradictions, non-finite values and unbounded/unknown fields (5.502461ms)
+✔ agent requests exclude references, fixture answers, source and arbitrary provider routing (9.710333ms)
+✔ broker rejects URL/model selection and oversized rubrics (2.819733ms)
+✔ canonical content hash is stable across key order and includes document hash (1.190968ms)
+✔ Python and TS validate and hash the same wire data (149.548194ms)
+✔ Python rejects invalid envelopes and imports generated types (126.600681ms)
+✔ untrusted instructions remain quoted user data; transport receives no tools or executable source port (190.362872ms)
+✔ malformed assessment: unknown criterion (4.263387ms)
+✔ malformed assessment: unknown example (4.473406ms)
+✔ malformed assessment: empty example list (3.412416ms)
+✔ malformed assessment: ungrounded evidence (12.594032ms)
+✔ malformed assessment: empty feedback (7.521387ms)
+✔ malformed assessment: no next action (2.796149ms)
+✔ malformed assessment: no findings (2.905696ms)
+✔ malformed assessment: cheating accusation (3.117236ms)
+✔ malformed assessment: infallibility claim (4.101683ms)
+✔ ready must cover every rubric criterion (3.879712ms)
+✔ the broker and service can both validate long summaries without duplicating the fallibility notice (14.571761ms)
+✔ bounded parser rejects malformed provider response (8 bytes) (3.752213ms)
+✔ bounded parser rejects malformed provider response (14 bytes) (3.560763ms)
+✔ bounded parser rejects malformed provider response (405 bytes) (5.568141ms)
+✔ bounded parser rejects malformed provider response (32769 bytes) (3.730099ms)
+✔ budget and inconsistent binding fail before transport (3.85674ms)
+✔ oversized evidence is rejected without truncating quoted material (9.760284ms)
+✔ transport failures are sanitized and never retried automatically (4.209018ms)
+✔ aborted calls never reach transport (2.72327ms)
+✔ abort and timeout settle even when transport ignores its signal and replies late (35.344391ms)
+✔ binding derives exact source/data/rubric/receipt/agent/provider identities from saved evidence (86.806022ms)
+✔ ineligible: late edit with old code hash (1.167018ms)
+✔ ineligible: matching hash but different stored source (0.746756ms)
+✔ ineligible: modified dataset bytes (0.712805ms)
+✔ ineligible: new rubric version (0.762677ms)
+✔ ineligible: different tutorial (0.671562ms)
+✔ ineligible: operational failure in a completed run (1.344232ms)
+✔ ineligible: partial agent execution (0.919743ms)
+✔ ineligible: unvalidated source (1.035964ms)
+✔ ineligible: missing fixture coverage (2.16532ms)
+✔ ineligible: duplicate fixture rows (2.554565ms)
+✔ ineligible: incorrect fixture output (2.129045ms)
+✔ ineligible: forged fixture verdict (1.5168ms)
+✔ ineligible: unmatched fixture (1.584389ms)
+✔ ineligible: missing explanatory evidence (2.03239ms)
+✔ ineligible: missing agent source digest (0.707695ms)
+✔ ineligible: missing agent prompt digest (0.61657ms)
+✔ ineligible: missing provider provenance (0.480689ms)
+✔ ineligible: provider configuration changed (0.513744ms)
+✔ ineligible: provider model changed without revision (0.934796ms)
+✔ ineligible: disabled provider (0.439979ms)
+✔ ineligible: unknown agent variant (0.562342ms)
+✔ ineligible: mismatched receipt ID (0.563708ms)
+✔ ineligible: wrong run mode (0.499072ms)
+✔ ineligible: wrong provenance code hash (0.415856ms)
+✔ ineligible: intro is read-only (0.381641ms)
+✔ any agent source, prompt, result, rubric, lock or runner identity change invalidates the binding (19.393465ms)
+✔ service completes through the bounded review operation with a typed mock transport (100.041747ms)
+✔ same request ID is idempotent under concurrent creates; returned records and requests are isolated (20.82968ms)
+✔ reused request ID with a different payload conflicts before another provider call (2.743854ms)
+✔ failed eligibility never invokes the broker (1.989413ms)
+✔ educational needs_changes is distinct from operational failure (7.102411ms)
+✔ educational inconclusive is distinct from operational failure (6.986697ms)
+✔ operational errors are failed without an assessment, sanitized, and explicit retries retain old receipts (16.336448ms)
+✔ malformed mock broker feedback cannot complete a review (7.204288ms)
+✔ cancel before dispatch avoids inference; cancel is idempotent (2.750787ms)
+✔ cancel during provider wait aborts and ignores late completion (3.483965ms)
+✔ timeout ends a review even if a mock broker ignores cancellation (25.690567ms)
+✔ late rubric change rejects completion (7.389018ms)
+✔ late receipt change rejects completion (6.94563ms)
+✔ late provider change rejects completion (7.738434ms)
+✔ late dataset change rejects completion (8.990043ms)
+✔ late source edit cannot satisfy current completion; old record remains historical (8.210934ms)
+✔ bounded active work, retained receipt capacity, and shutdown fail closed (10.798729ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 74
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1955.145189
+
+npm run typecheck
+
+> evals-tutorial@0.1.0 typecheck
+> turbo run typecheck
+
+turbo 2.5.8
+
+• Packages in scope: @evals-tutorial/contracts, @evals-tutorial/evaluator-runtime, @evals-tutorial/phoenix, @evals-tutorial/review, @evals-tutorial/server, @evals-tutorial/web
+• Running typecheck in 6 packages
+• Remote caching disabled
+@evals-tutorial/contracts:typecheck: cache hit, replaying logs 5b16183142b3897c
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/contracts:typecheck: > @evals-tutorial/contracts@0.1.0 typecheck
+@evals-tutorial/contracts:typecheck: > tsc --noEmit
+@evals-tutorial/contracts:typecheck: 
+@evals-tutorial/review:typecheck: cache hit, replaying logs 9bcf9fd33c0b4d61
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/review:typecheck: > @evals-tutorial/review@0.1.0 typecheck
+@evals-tutorial/review:typecheck: > tsc --noEmit
+@evals-tutorial/review:typecheck: 
+@evals-tutorial/server:typecheck: cache miss, executing f1654a5d0532ea26
+@evals-tutorial/server:typecheck: 
+@evals-tutorial/server:typecheck: > @evals-tutorial/server@0.1.0 typecheck
+@evals-tutorial/server:typecheck: > tsc --noEmit
+@evals-tutorial/server:typecheck: 
+
+ Tasks:    3 successful, 3 total
+Cached:    2 cached, 3 total
+  Time:    1.502s 
+
+
+npm run build
+
+> evals-tutorial@0.1.0 build
+> turbo run build
+
+turbo 2.5.8
+
+• Packages in scope: @evals-tutorial/contracts, @evals-tutorial/evaluator-runtime, @evals-tutorial/phoenix, @evals-tutorial/review, @evals-tutorial/server, @evals-tutorial/web
+• Running build in 6 packages
+• Remote caching disabled
+@evals-tutorial/contracts:build: cache hit, replaying logs d732df8858f70924
+@evals-tutorial/contracts:build: 
+@evals-tutorial/contracts:build: > @evals-tutorial/contracts@0.1.0 build
+@evals-tutorial/contracts:build: > tsc --noEmit
+@evals-tutorial/contracts:build: 
+@evals-tutorial/review:build: cache hit, replaying logs 392029149e48d1dc
+@evals-tutorial/review:build: 
+@evals-tutorial/review:build: > @evals-tutorial/review@0.1.0 build
+@evals-tutorial/review:build: > tsc --noEmit
+@evals-tutorial/review:build: 
+@evals-tutorial/server:build: cache miss, executing fe0f95c2aa401d30
+@evals-tutorial/server:build: 
+@evals-tutorial/server:build: > @evals-tutorial/server@0.1.0 build
+@evals-tutorial/server:build: > tsc --noEmit
+@evals-tutorial/server:build: 
+
+ Tasks:    3 successful, 3 total
+Cached:    2 cached, 3 total
+  Time:    2.654s 
+
+
+npm run contracts:check
+
+> evals-tutorial@0.1.0 contracts:check
+> python3 scripts/generate-contracts.py --check
+
+

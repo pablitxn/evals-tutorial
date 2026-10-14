@@ -1,0 +1,139 @@
+{
+  "foundationRevision": "5f95fca766616b770152665d00031e516f967c22",
+  "incorporatedMainRevision": "381ace40dc92a6ef597711039de3ab66b8b4c132",
+  "corpusRevision": "d9ab77508f6f6892f4de57594146abbd629ea471",
+  "liveProviderRequests": 0,
+  "realProviderTokens": 0,
+  "tests": {
+    "typescript": 23,
+    "python": 15,
+    "root": 74
+  },
+  "dependencyAndContractHashes": {
+    "package-lock.json": "5af575bf77c0a89d659df621439ab04a84753feb909bf173e5302655d4abd840",
+    "apps/agents/requirements.lock": "ee9dd71bc5bd397bd13d809ffe20ddf9f5bb1cfdde26910b1cb9b762b488c184",
+    "packages/contracts/schema/v1.json": "39413eb9d699f95c80814be28ced9f0795282442c091a329bd07b91148574e05"
+  },
+  "files": [
+    {
+      "path": "apps/agents/src/tutorial_agents/__init__.py",
+      "bytes": 93,
+      "sha256": "9a10ec0a3f6fd7dfbc6b0b8c58d82dd6e4215eb8bc119fdfb9406f8da6f6a514"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/__main__.py",
+      "bytes": 2047,
+      "sha256": "8e358862659731c4cf5cf81345b82287a59e6bb540d64cc5765c4ac7032f9847"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/broker.py",
+      "bytes": 4632,
+      "sha256": "8af86c865576a9bc8e05af468628a524df816ae529e7aa66243ebc7423032eca"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/domains.json",
+      "bytes": 23342,
+      "sha256": "2ad5ea2f06416ce26c4d129afeb57d994201b0ad750321584d437e13141e3cbd"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/maf.py",
+      "bytes": 1034,
+      "sha256": "f9c05a5bcc2327c0c539ae495d1539af657b9fb75926be7f02076c41bdd079a9"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/prepared.py",
+      "bytes": 3979,
+      "sha256": "52a913d240877221d962d16e3f1c4c4f70ba12aef5cb776743b84301dbe42315"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/runtime.py",
+      "bytes": 10138,
+      "sha256": "aeb1fe9d44d470e9b6631e9977d2c66724d7aafea48bcab7a6a9475117fbfded"
+    },
+    {
+      "path": "apps/agents/src/tutorial_agents/service.py",
+      "bytes": 4212,
+      "sha256": "c4fec33ed6be0977ee60f1e44c3e63257a493f6c31bcb61411bfa874e68ee023"
+    },
+    {
+      "path": "apps/agents/tests/test_agents.py",
+      "bytes": 15628,
+      "sha256": "a34157886c599c66ea61d63c38c20b3f1ee1622ff9c68cf06ff3435ad51c37a7"
+    },
+    {
+      "path": "apps/server/src/providers/agents.ts",
+      "bytes": 6181,
+      "sha256": "2b9692eadde6778618a467e1bc18c15f0ea5387274ee8138167bcfdabf269d01"
+    },
+    {
+      "path": "apps/server/src/providers/corpus.test.ts",
+      "bytes": 3030,
+      "sha256": "ac0f1ac8586d724225225c5bc02a0bff4038a22637fd80bfd9b93a7b6ea41961"
+    },
+    {
+      "path": "apps/server/src/providers/documents.ts",
+      "bytes": 2215,
+      "sha256": "549558705a73acc2a5e592fa895e161d7633149b8ae30031c04ba947c2137a83"
+    },
+    {
+      "path": "apps/server/src/providers/index.ts",
+      "bytes": 1724,
+      "sha256": "2cf288b23a3bb5bac4bbb55e4dc5e1088cd05a0447c5c4925196d919b3c06f2d"
+    },
+    {
+      "path": "apps/server/src/providers/process.ts",
+      "bytes": 6269,
+      "sha256": "fc8855fcc1fead6a0e135633c83e3effa7c64560b8ea0b60092fdeee1c6eccd3"
+    },
+    {
+      "path": "apps/server/src/providers/profile.ts",
+      "bytes": 2092,
+      "sha256": "8b81c9bab21aa44a327bdd978285de0900c490e0d926fa6236a732c0b5441989"
+    },
+    {
+      "path": "apps/server/src/providers/providers.test.ts",
+      "bytes": 8974,
+      "sha256": "11b82aa01c5371c13fcedfc640968e88695c56b76d68aa3986de1d992a4080c8"
+    },
+    {
+      "path": "apps/server/src/judge-broker/broker.test.ts",
+      "bytes": 4987,
+      "sha256": "61aeec1fdabcac1075747539ff4c3ee5384775d3417cb36250331357aef3a44b"
+    },
+    {
+      "path": "apps/server/src/judge-broker/index.ts",
+      "bytes": 8418,
+      "sha256": "f8cebca035c6a53862d00bd783f2452fb3c1b43d65b207cc62e85cd589c4140a"
+    },
+    {
+      "path": "apps/server/src/judge-broker/review.test.ts",
+      "bytes": 6816,
+      "sha256": "50cffc82f4c108e3a08d4b7ca7b8126901079134bfa81cd6be55818107e7f234"
+    },
+    {
+      "path": "docs/evidence/ET-WP-05/20261014-01-consultation-sources.json",
+      "bytes": 17064,
+      "sha256": "fe997ab20453ac05284f7f8a9790d28eedb7ab62f8994c687b6b4243cdca945f"
+    },
+    {
+      "path": "docs/evidence/ET-WP-05/20261014-01-python-tests.txt",
+      "bytes": 3731,
+      "sha256": "2d59b73e98bedc959ee43629782a2bea913ccf95ee4da3e9999239c6611f364d"
+    },
+    {
+      "path": "docs/evidence/ET-WP-05/20261014-01-root-checks.txt",
+      "bytes": 8034,
+      "sha256": "2f759348069390dde178e5e49a1735fdbbd4af2c61ee6df41a90492912856d7a"
+    },
+    {
+      "path": "docs/evidence/ET-WP-05/20261014-01-runtime.md",
+      "bytes": 12123,
+      "sha256": "990d9fc37d3c30275a54b84bd2a7e0559144dc3fa748cebfd0de900b69dca32e"
+    },
+    {
+      "path": "docs/evidence/ET-WP-05/20261014-01-ts-tests.txt",
+      "bytes": 2276,
+      "sha256": "995172c1ba7b54ffb08fc9f9227dfb2f75c0715ad03cee32f1b08221ad89695b"
+    }
+  ]
+}

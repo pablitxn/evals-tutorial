@@ -1,0 +1,22 @@
+test_no_ambient_provider_fallback (test_agents.ProfileTests.test_no_ambient_provider_fallback) ... ok
+test_strict_json_rejects_unportable_numbers (test_agents.ProfileTests.test_strict_json_rejects_unportable_numbers) ... ok
+test_jsonl_malformed_extra_line_and_oversize_rejected (test_agents.ProtocolTests.test_jsonl_malformed_extra_line_and_oversize_rejected) ... ok
+test_malformed_identity_still_returns_valid_failure (test_agents.ProtocolTests.test_malformed_identity_still_returns_valid_failure) ... ok
+test_missing_profile_has_correlated_failure_and_no_inference (test_agents.ProtocolTests.test_missing_profile_has_correlated_failure_and_no_inference) ... ok
+test_reference_exclusion_in_actual_jsonl_process (test_agents.ProtocolTests.test_reference_exclusion_in_actual_jsonl_process) ... ok
+test_all_prepared_agents_use_explicit_global_profile (test_agents.SDKTests.test_all_prepared_agents_use_explicit_global_profile) ... Executing <Task pending name='Task-2' coro=<SDKTests.test_all_prepared_agents_use_explicit_global_profile() running at /workspace/et-wp05/apps/agents/tests/test_agents.py:70> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/futures.py:389, Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.119 seconds
+Executing <Task pending name='Task-2' coro=<SDKTests.test_all_prepared_agents_use_explicit_global_profile() running at /workspace/et-wp05/apps/agents/tests/test_agents.py:70> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/futures.py:389, Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.113 seconds
+ok
+test_document_serialization_uses_bytes_ids_and_no_reference (test_agents.SDKTests.test_document_serialization_uses_bytes_ids_and_no_reference) ... ok
+test_judge_and_review_use_same_model_structured_output_no_tools (test_agents.SDKTests.test_judge_and_review_use_same_model_structured_output_no_tools) ... ok
+test_judge_contradictory_score_and_review_malformed_are_errors (test_agents.SDKTests.test_judge_contradictory_score_and_review_malformed_are_errors) ... ok
+test_malformed_nonfinite_duplicate_and_array_outputs_fail (test_agents.SDKTests.test_malformed_nonfinite_duplicate_and_array_outputs_fail) ... ok
+test_provider_errors_have_zero_retries_and_no_secret (test_agents.SDKTests.test_provider_errors_have_zero_retries_and_no_secret) ... ok
+test_reference_and_unknown_variant_excluded_before_inference (test_agents.SDKTests.test_reference_and_unknown_variant_excluded_before_inference) ... ok
+test_refusal_timeout_and_cancellation_are_operational_errors (test_agents.SDKTests.test_refusal_timeout_and_cancellation_are_operational_errors) ... ok
+test_w3c_trace_continuity_without_sensitive_telemetry (test_agents.SDKTests.test_w3c_trace_continuity_without_sensitive_telemetry) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 6.110s
+
+OK
