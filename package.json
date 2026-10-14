@@ -1,0 +1,16 @@
+{
+  "name": "evals-tutorial", "version": "0.1.0", "private": true,
+  "type": "module", "packageManager": "npm@11.9.0",
+  "engines": {"node": ">=24 <25", "npm": ">=11 <12"},
+  "workspaces": ["apps/server", "apps/web", "packages/contracts", "packages/evaluator-runtime", "packages/phoenix", "packages/review"],
+  "scripts": {
+    "contracts:generate": "python3 scripts/generate-contracts.py",
+    "contracts:check": "python3 scripts/generate-contracts.py --check",
+    "build": "turbo run build", "typecheck": "turbo run typecheck",
+    "test": "node --import tsx --test packages/contracts/tests/*.test.ts apps/server/tests/*.test.ts",
+    "install:all": "node scripts/install-all.mjs", "env:check": "node --import tsx scripts/env-check.ts",
+    "start": "node scripts/start.mjs", "stop": "node scripts/stop.mjs",
+    "demo:check": "node scripts/demo-check.mjs", "package:source": "python3 scripts/package-source.py"
+  },
+  "devDependencies": {"@types/node": "24.7.2", "tsx": "4.20.6", "turbo": "2.5.8", "typescript": "5.9.3"}
+}

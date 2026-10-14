@@ -1,0 +1,14 @@
+name: evals-tutorial
+services:
+  phoenix:
+    image: ${PHOENIX_IMAGE:?A readiness-verified pinned Phoenix image is required}
+    ports:
+      - "127.0.0.1:6006:6006"
+      - "127.0.0.1:4317:4317"
+    environment:
+      PHOENIX_WORKING_DIR: /data
+    volumes:
+      - phoenix-data:/data
+    restart: "no"
+volumes:
+  phoenix-data:
