@@ -10,6 +10,27 @@ test('scores reject contradictions, non-finite values and unbounded/unknown fiel
   for (const value of [{...good,score:0.5},{...good,score:NaN},{...good,label:'fail'},{...good,extra:true},{...good,explanation:''},{...good,score:Infinity}]) assert.equal(validateContract('EvalResult',value).valid,false);
   assert.equal(validateContract('EvalResult',{...good,label:'partial',score:0.5}).valid,true);
 });
+test('wire validators execute with string code generation disabled',()=>{
+  const result=spawnSync(process.execPath,['--disallow-code-generation-from-strings','--input-type=module','-e',`
+    import assert from 'node:assert/strict';
+    import { EvalResult, PhoenixLinks } from './packages/contracts/src/validators.generated.mjs';
+    assert.equal(EvalResult({score:1,label:'pass',explanation:'Supported reference'}),true);
+    assert.equal(EvalResult({score:0,label:'pass',explanation:'Contradiction'}),false);
+    assert.equal(PhoenixLinks({datasetVersionId:'RGF0YXNldFZlcnNpb246MjU=',experimentId:'RXhwZXJpbWVudDo1OA=='}),true);
+  `],{encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr || result.error?.message);
+});
+test('Phoenix opaque GlobalIDs retain padding without broadening tutorial IDs or URLs',()=>{
+  const ids={datasetId:'RGF0YXNldDox',datasetVersionId:'RGF0YXNldFZlcnNpb246MjU=',experimentId:'RXhwZXJpbWVudDo1OA=='};
+  assert.equal(validateContract('PhoenixLinks',ids).valid,true);
+  for(const key of Object.keys(ids)){
+    for(const value of ['', 'a=b', 'abc===', 'a b', 'a\n', 'x'.repeat(129)]){
+      assert.equal(validateContract('PhoenixLinks',{...ids,[key]:value}).valid,false,`${key}: ${JSON.stringify(value)}`);
+    }
+  }
+  assert.equal(validateContract('PhoenixLinks',{datasetUrl:'https://example.com/'}).valid,false);
+  assert.equal(validateContract('AcceptedRun',{runId:ids.experimentId}).valid,false);
+});
 test('agent requests exclude references, fixture answers, source and arbitrary provider routing',()=>{
   const request={schemaVersion:'1.0.0',runId:'run-1',exampleId:'ex-1',exerciseId:'intro',agentVariant:'baseline',input:{text:'synthetic'},documents:[],deadlineMs:10000};
   assert.equal(validateContract('AgentRequest',request).valid,true);
