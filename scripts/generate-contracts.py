@@ -46,6 +46,7 @@ for name,s in defs.items():
     if typ != name:pyout+='type '+name+' = '+typ+'\n'
 pyout+='\n'+'\n'.join(extra.values())
 for path,data in [(root/'packages/contracts/src/generated.ts',tsout),(root/'packages/contracts/python/tutorial_contracts/generated.py',pyout)]:
+    data=data.rstrip()+'\n'
     if '--check' in sys.argv:
         if not path.exists() or path.read_text()!=data:raise SystemExit(f'Generated contract drift: {path.relative_to(root)}')
     else:path.write_text(data)
