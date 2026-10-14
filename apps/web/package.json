@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "dev": "vite --host 127.0.0.1",
+    "test": "node --import tsx --test tests/model.test.ts"
+  },
   "dependencies": {
     "@evals-tutorial/contracts": "0.1.0",
     "react": "19.2.0",
