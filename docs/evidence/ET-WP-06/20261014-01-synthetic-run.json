@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "b689c955-f65e-445f-b8c9-2df22738d869",
+  "request": {
+    "requestId": "actual-fixtures",
+    "mode": "fixtures",
+    "agentVariant": "prepared",
+    "snapshot": {
+      "tutorialVersion": "1",
+      "exerciseId": "01-starred-classifier",
+      "exerciseVersion": "1",
+      "rubricVersion": "1",
+      "datasetId": "synthetic-data",
+      "datasetVersion": "1",
+      "datasetHash": "aa6c1673c83dab6a19b48562a3b2ae4927648a421e42fff3257571e859001fef",
+      "source": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> { const correct = row.output.correct === true; return {score:correct?1:0,label:correct?'pass':'fail',explanation:'synthetic evidence'}; }"
+    }
+  },
+  "codeHash": "901e67f5fc1ed3063f851c69152424eed706ce43afa7e1be6cea037433168cb6",
+  "status": "completed",
+  "telemetryStatus": "not_requested",
+  "createdAt": "2026-10-14T14:13:04.902Z",
+  "updatedAt": "2026-10-14T14:13:15.788Z",
+  "totalRows": 6,
+  "completedRows": 6,
+  "rows": [
+    {
+      "exampleId": "example-0",
+      "fixtureId": "correct",
+      "status": "completed",
+      "output": {
+        "correct": true
+      },
+      "evaluation": {
+        "score": 1,
+        "label": "pass",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    },
+    {
+      "exampleId": "example-0",
+      "fixtureId": "incorrect",
+      "status": "completed",
+      "output": {
+        "correct": false
+      },
+      "evaluation": {
+        "score": 0,
+        "label": "fail",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    },
+    {
+      "exampleId": "example-1",
+      "fixtureId": "correct",
+      "status": "completed",
+      "output": {
+        "correct": true
+      },
+      "evaluation": {
+        "score": 1,
+        "label": "pass",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    },
+    {
+      "exampleId": "example-1",
+      "fixtureId": "incorrect",
+      "status": "completed",
+      "output": {
+        "correct": false
+      },
+      "evaluation": {
+        "score": 0,
+        "label": "fail",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    },
+    {
+      "exampleId": "example-2",
+      "fixtureId": "incorrect",
+      "status": "completed",
+      "output": {
+        "correct": false
+      },
+      "evaluation": {
+        "score": 0,
+        "label": "fail",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    },
+    {
+      "exampleId": "example-2",
+      "fixtureId": "correct",
+      "status": "completed",
+      "output": {
+        "correct": true
+      },
+      "evaluation": {
+        "score": 1,
+        "label": "pass",
+        "explanation": "synthetic evidence"
+      },
+      "fixtureMatched": true
+    }
+  ],
+  "diagnostics": [],
+  "provenance": {
+    "codeHash": "901e67f5fc1ed3063f851c69152424eed706ce43afa7e1be6cea037433168cb6",
+    "datasetHash": "aa6c1673c83dab6a19b48562a3b2ae4927648a421e42fff3257571e859001fef",
+    "repositoryRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "dependencyLockHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "runnerImageDigest": "sha256:8230d713a84c8839e2a7d191be07750c3b659bd488a80f5d18a83baeb32b1def"
+  }
+}

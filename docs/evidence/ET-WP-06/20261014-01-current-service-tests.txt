@@ -1,0 +1,17 @@
+✔ mocked run orchestration preserves snapshots, idempotency and fixture truth (128.258811ms)
+✔ syntax errors, stale binding and missing isolation precede all provider calls (13.276655ms)
+✔ wrong fixture verdict differs from evaluator execution failure (18.01984ms)
+✔ agent sees no references/fixtures/source; malformed response has no score (63.897879ms)
+✔ one active run, queued cancellation, bounded capacity and ignored late provider replies (48.921166ms)
+✔ run timeout is operational and unfinished rows remain in the receipt (38.529956ms)
+✔ validation rejects concurrent compiles before allocating another isolated worker (0.98401ms)
+✔ host judge rejects binding abuse, Code mode, unknown criteria and exhausted budget (4.069601ms)
+✔ actual Docker RunService validates before mocked paid calls and records real fixture verdicts (15558.640765ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16158.01686
