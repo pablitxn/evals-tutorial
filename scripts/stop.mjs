@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fail,loadLocalEnv,root,run } from './lib.mjs';
+import { localDocker } from './docker-local.mjs';
 try {
   loadLocalEnv();
   const record=resolve(root,'.local/server.pid');
@@ -20,6 +21,6 @@ try {
     }
     if(existsSync(record))unlinkSync(record);
   }
-  run('docker',['compose','stop','phoenix']);
+  run('docker',['compose','stop','phoenix'],{env:localDocker(root).env});
   console.log('Tutorial stop requested. Phoenix volume retained.');
 } catch(error){fail(error);}

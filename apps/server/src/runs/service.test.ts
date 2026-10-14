@@ -175,7 +175,7 @@ test('host judge rejects binding abuse, Code mode, unknown criteria and exhauste
 
 test('actual Docker RunService validates before mocked paid calls and records real fixture verdicts', { skip: !process.env.ET_RUNNER_IMAGE, timeout: 60000 }, async () => {
   const actualImage = process.env.ET_RUNNER_IMAGE!;
-  const executor = new DockerExecutor({ imageDigest: actualImage });
+  const executor = new DockerExecutor({ dockerHost: process.env.ET_RUNNER_DOCKER_HOST, imageDigest: actualImage });
   let agentCalls = 0;
   const { runs } = await setup({ imageDigest: actualImage, executor, agent: { invoke: async () => { agentCalls++; throw new Error('No real provider is permitted in this test'); } } });
   const invalid = await runs.create(request('real-validation', 'export async function evaluate( {', 'agent'));

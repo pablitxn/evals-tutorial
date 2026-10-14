@@ -13,8 +13,10 @@ and the complete 150–180 minute workshop remain separate acceptance gates.
 
 Use Node 24.x, npm 11.x, Python 3.12 and Docker with Compose. Download access is
 needed for locked dependencies and pinned images. Preserve normal TLS checks.
-Docker must expose its local default socket to the restricted CLI (a private
-Docker context with no default socket is not yet supported by the runner).
+The selected Docker context must resolve to a local Unix socket. Docker Desktop
+contexts are supported; remote Docker daemons are intentionally excluded. The
+restricted CLI keeps its own empty configuration and receives only the trusted
+local socket address, without forwarding registry/proxy credentials into workers.
 
 ```sh
 npm run install:all

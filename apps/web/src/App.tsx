@@ -186,7 +186,8 @@ export function App() {
   const fixtureCurrent = !!current && runCurrent(work?.fixture, current, hash, work?.variant ?? '', status);
   const agentCurrent = !!current && runCurrent(work?.agent, current, hash, work?.variant ?? '', status);
   const fixtureReady = fixtureCurrent && fixturesDiscriminate(work?.fixture, dataset);
-  const readyForReview = valid && fixtureReady && agentCurrent && work?.agent?.status === 'completed';
+  const readyForReview = valid && fixtureReady && agentCurrent && work?.agent?.status === 'completed'
+    && work.fixture?.telemetryStatus !== 'pending' && work.agent.telemetryStatus !== 'pending';
   const reviewIsCurrent = !!current && !!exercise && reviewCurrent(work?.review, current, hash, work?.fixture, work?.agent, work?.variant ?? '', status)
     && (!['ready', 'needs_changes', 'inconclusive'].includes(work?.review?.status ?? '') || reviewFindingsValid(work?.review, exercise, work?.fixture, work?.agent));
   const cap = status?.capabilities;
@@ -255,6 +256,15 @@ export function App() {
       setAnnouncement('Cancellation requested. Completed results are retained.');
     } catch (problem) { setError(errorText(problem)); } finally { actionLock.current = false; setAction(undefined); }
   }
+  async function retryRecording(record: RunRecord) {
+    if (busy || actionLock.current) return;
+    actionLock.current = true; setAction('Requesting recording…'); setError(undefined);
+    try {
+      storeRun(await request<RunRecord>(`/api/runs/${encodeURIComponent(record.runId)}/telemetry`, 'RunRecord', {}));
+      setAnnouncement('Recording stored results in Phoenix. No inference repeated.');
+    } catch (problem) { setError(errorText(problem)); }
+    finally { actionLock.current = false; setAction(undefined); }
+  }
   function edit(source: string) {
     if (busy || !exercise || exercise.readOnly) return;
     update(active, { source, validation: undefined }); hashWork(active, source);
@@ -315,7 +325,7 @@ export function App() {
           {!exercise.readOnly && exercise.agentVariants.length > 1 && <div className="comparison-controls"><label>Prepared agent variant <select disabled={busy} value={work.variant} onChange={event => update(active, { variant: event.target.value })}>{exercise.agentVariants.map(variant => <option key={variant}>{variant}</option>)}</select></label><button disabled={!canRun || !agentCurrent || !alternative} onClick={() => run('agent', alternative)}>Compare Prepared Agent</button><span className="help">Optional paid comparison on identical source and dataset. Changing variant needs new review evidence.</span></div>}
         </section><ReferenceTabs key={exercise.id} exercise={exercise} dataset={dataset} /></div>
         {(active === '02-document-classification' || active === '03-independent-tie-out') && <DocumentPreviews dataset={dataset} />}
-        <section className="panel results-panel" ref={resultsRef} tabIndex={-1} aria-labelledby="results-heading"><div className="panel-heading"><h2 id="results-heading">Results</h2><div className="result-tabs" aria-label="Result views"><button aria-pressed={resultTab === 'fixtures'} onClick={() => setResultTab('fixtures')}>Fixture tests</button><button aria-pressed={resultTab === 'agent'} onClick={() => setResultTab('agent')}>Agent run</button></div></div><RunResults run={currentRun} dataset={dataset} current={resultTab === 'fixtures' ? fixtureCurrent : agentCurrent} /></section>
+        <section className="panel results-panel" ref={resultsRef} tabIndex={-1} aria-labelledby="results-heading"><div className="panel-heading"><h2 id="results-heading">Results</h2><div className="result-tabs" aria-label="Result views"><button aria-pressed={resultTab === 'fixtures'} onClick={() => setResultTab('fixtures')}>Fixture tests</button><button aria-pressed={resultTab === 'agent'} onClick={() => setResultTab('agent')}>Agent run</button></div></div><RunResults run={currentRun} dataset={dataset} current={resultTab === 'fixtures' ? fixtureCurrent : agentCurrent} />{currentRun && !runActive(currentRun) && currentRun.rows.length > 0 && ['failed', 'not_requested'].includes(currentRun.telemetryStatus) && <button disabled={busy} onClick={() => void retryRecording(currentRun)}>Retry Phoenix recording · no inference</button>}</section>
         {!exercise.readOnly && <section className="panel review-panel" aria-labelledby="review-heading"><div className="panel-heading"><div><p className="eyebrow">REVIEW YOUR WORK</p><h2 id="review-heading">DOUBLE CHECK</h2></div><span className="mode mode-judge">Uses review tokens</span></div><p>A separate educational review reads your evaluator, rubric and results. It never executes your source. Its feedback is fallible and does not grant human approval.</p><p className="help">Source {hash?.slice(0, 10) ?? 'hashing…'} · rubric {exercise.rubricVersion} · fixture {work.fixtureRunId ?? 'missing'} · agent {work.agentRunId ?? 'missing'}</p>
           {missingReview && <p className="review-prerequisite">{missingReview}</p>}
           <div className="action-buttons"><button className="primary" disabled={!canReview} onClick={review}>{work.review?.status === 'failed' || work.review?.status === 'inconclusive' ? 'Retry Review' : work.review ? 'Review Again' : 'DOUBLE CHECK'}</button>{work.review?.status === 'needs_changes' && <button disabled={busy} onClick={() => editorRef.current?.focus()}>Edit evaluator</button>}</div><p className="help">Explicit retries may use more tokens. Prior attempts stay inspectable; repeated retries do not guarantee correctness.</p>

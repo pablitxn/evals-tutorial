@@ -10,7 +10,7 @@ import { ServiceError } from '@evals-tutorial/contracts/services';
 import type { Compilation, EvaluationJob, IsolatedExecutor } from './types.js';
 
 const exec = promisify(execFile);
-const environment = () => ({ PATH: process.env.PATH ?? '/usr/bin:/bin' });
+const environment = (dockerHost?: string) => ({ PATH: process.env.PATH ?? '/usr/bin:/bin', ...(dockerHost ? { DOCKER_HOST: dockerHost } : {}) });
 const fault = (code: ServiceError['detail']['code'], message: string) => new ServiceError({ code, message, retryable: ['isolation_unavailable', 'timeout'].includes(code) }, 503);
 export const dockerSecurityArgs = Object.freeze([
   '--network=none', '--user=65532:65532', '--read-only', '--cap-drop=ALL',
@@ -26,6 +26,8 @@ export interface DockerExecutorOptions {
   compileTimeoutMs?: number;
   /** Stable hash of the host-owned receipt directory; one server per session. */
   sessionKey?: string;
+  /** Trusted local daemon socket resolved by bootstrap, never a worker input. */
+  dockerHost?: string;
 }
 
 export class DockerExecutor implements IsolatedExecutor {
@@ -37,11 +39,14 @@ export class DockerExecutor implements IsolatedExecutor {
   private closed = false;
   private readonly config = mkdtemp(join(tmpdir(), 'et-wp06-docker-config-'));
   private readonly sessionKey: string;
+  private readonly dockerHost?: string;
   private initialization?: Promise<void>;
   constructor(options: DockerExecutorOptions) {
     if (!/^sha256:[a-f0-9]{64}$/.test(options.imageDigest)) throw fault('configuration', 'Runner requires an immutable local image digest');
     this.imageDigest = options.imageDigest;
     this.docker = options.dockerBinary ?? 'docker';
+    if (options.dockerHost && !/^unix:\/\/\/[^\0\r\n]+$/.test(options.dockerHost)) throw fault('configuration', 'Runner Docker endpoint must be a local Unix socket');
+    this.dockerHost = options.dockerHost;
     this.sessionKey = options.sessionKey ?? randomUUID();
     if (!/^[a-zA-Z0-9-]{1,128}$/.test(this.sessionKey)) throw fault('configuration', 'Invalid runner session key');
     this.compileTimeout = Math.min(options.compileTimeoutMs ?? LIMITS.codeTimeoutMs, LIMITS.codeTimeoutMs);
@@ -50,7 +55,7 @@ export class DockerExecutor implements IsolatedExecutor {
   async available(signal?: AbortSignal): Promise<void> {
     if (signal?.aborted || this.closed) throw fault('cancelled', 'Execution was cancelled');
     try {
-      const options = { timeout: 5000, maxBuffer: 65536, env: environment(), signal };
+      const options = { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost), signal };
       const cli = ['--config', await this.config];
       const info = await exec(this.docker, [...cli, 'info', '--format', '{{json .}}'], options);
       const capability = JSON.parse(info.stdout);
@@ -65,7 +70,7 @@ export class DockerExecutor implements IsolatedExecutor {
     }
   }
   private async reapAbandoned(cli: string[]): Promise<void> {
-    const options = { timeout: 5000, maxBuffer: 65536, env: environment() };
+    const options = { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) };
     const ids = (await exec(this.docker, [...cli, 'ps', '-aq', '--filter', 'label=evals-tutorial.owner=et-wp06', '--filter', 'label=evals-tutorial.session=' + this.sessionKey], options)).stdout.trim().split(/\s+/).filter(Boolean);
     if (ids.some(id => !/^[a-f0-9]{12,64}$/.test(id))) throw new Error('Invalid Docker inventory');
     if (ids.length) await exec(this.docker, [...cli, 'rm', '-f', ...ids], options);
@@ -117,9 +122,9 @@ export class DockerExecutor implements IsolatedExecutor {
       const cli = ['--config', await this.config];
       // Separate create from start: aborting an in-flight docker run can race daemon creation.
       // Await creation without the caller signal, then remove the confirmed name on every path.
-      await exec(this.docker, [...cli, 'create', '--name', name, '--label', 'evals-tutorial.owner=et-wp06', '--label', 'evals-tutorial.session=' + this.sessionKey, '-i', ...dockerSecurityArgs, this.imageDigest], { timeout: 5000, maxBuffer: 65536, env: environment() });
+      await exec(this.docker, [...cli, 'create', '--name', name, '--label', 'evals-tutorial.owner=et-wp06', '--label', 'evals-tutorial.session=' + this.sessionKey, '-i', ...dockerSecurityArgs, this.imageDigest], { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) });
       if (controller.signal.aborted) throw error ?? fault('cancelled', 'Execution was cancelled');
-      child = spawn(this.docker, [...cli, 'start', '-ai', name], { stdio: ['pipe', 'pipe', 'pipe'], env: environment() });
+      child = spawn(this.docker, [...cli, 'start', '-ai', name], { stdio: ['pipe', 'pipe', 'pipe'], env: environment(this.dockerHost) });
       await new Promise<void>(resolve => {
         child!.on('error', () => { error ??= fault('isolation_unavailable', 'Docker could not start the restricted worker'); resolve(); });
         child!.stdin!.on('error', () => { /* Process exit decides the result. */ });
@@ -171,7 +176,7 @@ export class DockerExecutor implements IsolatedExecutor {
       signal?.removeEventListener('abort', abort);
       controller.signal.removeEventListener('abort', cancelled);
       // The daemon may outlive the CLI. Remove by the host-created name even on abort.
-      try { await exec(this.docker, ['--config', await this.config, 'rm', '-f', name], { timeout: 5000, maxBuffer: 65536, env: environment() }); }
+      try { await exec(this.docker, ['--config', await this.config, 'rm', '-f', name], { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) }); }
       catch { removeError = fault('isolation_unavailable', 'Docker worker cleanup could not be confirmed'); this.closed = true; }
       this.active.delete(controller);
       this.finished.delete(completion); completed();
