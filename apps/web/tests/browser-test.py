@@ -4,10 +4,11 @@ Run Vite preview at 127.0.0.1:4173 first. No real inference or Phoenix recording
 import copy, hashlib, json, subprocess, time
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
+from browser_harness import launch_browser, new_artifact_directory, revision, write_report
 
 ROOT = Path(__file__).resolve().parents[3]
-ARTIFACTS = ROOT / 'docs/evidence/ET-WP-08'
-ARTIFACTS.mkdir(parents=True, exist_ok=True)
+PROVENANCE = revision(ROOT)
+ARTIFACTS = new_artifact_directory(ROOT)
 MOCK = json.loads(subprocess.check_output(['node', '--import', 'tsx', 'apps/web/tests/mock-data.ts'], cwd=ROOT))
 checks = []
 
@@ -80,7 +81,7 @@ class Backend:
 def record(name): checks.append({'check':name,'result':'passed','evidence':'synthetic production-build UI; no live inference'})
 
 with sync_playwright() as p:
-    browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+    browser=launch_browser(p, ARTIFACTS, PROVENANCE)
     context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
     page=context.new_page(); backend=Backend(); errors=[]
     page.on('pageerror',lambda error: errors.append(str(error)))
@@ -170,14 +171,14 @@ with sync_playwright() as p:
     page.get_by_role('tab',name='Python agent',exact=True).press('ArrowLeft');expect(page.get_by_role('tab',name='Dataset JSON',exact=True)).to_be_focused()
     editor.focus();editor.press('Tab');assert not editor.evaluate('(el)=>el===document.activeElement');record('Mixed per-criterion badges/cost; reference keyboard tabs; editor Tab escape')
     page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
-    page.screenshot(path=str(ARTIFACTS/'20261014-desktop-ui-mock.png'),full_page=True)
+    page.screenshot(path=str(ARTIFACTS/'desktop-ui-mock.png'),full_page=True)
     for width in [1024,390,320]:
         page.set_viewport_size({'width':width,'height':1000});page.reload();expect(page.get_by_role('heading',name='Policy support',exact=True)).to_be_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'),width
         page.get_by_role('textbox',name='Editable TypeScript evaluator').focus();page.get_by_role('textbox',name='Editable TypeScript evaluator').press('Tab')
         if width==390:
             page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
-            page.screenshot(path=str(ARTIFACTS/'20261014-narrow-ui-mock.png'),full_page=True)
+            page.screenshot(path=str(ARTIFACTS/'narrow-ui-mock.png'),full_page=True)
     record('1024/390/320 layouts avoid document overflow and allow editor keyboard escape')
     page.set_viewport_size({'width':720,'height':700});page.evaluate("document.documentElement.style.fontSize='200%'")
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth');record('200% font zoom with narrow viewport keeps page width bounded')
@@ -198,7 +199,7 @@ with sync_playwright() as p:
     blocked_context.close();record('Storage failure stays visible and preserves in-memory edits with copy control')
     assert not errors,errors
     record('Production bundle runs without browser page errors')
-    report={'mockOnly':True,'browser':browser.version,'base':'d54fe4add6c0e3be74f2e660e990a7c9c19d5e3d','checks':checks,'postCount':len(backend.posts),'liveProviderCalls':0,'livePhoenixArtifacts':0}
-    (ARTIFACTS/'20261014-browser-ui-mock.json').write_text(json.dumps(report,indent=2)+'\n')
+    report={**PROVENANCE,'mockOnly':True,'status':'passed','sandboxRequired':True,'browser':browser.version,'checks':checks,'postCount':len(backend.posts),'liveProviderCalls':0,'livePhoenixArtifacts':0}
+    write_report(ARTIFACTS, report)
     print(json.dumps(report,indent=2))
     browser.close()

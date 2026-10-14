@@ -1,0 +1,9 @@
+158e3a85a97d2f6df34b6b8adb97515a6d3be0869b531fde371c57d293713c2f  apps/web/dev-proxy.ts
+dbfb9f4bbe50666417f6c944ce7eaaff112ee9fe1340a995f25d52fc6d4be1fa  apps/web/tests/browser-test.py
+274e911224a6670b2b13a734c1ff4b411ec23e90c89bec38825e73166b98db67  apps/web/tests/browser_harness.py
+85e70c9250efa16ba78673fd8f274de1b79c3fd7f133fae5d90263bfb33da553  apps/web/tests/proxy.test.ts
+90be9d2360f4f4cc3dde88a06380a2034927a18816749afaa29eebab77dc5e09  apps/web/tests/test_browser_harness.py
+f1d719e386e4d92b89922133e4b30461213fe05f304be6136560435d9756a0fc  apps/web/vite.config.ts
+829da0050080756149aea32679be74d26c39958342cafdf3b5995b071e99cb5f  docs/evidence/ET-WP-08/20261014T1507Z-browser-proxy-correction.md
+672f900bda5de6b5d20f2d57ff62708c7a9512d9386e3ed0d7767262e7209817  docs/evidence/ET-WP-08/browser-20261014T150420381806Z-9fe04b04/browser-ui-mock.json
+fc924b132c41658f800fe27774d456ef5410fa8ef220ffb5b495208cd018b9fb  docs/ux/ET-WP-08-browser-corrections.md
