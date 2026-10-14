@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="1560" viewBox="0 0 390 1560" role="img" aria-labelledby="title desc">
+<title id="title">Narrow tutorial wireframe, ET-WP-02</title><desc id="desc">Static specification at 390 pixels: in-flow header and lesson disclosure, tie-out explanation, editable TypeScript, wrapping actions and cost cues, reference disclosure, locally scrolling results table and review section. No fixed overlay. All contents are illustrative.</desc>
+<style>text{font-family:Arial,sans-serif;fill:#172033}.muted{fill:#475569}.mono{font-family:monospace}.white{fill:white}.blue{fill:#1d4ed8}.amber{fill:#92400e}</style>
+<rect x="0" y="0" width="390" height="1560" rx="0" fill="#f6f8fb" stroke="#cbd5e1"/>
+<rect x="0" y="0" width="390" height="100" rx="0" fill="white" stroke="#cbd5e1"/>
+<text x="16" y="31" font-size="20" class="">Evals tutorial</text>
+<rect x="272" y="10" width="102" height="44" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="284" y="38" font-size="14" class="">Lessons</text>
+<text x="16" y="77" font-size="13" class="muted">Provider / model from backend</text>
+<text x="16" y="135" font-size="12" class="muted">CASE 3 / 6   |   CODE   |   25 MIN</text>
+<text x="16" y="170" font-size="23" class="">Check an independent tie-out</text>
+<text x="16" y="204" font-size="15" class="">Check extraction, then reconcile wages</text>
+<text x="16" y="228" font-size="15" class="">and withholding separately. A true</text>
+<text x="16" y="252" font-size="15" class="">mismatch is a valid finding.</text>
+<text x="16" y="279" font-size="12" class="muted">A. Lessons expands all seven links.</text>
+<rect x="16" y="294" width="358" height="369" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="32" y="326" font-size="16" class="">evaluator.ts</text>
+<text x="245" y="326" font-size="12" class="muted">Editable / Saved</text>
+<rect x="28" y="346" width="334" height="232" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="36" y="374" font-size="15" class="mono">export async function</text>
+<text x="36" y="401" font-size="15" class="mono">evaluate(row, ctx) {</text>
+<text x="36" y="428" font-size="15" class="mono">  // Check wages.</text>
+<text x="36" y="455" font-size="15" class="mono">  // Check withholding.</text>
+<text x="36" y="482" font-size="15" class="mono">  // Explain the mismatch.</text>
+<text x="36" y="509" font-size="15" class="mono">  return { /* complete */ };</text>
+<text x="36" y="536" font-size="15" class="mono">}</text>
+<text x="32" y="607" font-size="12" class="muted">Tab leaves editor. Expand / copy available.</text>
+<text x="32" y="637" font-size="12" class="muted">B. Code scrolls inside panel only.</text>
+<rect x="16" y="680" width="112" height="44" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="28" y="708" font-size="14" class="">Validate</text>
+<rect x="140" y="680" width="158" height="44" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="152" y="708" font-size="14" class="">Test Fixtures</text>
+<rect x="16" y="736" width="132" height="44" rx="10" fill="#1d4ed8" stroke="#cbd5e1"/>
+<text x="28" y="764" font-size="14" class="white">Run Agent</text>
+<text x="16" y="809" font-size="14" class="muted">Fixtures: no provider calls.</text>
+<text x="16" y="833" font-size="14" class="amber">Run Agent: uses agent tokens;</text>
+<text x="16" y="857" font-size="13" class="muted">show server bounds before activation.</text>
+<rect x="16" y="875" width="358" height="116" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="32" y="909" font-size="16" class="">References (read-only)</text>
+<text x="32" y="941" font-size="14" class="blue">Dataset JSON    |    Python agent</text>
+<text x="32" y="971" font-size="12" class="muted">C. Expand after editor; shared docs here.</text>
+<rect x="16" y="1007" width="358" height="205" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="32" y="1040" font-size="20" class="">Results</text>
+<text x="32" y="1070" font-size="14" class="blue">Fixture tests   |   Agent run</text>
+<text x="32" y="1100" font-size="12" class="muted">Version / source / receipt caption</text>
+<rect x="28" y="1113" width="334" height="45" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="38" y="1142" font-size="14" class="">Expected  |  Actual  |  Verdict  &gt;</text>
+<text x="32" y="1181" font-size="12" class="muted">D. Table scrolls locally; row details wrap.</text>
+<rect x="16" y="1228" width="358" height="243" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="32" y="1262" font-size="20" class="">DOUBLE CHECK</text>
+<text x="32" y="1293" font-size="14" class="">Complete matching fixtures and a real</text>
+<text x="32" y="1317" font-size="14" class="">run to enable educational review.</text>
+<text x="32" y="1347" font-size="13" class="amber">Uses review tokens when requested.</text>
+<rect x="32" y="1365" width="226" height="44" rx="10" fill="white" stroke="#cbd5e1"/>
+<text x="44" y="1393" font-size="14" class="">DOUBLE CHECK (ineligible)</text>
+<text x="32" y="1440" font-size="12" class="muted">E. Feedback follows results; no overlay.</text>
+<text x="16" y="1515" font-size="12" class="muted">Previous / Next below. Static wireframe;</text>
+<text x="16" y="1538" font-size="12" class="muted">no executed result or completion claimed.</text>
+</svg>
