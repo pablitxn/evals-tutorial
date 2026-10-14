@@ -1,0 +1,127 @@
+{
+  "version": "1.0.0",
+  "pages": [
+    [
+      "TD-001",
+      "W-2",
+      [
+        [
+          "Wages",
+          "42000.00"
+        ],
+        [
+          "Federal withholding",
+          "4200.00"
+        ]
+      ],
+      "Demo Employer A"
+    ],
+    [
+      "TD-002",
+      "W-2",
+      [
+        [
+          "Wages",
+          "18500.00"
+        ],
+        [
+          "Federal withholding",
+          "1850.00"
+        ]
+      ],
+      "Demo Employer B"
+    ],
+    [
+      "TD-003",
+      "1040",
+      [
+        [
+          "Total W2 wages",
+          "60500.00"
+        ],
+        [
+          "Withholding from W2s",
+          "6050.00"
+        ]
+      ],
+      "Demo Person A"
+    ],
+    [
+      "TD-004",
+      "1040",
+      [
+        [
+          "Total W2 wages",
+          "61500.00"
+        ],
+        [
+          "Withholding from W2s",
+          "6050.00"
+        ]
+      ],
+      "Demo Person A"
+    ],
+    [
+      "TD-005",
+      "1040",
+      [
+        [
+          "Total W2 wages",
+          "60500.00"
+        ],
+        [
+          "Withholding from W2s",
+          "6150.00"
+        ]
+      ],
+      "Demo Person A"
+    ],
+    [
+      "TD-006",
+      "1040",
+      [
+        [
+          "Total W2 wages",
+          "61500.00"
+        ],
+        [
+          "Withholding from W2s",
+          "6150.00"
+        ]
+      ],
+      "Demo Person A"
+    ],
+    [
+      "TD-007",
+      "1099-INT",
+      [
+        [
+          "Interest income",
+          "125.00"
+        ]
+      ],
+      "Demo Bank"
+    ],
+    [
+      "TD-008",
+      "Workshop lunch note",
+      [
+        [
+          "Sandwiches ordered",
+          "12"
+        ]
+      ],
+      "Workshop kitchen"
+    ],
+    [
+      "TD-009",
+      null,
+      [],
+      "Unclear page"
+    ]
+  ],
+  "font": "System DejaVu Sans; no font asset packaged",
+  "pillow": "12.3.0",
+  "reportlab": "4.4.9",
+  "recipeSha256": "369671848d7ea37e1e69d92f2bbfca8fed0d8247eb238ab60891d26b453c052b"
+}

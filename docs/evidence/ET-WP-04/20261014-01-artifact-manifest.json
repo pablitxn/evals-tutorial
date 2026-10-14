@@ -1,0 +1,426 @@
+{
+  "schemaVersion": "1.0.0",
+  "base": "d54fe4add6c0e3be74f2e660e990a7c9c19d5e3d",
+  "artifacts": [
+    {
+      "path": "content/.gitattributes",
+      "bytes": 93,
+      "sha256": "2576430b75aba16fe9d5d9a4c6922e5246f66a021ac1535d86b91ab7c24445d8"
+    },
+    {
+      "path": "content/README.md",
+      "bytes": 3375,
+      "sha256": "dc2f5e0d52dcdd5e46cf0662504a9fef21c6029d5ad1fcbc7c7e5625e63af976"
+    },
+    {
+      "path": "content/authoring/build.py",
+      "bytes": 43580,
+      "sha256": "369671848d7ea37e1e69d92f2bbfca8fed0d8247eb238ab60891d26b453c052b"
+    },
+    {
+      "path": "content/authoring/check-python.py",
+      "bytes": 1228,
+      "sha256": "174d72f6c763f9681905e06331ae6a3424b9183f4d215d8d770e7138cd6b3186"
+    },
+    {
+      "path": "content/authoring/content.test.ts",
+      "bytes": 12663,
+      "sha256": "383a353220a498228826ed5835d75f65ba0e2df433d3d84286696b0583f640c8"
+    },
+    {
+      "path": "content/authoring/finalize.ts",
+      "bytes": 1097,
+      "sha256": "b67bc1efe9b9b5e0549fe72493c7f0345309d091aeb9996e3fa05316f868f968"
+    },
+    {
+      "path": "content/authoring/independent-worksheet.json",
+      "bytes": 642,
+      "sha256": "f6ee1eb8d1b774287389348a7c93d8f056724f3afecee532974167c971c23523"
+    },
+    {
+      "path": "content/authoring/page-recipe.json",
+      "bytes": 1957,
+      "sha256": "1e1f874e207ca3d29bbec33cb7b894312a75681e842d75b63d42a392f501a4c9"
+    },
+    {
+      "path": "content/authoring/schema-probes.json",
+      "bytes": 3659,
+      "sha256": "321159e91d7afa388dea3d739741d9aaa9f376049749492892602d08c36c8026"
+    },
+    {
+      "path": "content/datasets/01-starred-classifier-v1/1.0.0.json",
+      "bytes": 2884,
+      "sha256": "2be3ae3efcc9effc2aa9e2627f534a622c6aba719a6aa4a9fd10ff7c557164c9"
+    },
+    {
+      "path": "content/datasets/02-document-classification-v1/1.0.0.json",
+      "bytes": 8010,
+      "sha256": "e4b278007c34c5e5f366dd8c9716c4ccc203f23348f9633ffc4953fdefcc691c"
+    },
+    {
+      "path": "content/datasets/03-independent-tie-out-v1/1.0.0.json",
+      "bytes": 43857,
+      "sha256": "c480716943d30dc2bc2016551e8cf2897d57eecd5ad4ae02d3ee4ffe5f7667a3"
+    },
+    {
+      "path": "content/datasets/04-policy-recommendation-v1/1.0.0.json",
+      "bytes": 15096,
+      "sha256": "86e6ab883947682780ef4fc69a9d35cbdba6bfffca37b3983a8c4d6d640fdd47"
+    },
+    {
+      "path": "content/datasets/05-package-readiness-v1/1.0.0.json",
+      "bytes": 11683,
+      "sha256": "d40563ec6fc692780b3f590f67af157b80f2879f00cf10c5b140af8a5e35f9c4"
+    },
+    {
+      "path": "content/datasets/06-simulated-travel-v1/1.0.0.json",
+      "bytes": 14940,
+      "sha256": "82f29c5dd021390e6514dd9237b17cca0e65bb3bc79c552218cb70a400b84fcd"
+    },
+    {
+      "path": "content/datasets/intro-v1/1.0.0.json",
+      "bytes": 1097,
+      "sha256": "ddee5c5c6a71f6cb5d323d8372e1e2bfe50c07f3b020bcb99b360d9b6f97a8c9"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-001.pdf",
+      "bytes": 70101,
+      "sha256": "fa36a0127d649f1dd6d0739c5f8d92c9d2fa78958219cb218e91c8db93c148d7"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-001.png",
+      "bytes": 60504,
+      "sha256": "9698c5c746d9e8ff4044ba1d953ed85f178e8b20ec9d6c72843b57a2bf033993"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-002.pdf",
+      "bytes": 71570,
+      "sha256": "2b22b4ebc01daac3bd374c6aaa3939830391906c2bebe35bace0748a18bea040"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-002.png",
+      "bytes": 62288,
+      "sha256": "77f961b4bd300e04f32dcd7c705c5d1b9e0e15f30b3e8de146119b44503a522c"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-003.pdf",
+      "bytes": 73354,
+      "sha256": "c1a78c4129df59c8c845f052d8ac609240c87767328b79e93d9a0737474a7741"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-003.png",
+      "bytes": 64114,
+      "sha256": "480fadce88090321a01410c59f01a0178ead56e6da02b44d0c7d3d3f5ff09e91"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-004.pdf",
+      "bytes": 73147,
+      "sha256": "56ed937e07874b34654704e2990e0da1eabe329ff342abced921e901445533e2"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-004.png",
+      "bytes": 63948,
+      "sha256": "d95527973b6eca09dfdde305d2854d541d6c0b990ba235dfac174bac142098db"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-005.pdf",
+      "bytes": 73246,
+      "sha256": "066b1c4617a7a6d19bd6be5c9dea04708a0363094a06832cbebbe561dace1d8a"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-005.png",
+      "bytes": 64072,
+      "sha256": "ac35bc98264211606201929f3f818a972a88e433c9875215945e9ab3f4fd84d6"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-006.pdf",
+      "bytes": 73480,
+      "sha256": "16abf066e8a92fea5396d34558b5c198a1530cd7f87afd5e3c4f4e21fa6a8ed8"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-006.png",
+      "bytes": 64341,
+      "sha256": "6cc6a39c073537108546e270804c1859c18d2ae477403c60073ab1324c1c5490"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-007.pdf",
+      "bytes": 64314,
+      "sha256": "87f20d39f59af034021c69a6e456227e0c4bd183549f4bf5797ed8fd5031b889"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-007.png",
+      "bytes": 55084,
+      "sha256": "5dbf44fb1564da3a18d4c4b8f2a428d5102d14f9c0a1c8dc43b3b2691b057a5d"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-008.pdf",
+      "bytes": 61365,
+      "sha256": "186f716a77225fa9593dafcdbd75a07f738dab440a03818fe4c212a1c6ad60cd"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-008.png",
+      "bytes": 52448,
+      "sha256": "1bb83d24aeba29fac849f423a7e8be4b662a746daf53308bd01f042d208b0813"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-009.pdf",
+      "bytes": 39017,
+      "sha256": "8e0db67bcc843392e318c7569da12e7e590bde064ad5c8b789c5ebefb96610ec"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/TD-009.png",
+      "bytes": 25638,
+      "sha256": "8c2e8b6e3ca2f75bdbff62e0edd0e12ac446a6b9f0cd1b0e1390f919bca75a1c"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/ground-truth.json",
+      "bytes": 3699,
+      "sha256": "06cfa5bbbc67c5b5cbb109a546e188ff109d1bb7be593ceea7558db4413354cc"
+    },
+    {
+      "path": "content/documents/tax-demo-v1/manifest.json",
+      "bytes": 5872,
+      "sha256": "e0cd7d303e2644536d5b8f39d6fe193725eee85aaf02c4e95cb4886dc1dc2957"
+    },
+    {
+      "path": "content/exercises/01-starred-classifier/agent-instructions.md",
+      "bytes": 363,
+      "sha256": "e335c21a0321bd35a2303a1df059413e57db6f73bda6c0960c397f583a43242b"
+    },
+    {
+      "path": "content/exercises/01-starred-classifier/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/01-starred-classifier/lesson.md",
+      "bytes": 440,
+      "sha256": "948d317b21d3408b6ec5566aae2916bf88ddd84c446ce4612f21b3d2941ece81"
+    },
+    {
+      "path": "content/exercises/01-starred-classifier/rubric.json",
+      "bytes": 214,
+      "sha256": "3ec26f79a1492023c14054014ac5fa523102037aa05ef1405c61bb675c8de3ab"
+    },
+    {
+      "path": "content/exercises/01-starred-classifier/starter.ts",
+      "bytes": 515,
+      "sha256": "78df22cadeedb4df182c5f5b41452a9b2c2e90977dbc4b7aba2d9607bc7df59e"
+    },
+    {
+      "path": "content/exercises/02-document-classification/agent-instructions.md",
+      "bytes": 384,
+      "sha256": "0532b9575cc5b82047998211e210cd39c9a96bb0b8eb250927b242517bd27bfb"
+    },
+    {
+      "path": "content/exercises/02-document-classification/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/02-document-classification/lesson.md",
+      "bytes": 487,
+      "sha256": "94354892dc9b7b732a27e83dc614c54206f34e268b960b0b9150745e2bd0aeea"
+    },
+    {
+      "path": "content/exercises/02-document-classification/rubric.json",
+      "bytes": 238,
+      "sha256": "362754b0fc66dec6161ecab8eec9dbb292adbc5b42655b5121b13637a1db19ce"
+    },
+    {
+      "path": "content/exercises/02-document-classification/starter.ts",
+      "bytes": 546,
+      "sha256": "8954d7e8d2248f52ea60400bd3a0863e4ee0fb5813abccf69c3eb951bccb3e02"
+    },
+    {
+      "path": "content/exercises/03-independent-tie-out/agent-instructions.md",
+      "bytes": 639,
+      "sha256": "183c36c13dc473d09fa6df3fa455da31eb81f436a4e75ddd3bf64b709fa031cf"
+    },
+    {
+      "path": "content/exercises/03-independent-tie-out/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/03-independent-tie-out/lesson.md",
+      "bytes": 557,
+      "sha256": "debe484053ce3b3988b829217894ee279c7edbdfd7b01526003480269762d4e6"
+    },
+    {
+      "path": "content/exercises/03-independent-tie-out/rubric.json",
+      "bytes": 737,
+      "sha256": "e2a07222be7bf4fd7dd433e1a238e0e6cc67fef1aaf681007009899dc656a5b7"
+    },
+    {
+      "path": "content/exercises/03-independent-tie-out/starter.ts",
+      "bytes": 728,
+      "sha256": "275535861b1bb5539093904058c6cfc486f68fd4f363bbf3ce1c061278896197"
+    },
+    {
+      "path": "content/exercises/04-policy-recommendation/agent-instructions.md",
+      "bytes": 556,
+      "sha256": "4ffbc8835cba157c611564eb34ad4d23bafbeb2b2e597c082cb583cb072a611f"
+    },
+    {
+      "path": "content/exercises/04-policy-recommendation/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/04-policy-recommendation/lesson.md",
+      "bytes": 843,
+      "sha256": "137b89cfb39fbbd53af0510230bbfdd6492f2546af8cfcc173d43ff23c1194cf"
+    },
+    {
+      "path": "content/exercises/04-policy-recommendation/rubric.json",
+      "bytes": 504,
+      "sha256": "085671aa81cb28585118de4fe26efde9cf959d3c055fe61466aa8c3ebd76c5bb"
+    },
+    {
+      "path": "content/exercises/04-policy-recommendation/starter.ts",
+      "bytes": 717,
+      "sha256": "a622a47c891e6a88b83eb6702f0c769957c48478bdd92edef7f32bf4d8f01429"
+    },
+    {
+      "path": "content/exercises/05-package-readiness/agent-instructions.md",
+      "bytes": 703,
+      "sha256": "378938410d280697318027bb714e4dd8ac9ab5c8cfa02454d08e68d016867cf3"
+    },
+    {
+      "path": "content/exercises/05-package-readiness/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/05-package-readiness/lesson.md",
+      "bytes": 569,
+      "sha256": "afa086aa75999c36c5eba4173d4dced6ca8eb9355df366fa67cc541ed03da982"
+    },
+    {
+      "path": "content/exercises/05-package-readiness/rubric.json",
+      "bytes": 818,
+      "sha256": "502d7cdf2249ead0e8ee6588a61f04d6c63b50e213e9328c79cd139e5051f6d2"
+    },
+    {
+      "path": "content/exercises/05-package-readiness/starter.ts",
+      "bytes": 566,
+      "sha256": "523ec11e16cc42daddc406cdb1807fad9bf4ecef8908b95eb22512883c925f36"
+    },
+    {
+      "path": "content/exercises/06-simulated-travel/agent-instructions.md",
+      "bytes": 667,
+      "sha256": "6076aca465ba3e99e2746b57b6def7b9837e2ecfb285eea51b4ad676f0735876"
+    },
+    {
+      "path": "content/exercises/06-simulated-travel/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/exercises/06-simulated-travel/lesson.md",
+      "bytes": 534,
+      "sha256": "99d3ccbd34a44a90a2f89de588b618285c03d2d2c24b0040bcb502267ee92ee3"
+    },
+    {
+      "path": "content/exercises/06-simulated-travel/rubric.json",
+      "bytes": 876,
+      "sha256": "7283a5787295e249469b9a811ce7b5eadd7def0d1060a1055b1341aa63bc7be7"
+    },
+    {
+      "path": "content/exercises/06-simulated-travel/starter.ts",
+      "bytes": 682,
+      "sha256": "dceb55abbe56acbff2586ddca045c1eb93aa387ace095958808a7b9b2bd4a379"
+    },
+    {
+      "path": "content/intro/agent-instructions.md",
+      "bytes": 370,
+      "sha256": "da9083c438fa1d09bb95d7b851b16ff653248c37ce26737d6fba45dde1bca6c0"
+    },
+    {
+      "path": "content/intro/agent_consultation.py",
+      "bytes": 363,
+      "sha256": "e87ae0757f8957489bddc13b43da845eb012b91c671c81e380233afa73ee6077"
+    },
+    {
+      "path": "content/intro/lesson.md",
+      "bytes": 594,
+      "sha256": "4a3e06b2ade7faa284d6caf94bdc85c3c3059778dd6e020f6b6bc9f6df976d31"
+    },
+    {
+      "path": "content/intro/rubric.json",
+      "bytes": 235,
+      "sha256": "61e37a177c09c14407530858711f6ab4f824d36db5ebc43aff62d49166668452"
+    },
+    {
+      "path": "content/intro/starter.ts",
+      "bytes": 588,
+      "sha256": "87e009814ca50801e509e73c26f5be221eeacf296e462f580d2f656bbfc18b93"
+    },
+    {
+      "path": "content/tutorial.json",
+      "bytes": 56703,
+      "sha256": "86f16777f1b155dc5e8d5ef9572af52796da14b131a022c64a7ffab29434e080"
+    },
+    {
+      "path": "docs/curriculum/README.md",
+      "bytes": 12217,
+      "sha256": "7c32071d70c23e04f83f961bc8a0e3b5efc4ca764cb2092ab89e783c37d10210"
+    },
+    {
+      "path": "docs/curriculum/cases.md",
+      "bytes": 25739,
+      "sha256": "eea77e1d2f517017037ae9f258917597102e4eefe9b8544e69db3a2636ab6cf0"
+    },
+    {
+      "path": "docs/curriculum/documents.md",
+      "bytes": 7055,
+      "sha256": "43bbde4ba0d61b707d8e197b4161d0951a2f9328b5763c6e57f2d89088a35be5"
+    },
+    {
+      "path": "docs/curriculum/handoff.md",
+      "bytes": 4248,
+      "sha256": "9a208517f3d6758a3aa4d5e4021b26355026914039f132e358b0dffc7157247a"
+    },
+    {
+      "path": "docs/evidence/ET-WP-01/20261014T1338Z-specification.md",
+      "bytes": 8166,
+      "sha256": "312b6dc00fc36128297a61790eb68773a247b9c3e4eb830d703f8429cec219f9"
+    },
+    {
+      "path": "docs/evidence/ET-WP-01/20261014T1338Z-static-check.txt",
+      "bytes": 732,
+      "sha256": "c271d6db04a96cd8af6936682aedbf1637c3bb1504d9a50b21e9aa6bd34388eb"
+    },
+    {
+      "path": "docs/evidence/ET-WP-01/artifact-sha256.txt",
+      "bytes": 725,
+      "sha256": "aceeccc366c5e925e6779a4d32851b14344b8ff4dabe470039f13af06dab525b"
+    },
+    {
+      "path": "docs/evidence/ET-WP-01/specification-check.py",
+      "bytes": 2277,
+      "sha256": "9dce71791c8e50be698b2fcbe57049ea51669dae5a373dbe8ff0976c39b25968"
+    },
+    {
+      "path": "docs/evidence/ET-WP-04/20261014-01-content-tests.txt",
+      "bytes": 527,
+      "sha256": "1054ad77096afd0b1e2b321782b7a8100f86a88f9036f2f0aea1da94190d3ac9"
+    },
+    {
+      "path": "docs/evidence/ET-WP-04/20261014-01-corpus.md",
+      "bytes": 9509,
+      "sha256": "4db0edc8a4f351e3212c657e68dc7ae41a773cec0287c39d4b1311ada488b5f6"
+    },
+    {
+      "path": "docs/evidence/ET-WP-04/20261014-01-document-contact-sheet.png",
+      "bytes": 176598,
+      "sha256": "b9b772b39cb2554997b3e7de1df3e2a756d2c287352bf1a5e51d611ea4e5d9a9"
+    },
+    {
+      "path": "docs/evidence/ET-WP-04/20261014-01-python-check.txt",
+      "bytes": 112,
+      "sha256": "90e05b4162c099763e88f6c6aa71ffe6796ad4a98c37956a605799c936aa5b3e"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+✔ actual content envelopes, domain schemas, shared manifest and discriminating code fixtures (200.976177ms)
+✔ boundary probes reject malformed shapes rather than grading them as semantic failures (75.021196ms)
+✔ content loader detects tampered reference, fixture and actual document bytes (371.515888ms)
+✔ independent visual authoring ledger agrees with reference readings and each dataset (59.979364ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 992.968313

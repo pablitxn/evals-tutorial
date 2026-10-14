@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "rows": [
+    [
+      "tie-balanced",
+      "TD-003",
+      6050000,
+      605000,
+      0,
+      0
+    ],
+    [
+      "tie-wages",
+      "TD-004",
+      6150000,
+      605000,
+      -100000,
+      0
+    ],
+    [
+      "tie-withholding",
+      "TD-005",
+      6050000,
+      615000,
+      0,
+      -10000
+    ],
+    [
+      "tie-both",
+      "TD-006",
+      6150000,
+      615000,
+      -100000,
+      -10000
+    ],
+    [
+      "tie-missing",
+      "TD-003",
+      6050000,
+      605000,
+      null,
+      null
+    ]
+  ],
+  "w2WagesCents": 6050000,
+  "w2WithholdingCents": 605000,
+  "interestExcludedCents": 12500
+}

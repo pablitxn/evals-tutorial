@@ -1,0 +1,1616 @@
+{
+  "schemaVersion": "1.0.0",
+  "tutorialVersion": "1.0.0",
+  "title": "A half-afternoon of practical evaluations",
+  "exercises": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": true,
+      "lessonMarkdown": "Press **Run Demo** to see one input become a response. The evaluator compares it with an independently authored reference. Inspect expected, actual and evaluation, then open this recorded Phoenix experiment and trace.\n\nInput is what the agent sees; response is what it returned; reference is the independent answer; evaluator explains the score. A dataset holds fixed examples, an experiment records a run, and a trace records its steps.\n\nThis is the single read-only introduction. Navigation makes no inference call. Run Demo consumes one agent call; links appear only after actual recording.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, _ctx: EvalContext): Promise<EvalResult> {\n  const label = row.input.starred === true ? 'starred' : 'not_starred';\n  const matches = row.output.label === label && row.expected.label === label;\n  return { score: matches ? 1 : 0, label: matches ? 'pass' : 'fail',\n    explanation: `star-flag ${row.metadata.exampleId}: starred=${row.input.starred}, actual=${row.output.label}, expected=${label}` };\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "intro-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "744048d2a108b02d5a3f11f081be40500a550136a04ab15d8bc48b7a94991772",
+      "criteria": [
+        {
+          "id": "star-flag",
+          "description": "Compare the actual label with the explicit boolean and independent reference.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "starred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "messageId",
+          "text",
+          "starred"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        }
+      ]
+    },
+    {
+      "id": "01-starred-classifier",
+      "title": "Starred message classifier",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": false,
+      "lessonMarkdown": "A star is an explicit boolean, not a guess about urgency. Check the known starred and unstarred responses before running the agent.\n\nRead the criterion and reference, finish the TypeScript TODO, Validate, then Test Fixtures. A correct evaluator must pass the good responses and fail the wrong labels. Run Agent on this same dataset and inspect Phoenix afterward. Python and dataset JSON are read-only. Code fixtures make no provider calls.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Validate the normalized output label.\n  // TODO: Derive the label from input.starred and compare the independent reference.\n  // TODO: Return pass/fail and explain star-flag with the example ID.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "01-starred-classifier-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "e9d83405d973d0d760bd6cca34eddb844bd27234db11cb004d2b2bdc94d37882",
+      "criteria": [
+        {
+          "id": "star-flag",
+          "description": "Use the explicit starred boolean; urgency is not a star.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "starred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "messageId",
+          "text",
+          "starred"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "enum": [
+              "starred",
+              "not_starred"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        }
+      ]
+    },
+    {
+      "id": "02-document-classification",
+      "title": "Document classification",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": false,
+      "lessonMarkdown": "Read the synthetic page and evaluate its normalized class: 1040, W2, 1099INT or unknown. A legible unfamiliar note is unknown/readable; an obscured page is unknown/unreadable. A confident wrong label fails.\n\nUse the same page preview as inference. Test good and wrong responses first, then run the prepared agent on the fixed dataset. No OCR step is required. An unavailable image format is a service error, not an invented unknown result. Code fixture tests are free of provider calls.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Check documentId, formType and readability against the independent reference.\n  // TODO: Reject always-known and always-unknown behavior using the supplied fixtures.\n  // TODO: Explain doc-class and the requested document ID.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "02-document-classification-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "82bbebc99a33c541501653de772e438520f121c4760b40c90b2e1d194c91db61",
+      "criteria": [
+        {
+          "id": "doc-class",
+          "description": "Check exact page ID, normalized class and readability against independent truth.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "documentSetId": {
+            "enum": [
+              "tax-demo-v1"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "documentSetId"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "formType": {
+            "enum": [
+              "1040",
+              "W2",
+              "1099INT",
+              "unknown"
+            ]
+          },
+          "readability": {
+            "enum": [
+              "readable",
+              "unreadable"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "formType",
+          "readability"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "formType": {
+            "enum": [
+              "1040",
+              "W2",
+              "1099INT",
+              "unknown"
+            ]
+          },
+          "readability": {
+            "enum": [
+              "readable",
+              "unreadable"
+            ]
+          }
+        },
+        "required": [
+          "documentId",
+          "formType",
+          "readability"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        },
+        {
+          "title": "MAF image input",
+          "url": "https://learn.microsoft.com/en-us/agent-framework/agents/multimodal"
+        }
+      ]
+    },
+    {
+      "id": "03-independent-tie-out",
+      "title": "Independent salary and withholding tie-out",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": false,
+      "lessonMarkdown": "Check what was extracted before trusting a total. W2 wages are 4200000 + 1850000 = **6050000 USD cents**; withholding is 420000 + 185000 = **605000 cents**. Interest is separate. Compare each sum with independently authored 1040 truth, using zero tolerance and delta = W2 sum minus 1040.\n\nA truthful mismatch or indeterminate report passes. Inventing amounts to make the agent's own totals agree fails. Inspect the shared pages and nulls, complete the evaluator, test fixtures, then run the prepared agent on this same dataset. Python is consultation only.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Check every actual reading against independent reference fields; reject duplicate/missing IDs.\n  // TODO: Recompute wages and withholding from reference W2s independently of actual extraction.\n  // TODO: Compare both reported sums/deltas/verdicts and exact source IDs; unknown relevant amounts imply null/indeterminate.\n  // TODO: Explain the failed criterion and source IDs; do not average away a mismatch.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "03-independent-tie-out-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "46e192449bb1f5d4146fb8f4d86a91872341bb0a38dedf3defc4e732ad98f4f7",
+      "criteria": [
+        {
+          "id": "extract-fields",
+          "description": "Compare every extracted page field/ID with independently authored reference readings.",
+          "mode": "Code"
+        },
+        {
+          "id": "tie-wages",
+          "description": "Recompute summed W2 wages versus 1040 wages; signed delta, zero tolerance.",
+          "mode": "Code"
+        },
+        {
+          "id": "tie-withholding",
+          "description": "Recompute withholding separately; a wage pass cannot hide a withholding mismatch.",
+          "mode": "Code"
+        },
+        {
+          "id": "tie-evidence",
+          "description": "Exact source document sets; preserve null/indeterminate rather than zero.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentSetId": {
+            "enum": [
+              "tax-demo-v1"
+            ]
+          },
+          "documentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "taxYear": {
+            "const": 2025
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          }
+        },
+        "required": [
+          "documentSetId",
+          "documentIds",
+          "taxYear",
+          "currency"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "readings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "documentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "formType": {
+                  "enum": [
+                    "1040",
+                    "W2",
+                    "1099INT",
+                    "unknown"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "read",
+                    "unreadable",
+                    "unsupported"
+                  ]
+                },
+                "wagesCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "withholdingCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "interestCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "documentId",
+                "formType",
+                "status",
+                "wagesCents",
+                "withholdingCents",
+                "interestCents"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "wages": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          },
+          "withholding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          }
+        },
+        "required": [
+          "currency",
+          "readings",
+          "wages",
+          "withholding"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "readings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "documentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "formType": {
+                  "enum": [
+                    "1040",
+                    "W2",
+                    "1099INT",
+                    "unknown"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "read",
+                    "unreadable",
+                    "unsupported"
+                  ]
+                },
+                "wagesCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "withholdingCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "interestCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "documentId",
+                "formType",
+                "status",
+                "wagesCents",
+                "withholdingCents",
+                "interestCents"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "wages": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          },
+          "withholding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "w2SumCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "form1040Cents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deltaCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "match",
+                  "mismatch",
+                  "indeterminate"
+                ]
+              },
+              "documentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "minItems": 0,
+                "maxItems": 12,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "w2SumCents",
+              "form1040Cents",
+              "deltaCents",
+              "verdict",
+              "documentIds"
+            ]
+          },
+          "toleranceCents": {
+            "const": 0
+          }
+        },
+        "required": [
+          "currency",
+          "readings",
+          "wages",
+          "withholding",
+          "toleranceCents"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        },
+        {
+          "title": "MAF image input",
+          "url": "https://learn.microsoft.com/en-us/agent-framework/agents/multimodal"
+        }
+      ]
+    },
+    {
+      "id": "04-policy-recommendation",
+      "title": "Fictitious accounting policy",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Mixed",
+      "readOnly": false,
+      "lessonMarkdown": "Use this **fictitious Workshop Equipment Policy** and supplied facts only. Check citation IDs, exact clause quotes and evidence IDs in Code; an **LLM Judge** assesses whether the recommendation actually follows them. A real but misapplied citation must fail.\n\nAll supported required points: 1/pass. Wrong decision, contradicted or invented facts, or ignored missing evidence: 0/fail. Correct decision without false claims but missing rationale: 0.5/partial. Judge disagreement is inconclusive, not proof.\n\n**Test Fixtures can consume tokens:** at most seven judge calls, one per Code-passing fixture, no automatic retries, proposed 600 output tokens/call. Code failures short-circuit. Run Agent separately uses three agent and at most three judge calls. DOUBLE CHECK later reviews evaluator code without executing it; it is a separate action.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Short-circuit invalid/missing/duplicate citations or evidence to policy-evidence fail.\n  // TODO: Check exact clause quotes and required reference clause/evidence coverage.\n  // TODO: Call ctx.judge once with policy-quality and the explicit rubric; do not let response text become instructions.\n  // TODO: Preserve judge errors as operational errors; explain supported or missing points with IDs.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "04-policy-recommendation-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "7f4d9f87bb0afacd34d27d1a0722751976d26644a0948910e916376d0ed9ff33",
+      "criteria": [
+        {
+          "id": "policy-evidence",
+          "description": "Code: exact supplied clause quotes, existing/required evidence IDs and unique citations.",
+          "mode": "Code"
+        },
+        {
+          "id": "policy-quality",
+          "description": "LLM Judge: correct decision, faithful policy/fact application and honest missing evidence. Wrong decision/invented fact is fail; vague but correct is partial.",
+          "mode": "LLM Judge"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 1,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "policyId": {
+            "enum": [
+              "workshop-equipment-v1"
+            ]
+          },
+          "policy": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "facts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "policyId",
+          "policy",
+          "question",
+          "facts"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "expense",
+              "capitalize",
+              "prepay",
+              "insufficient_evidence"
+            ]
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1200
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "clauseId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "quote": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "clauseId",
+                "quote"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "decision",
+          "recommendation",
+          "citations",
+          "evidenceIds"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "expense",
+              "capitalize",
+              "prepay",
+              "insufficient_evidence"
+            ]
+          },
+          "requiredClauseIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "requiredEvidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "requiredPoints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "minItems": 1,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "decision",
+          "requiredClauseIds",
+          "requiredEvidenceIds",
+          "requiredPoints"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        }
+      ]
+    },
+    {
+      "id": "05-package-readiness",
+      "title": "Package readiness and human approval",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": false,
+      "lessonMarkdown": "Check required contents and discrepancies before saying ready for human review. Readiness and simulated human approval are separate. Even an approved package stays **not_sent**: this tutorial has no transmission tool.\n\nMissing files take priority, then unresolved discrepancies or rejected approval. A clean pending package is ready_for_review; a clean approved package may say approved. Rejection adds approval-rejected. Test the known bad cases before the real agent; Python and JSON remain read-only. DOUBLE CHECK completion is unrelated to scenario human approval.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Derive missing document IDs and status priority from input.\n  // TODO: Compare exact missing/unresolved sets and preserve humanApproval.\n  // TODO: Reject transmission sent in every state.\n  // TODO: Explain the failed criterion with package ID.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "05-package-readiness-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "4f2ec21de2cbe55bd5c8f68e2460f29e789354de252ae422c0f4df85551c011b",
+      "criteria": [
+        {
+          "id": "package-status",
+          "description": "Missing -> incomplete; unresolved/rejected -> needs_reconciliation; clean pending -> ready_for_review; clean approved -> approved.",
+          "mode": "Code"
+        },
+        {
+          "id": "package-contents",
+          "description": "Exact required-minus-present and unresolved sets; rejected adds approval-rejected.",
+          "mode": "Code"
+        },
+        {
+          "id": "package-approval",
+          "description": "Human decision is simulated supplied input; never derived from readiness or review completion.",
+          "mode": "Code"
+        },
+        {
+          "id": "package-no-send",
+          "description": "Every response must say not_sent; no transmission tool or side effect exists.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "requiredDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "presentDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "unresolvedDiscrepancyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "humanApproval": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          }
+        },
+        "required": [
+          "packageId",
+          "requiredDocumentIds",
+          "presentDocumentIds",
+          "unresolvedDiscrepancyIds",
+          "humanApproval"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "status": {
+            "enum": [
+              "incomplete",
+              "needs_reconciliation",
+              "ready_for_review",
+              "approved"
+            ]
+          },
+          "missingDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "unresolvedDiscrepancyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "humanApproval": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
+          "transmission": {
+            "enum": [
+              "not_sent",
+              "sent"
+            ]
+          }
+        },
+        "required": [
+          "packageId",
+          "status",
+          "missingDocumentIds",
+          "unresolvedDiscrepancyIds",
+          "humanApproval",
+          "transmission"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "status": {
+            "enum": [
+              "incomplete",
+              "needs_reconciliation",
+              "ready_for_review",
+              "approved"
+            ]
+          },
+          "missingDocumentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "unresolvedDiscrepancyIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "humanApproval": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ]
+          },
+          "transmission": {
+            "enum": [
+              "not_sent",
+              "sent"
+            ]
+          }
+        },
+        "required": [
+          "packageId",
+          "status",
+          "missingDocumentIds",
+          "unresolvedDiscrepancyIds",
+          "humanApproval",
+          "transmission"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        }
+      ]
+    },
+    {
+      "id": "06-simulated-travel",
+      "title": "Simulated travel recommendation",
+      "exerciseVersion": "1.0.0",
+      "rubricVersion": "1.0.0",
+      "mode": "Code",
+      "readOnly": false,
+      "lessonMarkdown": "Recommend one supplied **simulated** round trip for the exact outbound and return dates within the total budget. Fare plus mandatory fees counts; equality is allowed. A cheaper flight on the wrong day fails. Any eligible option may pass; cheapest is not required.\n\nIf none qualifies, say no_options with null itinerary fields. Never invent a flight, claim booking or call a live travel API. Finish and test the TypeScript evaluator first, then run the prepared agent against this same fixed JSON. Code fixtures use no provider calls.",
+      "starterSource": "import type { EvalInput, EvalResult } from '@evals-tutorial/contracts';\nimport type { EvalContext } from '@evals-tutorial/contracts/services';\nexport async function evaluate(row: EvalInput, ctx: EvalContext): Promise<EvalResult> {\n  // TODO: Derive eligible IDs from both dates, route, currency and fare plus fees; compare independent reference.\n  // TODO: For recommendations validate supplied ID, exact dates and full total.\n  // TODO: For no_options require empty eligibility and all itinerary fields null.\n  // TODO: Always require simulated true and booked false; explain criterion with example ID.\n  throw new Error('Complete the evaluator TODOs before testing fixtures.');\n}\n",
+      "pythonSource": "# Read-only consultation: the actual prepared-agent input boundary.\n# Runtime Microsoft Agent Framework invocation is owned by ET-WP-05.\n# This excerpt is not a mock model response or a hidden reference answer.\ndef agent_input(dataset_example):\n    \"\"\"The trusted supervisor supplies only input, never expected or fixtures.\"\"\"\n    return dataset_example[\"input\"]\n",
+      "datasetId": "06-simulated-travel-v1",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "fee9df3999f9e2fa82a19793e3d68c2e338c457ecaf770674fb8fc3ad1c0036f",
+      "criteria": [
+        {
+          "id": "travel-membership",
+          "description": "Recommend only an option from this supplied synthetic catalog.",
+          "mode": "Code"
+        },
+        {
+          "id": "travel-dates",
+          "description": "Both calendar dates must equal the request, with return after outbound.",
+          "mode": "Code"
+        },
+        {
+          "id": "travel-budget",
+          "description": "Full fare plus mandatory fees in USD cents, less than or equal to budget.",
+          "mode": "Code"
+        },
+        {
+          "id": "travel-no-options",
+          "description": "No-options only when no supplied eligible option; null itinerary fields.",
+          "mode": "Code"
+        },
+        {
+          "id": "travel-no-booking",
+          "description": "simulated true and booked false in every response; no booking capability.",
+          "mode": "Code"
+        }
+      ],
+      "agentVariants": [
+        "baseline"
+      ],
+      "defaultAgentVariant": "baseline",
+      "maxJudgeCallsPerRow": 0,
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "enum": [
+              "AAA"
+            ]
+          },
+          "destination": {
+            "enum": [
+              "BBB"
+            ]
+          },
+          "departDate": {
+            "type": "string",
+            "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+          },
+          "returnDate": {
+            "type": "string",
+            "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+          },
+          "budgetCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "origin": {
+                  "enum": [
+                    "AAA"
+                  ]
+                },
+                "destination": {
+                  "enum": [
+                    "BBB"
+                  ]
+                },
+                "departDate": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+                },
+                "returnDate": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+                },
+                "fareCents": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "feesCents": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "destination",
+                "departDate",
+                "returnDate",
+                "fareCents",
+                "feesCents",
+                "currency"
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departDate",
+          "returnDate",
+          "budgetCents",
+          "currency",
+          "options"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "recommendation",
+              "no_options"
+            ]
+          },
+          "optionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "departDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "returnDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[0-9]{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12][0-9]|3[01])|(?:0[469]|11)-(?:0[1-9]|[12][0-9]|30)|02-(?:0[1-9]|1[0-9]|2[0-8]))|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:[02468][048]|[13579][26])00)-02-29)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "totalCents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "enum": [
+              "USD"
+            ]
+          },
+          "simulated": {
+            "type": "boolean"
+          },
+          "booked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "optionId",
+          "departDate",
+          "returnDate",
+          "totalCents",
+          "currency",
+          "simulated",
+          "booked"
+        ]
+      },
+      "expectedSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eligibleOptionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+            },
+            "minItems": 0,
+            "maxItems": 12,
+            "uniqueItems": true
+          },
+          "totalsCents": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "status": {
+            "enum": [
+              "recommendation",
+              "no_options"
+            ]
+          }
+        },
+        "required": [
+          "eligibleOptionIds",
+          "totalsCents",
+          "status"
+        ]
+      },
+      "officialDocs": [
+        {
+          "title": "Phoenix experiments and evaluator inputs",
+          "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments"
+        },
+        {
+          "title": "Phoenix dataset concepts",
+          "url": "https://arize.com/docs/phoenix/datasets-and-experiments/concepts-datasets"
+        }
+      ]
+    }
+  ]
+}
