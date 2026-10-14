@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -9,7 +9,8 @@ import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import type { RunRecord, Dataset, PhoenixLinks } from '@evals-tutorial/contracts';
-import { sha256, datasetHash, canonicalJson } from '@evals-tutorial/contracts/node';
+import { validateContract } from '@evals-tutorial/contracts';
+import { datasetHash } from '@evals-tutorial/contracts/node';
 import { ServiceError } from '@evals-tutorial/contracts/services';
 import { createPhoenixTelemetry, createTelemetryContext, parseCsv, type PhoenixTelemetryOptions } from '../src/index.js';
 import { fixtureDataset, fixtureRun } from './fixtures.js';
@@ -31,21 +32,20 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
   const options: PhoenixTelemetryOptions = { baseUrl, stateDirectory: directory };
   const telemetry = createPhoenixTelemetry(options);
   const observations: Record<string, unknown> = { mode: 'synthetic contract fixtures; real local Phoenix', inferenceCalls: 0, providerTokenSpend: 0 };
-  let contractBlocked = false;
-
-  // The production adapter always enforces its installed contract. Until the
-  // integrator admits actual GlobalIDs, inspect the persisted IDs directly and
-  // report a blocked service return, never a successful TelemetryService receipt.
+  // The accepted GlobalID correction now requires successful production returns.
+  // No journal inspection substitutes for a TelemetryService result.
   async function observed(ds: Dataset, rr: RunRecord, opt = options): Promise<PhoenixLinks> {
-    try { return (await createPhoenixTelemetry(opt).record(ds, rr, signal())).phoenix; }
-    catch (error) {
-      if (!(error instanceof ServiceError) || error.message !== 'Verified Phoenix GlobalIDs do not fit the installed PhoenixLinks contract') throw error;
-      contractBlocked = true;
-      const key = `run-${sha256(canonicalJson([baseUrl, rr.runId]))}`;
-      const journal = JSON.parse(await readFile(join(directory, `${key}.json`), 'utf8'));
-      const experiment = (await json(`/v1/experiments/${journal.experimentId}`)).data;
-      return { datasetId: experiment.dataset_id, datasetVersionId: experiment.dataset_version_id, experimentId: experiment.id };
+    const result = await createPhoenixTelemetry(opt).record(ds, rr, signal());
+    assert(validateContract('PhoenixLinks', result.phoenix).valid);
+    assert(result.phoenix.datasetUrl && result.phoenix.experimentUrl);
+    assert.equal(result.rowLinks.length, rr.rows.length);
+    for (const row of result.rowLinks) {
+      assert(validateContract('PhoenixLinks', row.phoenix).valid);
+      assert(row.phoenix.traceId && row.phoenix.traceUrl);
+      assert.equal(row.phoenix.datasetVersionId, result.phoenix.datasetVersionId);
+      assert.equal(row.phoenix.experimentId, result.phoenix.experimentId);
     }
+    return result.phoenix;
   }
   try {
     let first: PhoenixLinks;
@@ -58,11 +58,24 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
       assert(tasks.every((task: { trace_id: string }) => /^[a-f0-9]{32}$/.test(task.trace_id)));
       observations.fixture = { ...first, tasks };
     });
+    await t.test('successful return preserves actual padded GlobalIDs and verified per-row links', async () => {
+      const result = await telemetry.record(dataset, run, signal());
+      assert(result.phoenix.datasetVersionId!.endsWith('='), 'Use a fresh disposable Phoenix so the first version exercises actual padding');
+      const experiment = (await json(`/v1/experiments/${encodeURIComponent(result.phoenix.experimentId!)}`)).data;
+      assert.equal(result.phoenix.datasetId, experiment.dataset_id);
+      assert.equal(result.phoenix.datasetVersionId, experiment.dataset_version_id);
+      assert.equal(result.phoenix.experimentId, experiment.id);
+      const links = [result.phoenix.datasetUrl!, result.phoenix.experimentUrl!, ...result.rowLinks.map(row => row.phoenix.traceUrl!)];
+      for (const url of links) {
+        const response = await fetch(url); assert(response.ok); assert((await response.text()).includes('<title>Phoenix</title>'));
+      }
+      observations.successfulReturn = result;
+    });
     await t.test('fresh Node process resumes the same journal and persisted experiment', async () => {
       const request = join(directory, 'restart.json');
       await writeFile(request, JSON.stringify({ dataset, run, options }));
       const returned = JSON.parse(execFileSync(process.execPath, ['--import', 'tsx', 'packages/phoenix/tests/restart.ts', request], { encoding: 'utf8', timeout: 20000 }));
-      if (!returned.contractBlocked) assert.deepEqual(returned.phoenix, first!);
+      assert.deepEqual(returned.phoenix, first!);
       const tasks = (await json(`/v1/experiments/${first!.experimentId}/runs`)).data;
       assert.equal(tasks.length, 2);
       observations.restart = { sameExperiment: true, rows: tasks.length };
@@ -194,7 +207,7 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
       };
       await assert.rejects(createPhoenixTelemetry({ ...options, fetch: corrupt }).record(dataset, malformedRun, signal()), code('telemetry_unavailable'));
     });
-    observations.serviceReturn = contractBlocked ? 'blocked: installed PhoenixLinks rejects actual padded GlobalIDs' : 'verified';
+    observations.serviceReturn = 'verified';
     observations.serverVersion = await (await fetch(`${baseUrl}/arize_phoenix_version`)).text();
     if (process.env.ET_WP07_RECEIPT) await writeFile(process.env.ET_WP07_RECEIPT, JSON.stringify(observations, null, 2));
     console.log(JSON.stringify({ serviceReturn: observations.serviceReturn, serverVersion: observations.serverVersion, inferenceCalls: 0 }));

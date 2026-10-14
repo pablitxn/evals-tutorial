@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import type { Dataset, DocumentManifest, EvalResult, PhoenixLinks, Tutorial } from '@evals-tutorial/contracts';
 import { validateContract } from '@evals-tutorial/contracts';
-import { canonicalJson, datasetHash, sha256 } from '@evals-tutorial/contracts/node';
+import { datasetHash, sha256 } from '@evals-tutorial/contracts/node';
 import { createPhoenixTelemetry } from '../src/index.js';
 import { fixtureRun } from './fixtures.js';
 
@@ -18,18 +18,13 @@ test('actual seven-exercise corpus imports and version pins; synthetic recording
   const baseUrl = 'http://127.0.0.1:6006'; const signal = new AbortController().signal;
   const service = createPhoenixTelemetry({ baseUrl, stateDirectory });
   const nonce = randomUUID(); const observations: object[] = [];
-  let blocked = false;
   async function observe(dataset: Dataset, run: ReturnType<typeof fixtureRun>): Promise<PhoenixLinks> {
-    try { return (await service.record(dataset, run, signal)).phoenix; }
-    catch (error) {
-      if ((error as Error).message !== 'Verified Phoenix GlobalIDs do not fit the installed PhoenixLinks contract') throw error;
-      blocked = true;
-      const key = `run-${sha256(canonicalJson([baseUrl, run.runId]))}`;
-      const receipt = JSON.parse(await readFile(join(stateDirectory, `${key}.json`), 'utf8'));
-      const response = await fetch(`${baseUrl}/v1/experiments/${receipt.experimentId}`); assert(response.ok);
-      const experiment = (await response.json()).data;
-      return { datasetId: experiment.dataset_id, datasetVersionId: experiment.dataset_version_id, experimentId: experiment.id };
-    }
+    const result = await service.record(dataset, run, signal);
+    assert(validateContract('PhoenixLinks', result.phoenix).valid);
+    assert(result.phoenix.datasetUrl && result.phoenix.experimentUrl);
+    assert.equal(result.rowLinks.length, run.rows.length);
+    result.rowLinks.forEach(row => assert(validateContract('PhoenixLinks', row.phoenix).valid && row.phoenix.traceId && row.phoenix.traceUrl));
+    return result.phoenix;
   }
   try {
     for (const exercise of tutorial.exercises) {
@@ -68,7 +63,7 @@ test('actual seven-exercise corpus imports and version pins; synthetic recording
     assert.equal(observations.length, 7);
     if (process.env.ET_WP07_CORPUS_RECEIPT) await writeFile(process.env.ET_WP07_CORPUS_RECEIPT, JSON.stringify({
       corpusHead: 'd9ab77508f6f6892f4de57594146abbd629ea471', inferenceCalls: 0,
-      serviceReturn: blocked ? 'blocked: installed PhoenixLinks rejects actual padded GlobalIDs' : 'verified', observations,
+      serviceReturn: 'verified', observations,
     }, null, 2));
   } finally { await rm(stateDirectory, { recursive: true }); }
 });
