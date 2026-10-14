@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-10-14T13:30:45.024375+00:00",
+  "checks": [
+    {
+      "url": "https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/model-providers/openai",
+      "status": "fail",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/agent-framework/agents/multimodal",
+      "status": "fail",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/datasets",
+      "status": "fail",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://arize.com/docs/phoenix/sdk-api-reference/typescript/packages/phoenix-client/experiments",
+      "status": "fail",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "url": "https://pypi.org/pypi/agent-framework-openai/1.16.0/json",
+      "status": "pass",
+      "httpStatus": 200,
+      "resolvedUrl": "https://pypi.org/pypi/agent-framework-openai/1.16.0/json",
+      "tls": "default certificate/hostname verification; no bypass"
+    },
+    {
+      "url": "https://registry.npmjs.org/@arizeai%2fphoenix-client/7.16.1",
+      "status": "pass",
+      "httpStatus": 200,
+      "resolvedUrl": "https://registry.npmjs.org/@arizeai%2fphoenix-client/7.16.1",
+      "tls": "default certificate/hostname verification; no bypass"
+    }
+  ]
+}

@@ -1,0 +1,645 @@
+{
+  "name": "node",
+  "dependencies": {
+    "@arizeai/phoenix-client": {
+      "version": "7.16.1",
+      "resolved": "https://registry.npmjs.org/@arizeai/phoenix-client/-/phoenix-client-7.16.1.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@anthropic-ai/sdk": {},
+        "@arizeai/openinference-semantic-conventions": {
+          "version": "2.14.0",
+          "resolved": "https://registry.npmjs.org/@arizeai/openinference-semantic-conventions/-/openinference-semantic-conventions-2.14.0.tgz",
+          "overridden": false
+        },
+        "@arizeai/phoenix-config": {
+          "version": "0.5.0",
+          "resolved": "https://registry.npmjs.org/@arizeai/phoenix-config/-/phoenix-config-0.5.0.tgz",
+          "overridden": false
+        },
+        "@arizeai/phoenix-otel": {
+          "version": "2.2.0"
+        },
+        "ai": {
+          "version": "7.0.140",
+          "resolved": "https://registry.npmjs.org/ai/-/ai-7.0.140.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@ai-sdk/gateway": {
+              "version": "4.0.113",
+              "resolved": "https://registry.npmjs.org/@ai-sdk/gateway/-/gateway-4.0.113.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@ai-sdk/provider-utils": {
+                  "version": "5.0.59"
+                },
+                "@ai-sdk/provider": {
+                  "version": "4.0.27"
+                },
+                "@vercel/oidc": {
+                  "version": "3.2.0",
+                  "resolved": "https://registry.npmjs.org/@vercel/oidc/-/oidc-3.2.0.tgz",
+                  "overridden": false
+                },
+                "zod": {
+                  "version": "4.6.7"
+                }
+              }
+            },
+            "@ai-sdk/provider-utils": {
+              "version": "5.0.59",
+              "resolved": "https://registry.npmjs.org/@ai-sdk/provider-utils/-/provider-utils-5.0.59.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@ai-sdk/provider": {
+                  "version": "4.0.27"
+                },
+                "@standard-schema/spec": {
+                  "version": "1.1.0",
+                  "resolved": "https://registry.npmjs.org/@standard-schema/spec/-/spec-1.1.0.tgz",
+                  "overridden": false
+                },
+                "@workflow/serde": {
+                  "version": "4.1.0",
+                  "resolved": "https://registry.npmjs.org/@workflow/serde/-/serde-4.1.0.tgz",
+                  "overridden": false
+                },
+                "eventsource-parser": {
+                  "version": "3.1.1",
+                  "resolved": "https://registry.npmjs.org/eventsource-parser/-/eventsource-parser-3.1.1.tgz",
+                  "overridden": false
+                },
+                "undici": {
+                  "version": "7.30.0",
+                  "resolved": "https://registry.npmjs.org/undici/-/undici-7.30.0.tgz",
+                  "overridden": false
+                },
+                "zod": {
+                  "version": "4.6.7"
+                }
+              }
+            },
+            "@ai-sdk/provider": {
+              "version": "4.0.27",
+              "resolved": "https://registry.npmjs.org/@ai-sdk/provider/-/provider-4.0.27.tgz",
+              "overridden": false,
+              "dependencies": {
+                "json-schema": {
+                  "version": "0.4.0",
+                  "resolved": "https://registry.npmjs.org/json-schema/-/json-schema-0.4.0.tgz",
+                  "overridden": false
+                }
+              }
+            },
+            "zod": {
+              "version": "4.6.7"
+            }
+          }
+        },
+        "async": {
+          "version": "3.2.6",
+          "resolved": "https://registry.npmjs.org/async/-/async-3.2.6.tgz",
+          "overridden": false
+        },
+        "jest": {},
+        "openai": {},
+        "openapi-fetch": {
+          "version": "0.17.0",
+          "resolved": "https://registry.npmjs.org/openapi-fetch/-/openapi-fetch-0.17.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "openapi-typescript-helpers": {
+              "version": "0.1.0",
+              "resolved": "https://registry.npmjs.org/openapi-typescript-helpers/-/openapi-typescript-helpers-0.1.0.tgz",
+              "overridden": false
+            }
+          }
+        },
+        "tiny-invariant": {
+          "version": "1.3.3",
+          "resolved": "https://registry.npmjs.org/tiny-invariant/-/tiny-invariant-1.3.3.tgz",
+          "overridden": false
+        },
+        "vitest": {},
+        "zod": {
+          "version": "4.6.7",
+          "resolved": "https://registry.npmjs.org/zod/-/zod-4.6.7.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "@arizeai/phoenix-otel": {
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@arizeai/phoenix-otel/-/phoenix-otel-2.2.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@arizeai/openinference-core": {
+          "version": "2.8.0",
+          "resolved": "https://registry.npmjs.org/@arizeai/openinference-core/-/openinference-core-2.8.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@arizeai/openinference-semantic-conventions": {
+              "version": "2.14.0"
+            },
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.12.0"
+            }
+          }
+        },
+        "@arizeai/openinference-semantic-conventions": {
+          "version": "2.14.0"
+        },
+        "@arizeai/openinference-vercel": {
+          "version": "3.3.0",
+          "resolved": "https://registry.npmjs.org/@arizeai/openinference-vercel/-/openinference-vercel-3.3.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@ai-sdk/otel": {
+              "version": "1.0.140",
+              "resolved": "https://registry.npmjs.org/@ai-sdk/otel/-/otel-1.0.140.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@ai-sdk/provider": {
+                  "version": "4.0.27"
+                },
+                "@opentelemetry/api": {
+                  "version": "1.9.1",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.1.tgz",
+                  "overridden": false
+                },
+                "ai": {
+                  "version": "7.0.140"
+                }
+              }
+            },
+            "@arizeai/openinference-core": {
+              "version": "2.8.0"
+            },
+            "@arizeai/openinference-genai": {
+              "version": "0.4.0",
+              "resolved": "https://registry.npmjs.org/@arizeai/openinference-genai/-/openinference-genai-0.4.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@arizeai/openinference-semantic-conventions": {
+                  "version": "2.14.0"
+                },
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/semantic-conventions": {
+                  "version": "1.43.0"
+                }
+              }
+            },
+            "@arizeai/openinference-semantic-conventions": {
+              "version": "2.14.0"
+            },
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/semantic-conventions": {
+              "version": "1.43.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-1.43.0.tgz",
+              "overridden": false
+            },
+            "ai": {
+              "version": "7.0.140"
+            }
+          }
+        },
+        "@arizeai/phoenix-config": {
+          "version": "0.5.0"
+        },
+        "@opentelemetry/api": {
+          "version": "1.9.1",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.1.tgz",
+          "overridden": false
+        },
+        "@opentelemetry/context-async-hooks": {
+          "version": "2.12.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/context-async-hooks/-/context-async-hooks-2.12.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            }
+          }
+        },
+        "@opentelemetry/core": {
+          "version": "2.12.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.12.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/semantic-conventions": {
+              "version": "1.43.0"
+            }
+          }
+        },
+        "@opentelemetry/exporter-trace-otlp-proto": {
+          "version": "0.220.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/exporter-trace-otlp-proto/-/exporter-trace-otlp-proto-0.220.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.9.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/semantic-conventions": {
+                  "version": "1.43.0"
+                }
+              }
+            },
+            "@opentelemetry/otlp-exporter-base": {
+              "version": "0.220.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/otlp-exporter-base/-/otlp-exporter-base-0.220.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/core": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/otlp-transformer": {
+                  "version": "0.220.0"
+                }
+              }
+            },
+            "@opentelemetry/otlp-transformer": {
+              "version": "0.220.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/otlp-transformer/-/otlp-transformer-0.220.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api-logs": {
+                  "version": "0.220.0"
+                },
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/core": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/resources": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/core": {
+                      "version": "2.9.0"
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/sdk-logs": {
+                  "version": "0.220.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-logs/-/sdk-logs-0.220.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api-logs": {
+                      "version": "0.220.0"
+                    },
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/core": {
+                      "version": "2.9.0",
+                      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "@opentelemetry/api": {
+                          "version": "1.9.0"
+                        },
+                        "@opentelemetry/semantic-conventions": {
+                          "version": "1.43.0"
+                        }
+                      }
+                    },
+                    "@opentelemetry/resources": {
+                      "version": "2.9.0",
+                      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.9.0.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "@opentelemetry/api": {
+                          "version": "1.9.0"
+                        },
+                        "@opentelemetry/core": {
+                          "version": "2.9.0"
+                        },
+                        "@opentelemetry/semantic-conventions": {
+                          "version": "1.43.0"
+                        }
+                      }
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/sdk-metrics": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-metrics/-/sdk-metrics-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/core": {
+                      "version": "2.9.0",
+                      "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "@opentelemetry/api": {
+                          "version": "1.9.0"
+                        },
+                        "@opentelemetry/semantic-conventions": {
+                          "version": "1.43.0"
+                        }
+                      }
+                    },
+                    "@opentelemetry/resources": {
+                      "version": "2.9.0",
+                      "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.9.0.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "@opentelemetry/api": {
+                          "version": "1.9.0"
+                        },
+                        "@opentelemetry/core": {
+                          "version": "2.9.0"
+                        },
+                        "@opentelemetry/semantic-conventions": {
+                          "version": "1.43.0"
+                        }
+                      }
+                    }
+                  }
+                },
+                "@opentelemetry/sdk-trace": {
+                  "version": "2.9.0"
+                }
+              }
+            },
+            "@opentelemetry/resources": {
+              "version": "2.9.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.9.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/core": {
+                  "version": "2.9.0"
+                },
+                "@opentelemetry/semantic-conventions": {
+                  "version": "1.43.0"
+                }
+              }
+            },
+            "@opentelemetry/sdk-trace": {
+              "version": "2.9.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace/-/sdk-trace-2.9.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/core": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/core/-/core-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/resources": {
+                  "version": "2.9.0",
+                  "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.9.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@opentelemetry/api": {
+                      "version": "1.9.0"
+                    },
+                    "@opentelemetry/core": {
+                      "version": "2.9.0"
+                    },
+                    "@opentelemetry/semantic-conventions": {
+                      "version": "1.43.0"
+                    }
+                  }
+                },
+                "@opentelemetry/semantic-conventions": {
+                  "version": "1.43.0"
+                }
+              }
+            }
+          }
+        },
+        "@opentelemetry/instrumentation": {
+          "version": "0.220.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/instrumentation/-/instrumentation-0.220.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api-logs": {
+              "version": "0.220.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/api-logs/-/api-logs-0.220.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                }
+              }
+            },
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "import-in-the-middle": {
+              "version": "3.5.2",
+              "resolved": "https://registry.npmjs.org/import-in-the-middle/-/import-in-the-middle-3.5.2.tgz",
+              "overridden": false,
+              "dependencies": {
+                "cjs-module-lexer": {
+                  "version": "2.3.0",
+                  "resolved": "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-2.3.0.tgz",
+                  "overridden": false
+                },
+                "es-module-lexer": {
+                  "version": "3.0.3",
+                  "resolved": "https://registry.npmjs.org/es-module-lexer/-/es-module-lexer-3.0.3.tgz",
+                  "overridden": false
+                },
+                "module-details-from-path": {
+                  "version": "1.0.4",
+                  "resolved": "https://registry.npmjs.org/module-details-from-path/-/module-details-from-path-1.0.4.tgz",
+                  "overridden": false
+                }
+              }
+            },
+            "require-in-the-middle": {
+              "version": "8.0.1",
+              "resolved": "https://registry.npmjs.org/require-in-the-middle/-/require-in-the-middle-8.0.1.tgz",
+              "overridden": false,
+              "dependencies": {
+                "debug": {
+                  "version": "4.4.3",
+                  "resolved": "https://registry.npmjs.org/debug/-/debug-4.4.3.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "ms": {
+                      "version": "2.1.3",
+                      "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
+                      "overridden": false
+                    }
+                  }
+                },
+                "module-details-from-path": {
+                  "version": "1.0.4"
+                }
+              }
+            }
+          }
+        },
+        "@opentelemetry/resources": {
+          "version": "2.12.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/resources/-/resources-2.12.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/semantic-conventions": {
+              "version": "1.43.0"
+            }
+          }
+        },
+        "@opentelemetry/sdk-trace-base": {
+          "version": "2.12.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-base/-/sdk-trace-base-2.12.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/resources": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/sdk-trace": {
+              "version": "2.12.0",
+              "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace/-/sdk-trace-2.12.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@opentelemetry/api": {
+                  "version": "1.9.0"
+                },
+                "@opentelemetry/core": {
+                  "version": "2.12.0"
+                },
+                "@opentelemetry/resources": {
+                  "version": "2.12.0"
+                },
+                "@opentelemetry/semantic-conventions": {
+                  "version": "1.43.0"
+                }
+              }
+            },
+            "@opentelemetry/semantic-conventions": {
+              "version": "1.43.0"
+            }
+          }
+        },
+        "@opentelemetry/sdk-trace-node": {
+          "version": "2.12.0",
+          "resolved": "https://registry.npmjs.org/@opentelemetry/sdk-trace-node/-/sdk-trace-node-2.12.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@opentelemetry/api": {
+              "version": "1.9.0"
+            },
+            "@opentelemetry/context-async-hooks": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/core": {
+              "version": "2.12.0"
+            },
+            "@opentelemetry/sdk-trace-base": {
+              "version": "2.12.0"
+            }
+          }
+        }
+      }
+    },
+    "@opentelemetry/api": {
+      "version": "1.9.0",
+      "resolved": "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.0.tgz",
+      "overridden": false
+    },
+    "@types/node": {
+      "version": "24.10.0",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.10.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "undici-types": {
+          "version": "7.16.0",
+          "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-7.16.0.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "overridden": false
+    }
+  }
+}

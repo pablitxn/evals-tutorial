@@ -1,0 +1,74 @@
+{
+  "scope": "ET-WP-00 owned paths only; excludes this self-referential manifest",
+  "publicationBase": "d1cbedc55bd2ed346039fd8f6d70d9cca21bc7b6",
+  "files": [
+    {
+      "path": "docs/evidence/ET-WP-00/20261014-01-preflight.md",
+      "sha256": "0c83d1b407198a37fedb06aabe5186aa210cef1bbf498a095597dd1fed6191ce"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/browser.json",
+      "sha256": "c502cb2ea5cac6a2535957c37c25d23c04d09038f3cda7b33f506c07be840531"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/connectivity.json",
+      "sha256": "f3adbc2a9c25b4a848a48e1793d7bade2b5936c28e95bd8e4d45c468ddd0d115"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/docker.json",
+      "sha256": "cbfc08dae2300bef32cb9b592ab4013f5ed699532833a6b9eea7637cd941c350"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/maf.json",
+      "sha256": "b12adb7e9f4d12d9791c31eb618805e02f48385c1abcb8cb9a875a8e39a89e7b"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/node-versions.json",
+      "sha256": "3b260e19cc5cdd5a59b0b1f563828fa3129b4638a4bf3cc8b820761e0938f533"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/phoenix-links.json",
+      "sha256": "102d23fb3c61a554ed0f59b8043bf803567722b5cba121361245438960677923"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/phoenix.json",
+      "sha256": "e675d6c0a7e84a24e249ec7416964e01bee4687ccb327ff7961d1a227a91253c"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/probes/browser_probe.py",
+      "sha256": "35089454b194cf87fae5db0d077243cbb79d3b73588584d8d8c53978e9c9abeb"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/probes/docker_probe.py",
+      "sha256": "333f8acede067008547180e59cff26cbd9b4c84eb47d45f9208b865086652709"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/probes/maf_probe.py",
+      "sha256": "d49bceaf8bd78d4dcde350928cd1b2a41e67a3e53ae5ef139eaea0aa47c5d009"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/probes/phoenix_probe.mts",
+      "sha256": "91fb4dc78fcf09371be2da5fb351492be51456ac7df2f1644f36956a13f3d5fd"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/python-versions.txt",
+      "sha256": "54688181747661ea86fb782bc23ac527d7aa918fabb1af62ed7c95f460373694"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/receipt.json",
+      "sha256": "1fd0108dc2748b1f884706a097f76d36b9e0c1922ada20642a159892d8136e80"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/sources.json",
+      "sha256": "f8306deb290261ba6bd79268ae3e47314c9f41c05c5d2fa43a32afda85eb4fb9"
+    },
+    {
+      "path": "docs/evidence/ET-WP-00/validation.json",
+      "sha256": "69145ba87749759651dbae427cbabd98ca62aa70feeddc36a1f4a65b17607f15"
+    },
+    {
+      "path": "docs/readiness/ET-WP-00.md",
+      "sha256": "1fa8e4ded6b80a2265c191dc39aa36b858dfbe36876d8163c7fbd2f9ee853859"
+    }
+  ]
+}
