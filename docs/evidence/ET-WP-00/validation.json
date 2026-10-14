@@ -1,0 +1,10 @@
+{
+  "ownership": "pass",
+  "jsonParsing": "pass",
+  "credentialMarkers": "none found; bounded marker check is not proof against every secret",
+  "englishHeuristic": "no Spanish candidates in 16 task-owned staged files; no semantic English certification",
+  "pythonDependencyCheck": "No broken requirements found",
+  "typecheck": "strict TS NodeNext probe passed",
+  "whitespace": "git diff --cached --check passed",
+  "scope": "documentation/probe evidence only; no integrated CI executed"
+}

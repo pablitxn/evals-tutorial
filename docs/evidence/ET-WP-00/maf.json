@@ -1,0 +1,324 @@
+{
+  "mode": "in-memory-mock; no inference; no live format support claimed",
+  "versions": {
+    "agent-framework-core": "1.21.0",
+    "agent-framework-openai": "1.16.0",
+    "openai": "3.31.0",
+    "pydantic": "2.14.1",
+    "opentelemetry-api": "1.45.1",
+    "opentelemetry-sdk": "1.45.1"
+  },
+  "requests": [
+    {
+      "url": "https://api.openai.com/v1/responses",
+      "path": "/v1/responses",
+      "body": {
+        "model": "offline-probe-model",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic probe."
+              },
+              {
+                "type": "input_image",
+                "image_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j0ioAAAAASUVORK5CYII=",
+                "detail": "auto"
+              }
+            ]
+          }
+        ],
+        "instructions": "Return a label.",
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "url": "https://api.openai.com/v1/responses",
+      "path": "/v1/responses",
+      "body": {
+        "model": "offline-probe-model",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic probe."
+              },
+              {
+                "type": "input_file",
+                "file_data": "data:application/pdf;base64,JVBERi0xLjQKJSBTeW50aGV0aWMgcmVxdWVzdC1zaGFwZSBwbGFjZWhvbGRlciwgbm90IGEgcGVyY2VwdGlvbiB0ZXN0LgolJUVPRg=="
+              }
+            ]
+          }
+        ],
+        "instructions": "Return a label.",
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "url": "https://synthetic.openai.azure.com/openai/v1/responses?api-version=2025-04-01-preview",
+      "path": "/openai/v1/responses",
+      "body": {
+        "model": "offline-deployment",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic Azure request probe."
+              },
+              {
+                "type": "input_image",
+                "image_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j0ioAAAAASUVORK5CYII=",
+                "detail": "auto"
+              }
+            ]
+          }
+        ],
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "url": "https://synthetic.openai.azure.com/openai/v1/responses?api-version=2025-04-01-preview",
+      "path": "/openai/v1/responses",
+      "body": {
+        "model": "offline-deployment",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic Azure request probe."
+              },
+              {
+                "type": "input_file",
+                "file_data": "data:application/pdf;base64,JVBERi0xLjQKJSBTeW50aGV0aWMgcmVxdWVzdC1zaGFwZSBwbGFjZWhvbGRlciwgbm90IGEgcGVyY2VwdGlvbiB0ZXN0LgolJUVPRg=="
+              }
+            ]
+          }
+        ],
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "url": "https://synthetic.openai.azure.com/openai/v1/responses",
+      "path": "/openai/v1/responses",
+      "body": {
+        "model": "offline-deployment",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic Azure request probe."
+              },
+              {
+                "type": "input_image",
+                "image_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j0ioAAAAASUVORK5CYII=",
+                "detail": "auto"
+              }
+            ]
+          }
+        ],
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "url": "https://synthetic.openai.azure.com/openai/v1/responses",
+      "path": "/openai/v1/responses",
+      "body": {
+        "model": "offline-deployment",
+        "stream": false,
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": [
+              {
+                "type": "input_text",
+                "text": "Synthetic Azure request probe."
+              },
+              {
+                "type": "input_file",
+                "file_data": "data:application/pdf;base64,JVBERi0xLjQKJSBTeW50aGV0aWMgcmVxdWVzdC1zaGFwZSBwbGFjZWhvbGRlciwgbm90IGEgcGVyY2VwdGlvbiB0ZXN0LgolJUVPRg=="
+              }
+            ]
+          }
+        ],
+        "max_output_tokens": 32,
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "strict": true,
+            "name": "Result",
+            "schema": {
+              "properties": {
+                "label": {
+                  "title": "Label",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "title": "Result",
+              "type": "object",
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "missingConfig": {
+    "type": "SettingNotFoundError",
+    "message": "Exactly one of 'base_url', 'endpoint' must be provided, but none was set."
+  },
+  "azureResourceBaseUrl": "https://synthetic.openai.azure.com/openai/v1/",
+  "azureV1BaseUrl": "https://synthetic.openai.azure.com/openai/v1/",
+  "azureResourceQuery": {
+    "api-version": "2025-04-01-preview"
+  },
+  "azureV1Query": {},
+  "responsesSignature": "(model: 'str | None' = None, *, api_key: 'str | SecretString | Callable[[], str | Awaitable[str]] | None' = None, credential: 'AzureCredentialTypes | AzureTokenProvider | None' = None, org_id: 'str | None' = None, base_url: 'str | None' = None, azure_endpoint: 'str | None' = None, api_version: 'str | None' = None, default_headers: 'Mapping[str, str] | None' = None, async_client: 'AsyncOpenAI | None' = None, instruction_role: 'str | None' = None, compaction_strategy: 'CompactionStrategy | None' = None, tokenizer: 'TokenizerProtocol | None' = None, middleware: 'Sequence[ChatAndFunctionMiddlewareTypes] | None' = None, function_invocation_configuration: 'FunctionInvocationConfiguration | None' = None, additional_properties: 'dict[str, Any] | None' = None, env_file_path: 'str | None' = None, env_file_encoding: 'str | None' = None) -> 'None'",
+  "chatCompletionsSignature": "(model: 'str | None' = None, *, api_key: 'str | SecretString | Callable[[], str | Awaitable[str]] | None' = None, credential: 'AzureCredentialTypes | AzureTokenProvider | None' = None, org_id: 'str | None' = None, default_headers: 'Mapping[str, str] | None' = None, async_client: 'AsyncOpenAI | None' = None, instruction_role: 'str | None' = None, response_parser: 'OpenAIChatResponseContentsParser | None' = None, message_preparer: 'OpenAIChatMessagePreparer | None' = None, base_url: 'str | None' = None, azure_endpoint: 'str | None' = None, api_version: 'str | None' = None, middleware: 'Sequence[ChatAndFunctionMiddlewareTypes] | None' = None, function_invocation_configuration: 'FunctionInvocationConfiguration | None' = None, env_file_path: 'str | None' = None, env_file_encoding: 'str | None' = None) -> 'None'"
+}

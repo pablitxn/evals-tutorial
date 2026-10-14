@@ -1,0 +1,48 @@
+{
+  "atlasRepo": "pablitxn/sysadmin-workspace",
+  "mainSha": "8b8f5acebc7cd4430b7b1b7943b5f9e09817ab0e",
+  "planningPR": "https://github.com/pablitxn/sysadmin-workspace/pull/8",
+  "mergedVerified": true,
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "ce51fd873dbe1e99c7e9b61216d6b3372e9cd3bfbed8ea7106e77982a05d9871"
+    },
+    {
+      "path": "atlas/AGENTS.md",
+      "sha256": "1f2fef8b176405ad326754a42762590869d698cf47465ec00b3e7076b1e7013d"
+    },
+    {
+      "path": ".agents/skills/atlas-navigate/SKILL.md",
+      "sha256": "d364042c2f517d226987bbc5ac0dc1258b28bfdea66927c1e0274570df14e3f3"
+    },
+    {
+      "path": "atlas/wiki/evals-tutorial-roadmap-20261014.md",
+      "sha256": "690fc98447eb6954b0b403a0d879d2b49353d500aedbc9d49ec6bb97a18fe6eb"
+    },
+    {
+      "path": "atlas/wiki/evals-tutorial-architecture-20261014.md",
+      "sha256": "a7d64b4a658d483bc7c89113d45323d35462f47763a1ea6f92be1629ed1e0b47"
+    },
+    {
+      "path": "atlas/entries/2026-10-14-evals-tutorial-design-call.md",
+      "sha256": "a85aaacd5850037373c9de828bdcc3588269f3a4b0fe6a602f503cd9fa647e6d"
+    },
+    {
+      "path": "atlas/ops/reports/2026-10-14-evals-tutorial-sdk-evidence.md",
+      "sha256": "a2c5a561849dc4d5125ff3aa0e77b6cc5bccf9082fa189e2ac69b7927b52524f"
+    },
+    {
+      "path": "atlas/ops/standards/cloud-git-identity.md",
+      "sha256": "a02c3f551184b7437930400d9c8b63f0119a250d22686e0f7b55d46efb4a024a"
+    },
+    {
+      "path": "atlas/ops/standards/engineering-language-and-commits.md",
+      "sha256": "5e40d3c264d968fa2bb59dd0c77232951afef539815bdea7903086c976358017"
+    },
+    {
+      "path": "atlas/ops/standards/pull-request-and-parallel-integration.md",
+      "sha256": "8310024f0731bdde894d2ba591e3abc57407b61d7023fd16d1c8302f3b46e4eb"
+    }
+  ]
+}
