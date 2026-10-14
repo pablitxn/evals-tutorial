@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import { api,requestFor,waitRun,base } from './http-check.mjs';
 import { fail } from './lib.mjs';
 try{
-  const status=await api('/api/status');assert.equal(status.phase,'integrated');assert.equal(status.automaticInference,false);
+  let status;
+  for(let attempt=0;attempt<30;attempt++){
+    try{status=await api('/api/status');if(status.capabilities.telemetry.available)break;}catch{}
+    await new Promise(resolve=>setTimeout(resolve,1000));
+  }
+  assert.ok(status,'Tutorial status is unavailable');assert.equal(status.phase,'integrated');assert.equal(status.automaticInference,false);
   for(const name of ['content','validation','runner','telemetry'])assert.equal(status.capabilities[name].available,true,`${name} is unavailable`);
   const page=await fetch(base+'/');assert.equal(page.status,200);assert.ok(page.headers.get('content-security-policy').includes("script-src 'self'"));
   const tutorial=await api('/api/tutorial');assert.equal(tutorial.exercises.length,7);
