@@ -17,8 +17,8 @@
     "packages/review"
   ],
   "scripts": {
-    "contracts:generate": "python3 scripts/generate-contracts.py",
-    "contracts:check": "python3 scripts/generate-contracts.py --check",
+    "contracts:generate": "python3 scripts/generate-contracts.py && node scripts/generate-validators.mjs",
+    "contracts:check": "python3 scripts/generate-contracts.py --check && node scripts/generate-validators.mjs --check",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck && npm run typecheck:content",
     "test": "node --import tsx --test packages/*/tests/*.test.ts apps/server/tests/*.test.ts content/authoring/content.test.ts tests/integration/*.test.ts",
