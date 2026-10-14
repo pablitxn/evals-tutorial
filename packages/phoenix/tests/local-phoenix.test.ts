@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import type { RunRecord, Dataset, PhoenixLinks } from '@evals-tutorial/contracts';
+import { validateContract } from '@evals-tutorial/contracts';
 import { datasetHash } from '@evals-tutorial/contracts/node';
 import { ServiceError } from '@evals-tutorial/contracts/services';
 import { createPhoenixTelemetry, createTelemetryContext, parseCsv, type PhoenixTelemetryOptions } from '../src/index.js';
@@ -31,10 +32,20 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
   const options: PhoenixTelemetryOptions = { baseUrl, stateDirectory: directory };
   const telemetry = createPhoenixTelemetry(options);
   const observations: Record<string, unknown> = { mode: 'synthetic contract fixtures; real local Phoenix', inferenceCalls: 0, providerTokenSpend: 0 };
-  // The corrected shared contract must return verified links; persisted writes
-  // alone no longer satisfy this acceptance test.
+  // The accepted GlobalID correction now requires successful production returns.
+  // No journal inspection substitutes for a TelemetryService result.
   async function observed(ds: Dataset, rr: RunRecord, opt = options): Promise<PhoenixLinks> {
-    return (await createPhoenixTelemetry(opt).record(ds, rr, signal())).phoenix;
+    const result = await createPhoenixTelemetry(opt).record(ds, rr, signal());
+    assert(validateContract('PhoenixLinks', result.phoenix).valid);
+    assert(result.phoenix.datasetUrl && result.phoenix.experimentUrl);
+    assert.equal(result.rowLinks.length, rr.rows.length);
+    for (const row of result.rowLinks) {
+      assert(validateContract('PhoenixLinks', row.phoenix).valid);
+      assert(row.phoenix.traceId && row.phoenix.traceUrl);
+      assert.equal(row.phoenix.datasetVersionId, result.phoenix.datasetVersionId);
+      assert.equal(row.phoenix.experimentId, result.phoenix.experimentId);
+    }
+    return result.phoenix;
   }
   try {
     let first: PhoenixLinks;
@@ -46,6 +57,19 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
       assert.equal(tasks.length, 2);
       assert(tasks.every((task: { trace_id: string }) => /^[a-f0-9]{32}$/.test(task.trace_id)));
       observations.fixture = { ...first, tasks };
+    });
+    await t.test('successful return preserves actual padded GlobalIDs and verified per-row links', async () => {
+      const result = await telemetry.record(dataset, run, signal());
+      assert(result.phoenix.datasetVersionId!.endsWith('='), 'Use a fresh disposable Phoenix so the first version exercises actual padding');
+      const experiment = (await json(`/v1/experiments/${encodeURIComponent(result.phoenix.experimentId!)}`)).data;
+      assert.equal(result.phoenix.datasetId, experiment.dataset_id);
+      assert.equal(result.phoenix.datasetVersionId, experiment.dataset_version_id);
+      assert.equal(result.phoenix.experimentId, experiment.id);
+      const links = [result.phoenix.datasetUrl!, result.phoenix.experimentUrl!, ...result.rowLinks.map(row => row.phoenix.traceUrl!)];
+      for (const url of links) {
+        const response = await fetch(url); assert(response.ok); assert((await response.text()).includes('<title>Phoenix</title>'));
+      }
+      observations.successfulReturn = result;
     });
     await t.test('fresh Node process resumes the same journal and persisted experiment', async () => {
       const request = join(directory, 'restart.json');

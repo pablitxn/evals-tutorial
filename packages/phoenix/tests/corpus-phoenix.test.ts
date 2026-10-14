@@ -19,7 +19,12 @@ test('actual seven-exercise corpus imports and version pins; synthetic recording
   const service = createPhoenixTelemetry({ baseUrl, stateDirectory });
   const nonce = randomUUID(); const observations: object[] = [];
   async function observe(dataset: Dataset, run: ReturnType<typeof fixtureRun>): Promise<PhoenixLinks> {
-    return (await service.record(dataset, run, signal)).phoenix;
+    const result = await service.record(dataset, run, signal);
+    assert(validateContract('PhoenixLinks', result.phoenix).valid);
+    assert(result.phoenix.datasetUrl && result.phoenix.experimentUrl);
+    assert.equal(result.rowLinks.length, run.rows.length);
+    result.rowLinks.forEach(row => assert(validateContract('PhoenixLinks', row.phoenix).valid && row.phoenix.traceId && row.phoenix.traceUrl));
+    return result.phoenix;
   }
   try {
     for (const exercise of tutorial.exercises) {

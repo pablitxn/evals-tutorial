@@ -89,8 +89,9 @@ ET_WP07_LOCAL_PHOENIX=1 ET_WP07_PYTHON=/path/to/pinned/python \
 The local suite uploads only owned synthetic contract fixtures. The Python probe
 requires the pinned OTel 1.45.1 API/SDK/HTTP exporter; its AGENT/LLM spans are
 explicitly synthetic and make no model call. Missing Python skips continuity.
-The acceptance suites require a successful `TelemetryService.record` return with
-verified links. The old padded-GlobalID contract-block tolerance is removed after
-the shared correction; persistence without a valid service return fails the suite.
+The local/corpus suites require successful `TelemetryService.record` returns,
+including actual padded GlobalIDs and valid top-level/per-row links, using the
+integrator's merged contract correction. They fail on any recording error;
+journal read-back never substitutes for a successful production service return.
 Real corpus/runner/agent integration, actual MAF/provider telemetry and browser
 rendering require separate accepted producer heads and evidence.

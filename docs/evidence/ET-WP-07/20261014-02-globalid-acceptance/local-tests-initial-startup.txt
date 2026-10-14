@@ -1,0 +1,328 @@
+▶ real local Phoenix persistence of owned synthetic contracts; zero inference
+  ✖ identical and concurrent imports reuse dataset/version and experiment without duplicate results (46.865167ms)
+  ✖ successful return preserves actual padded GlobalIDs and verified per-row links (20.496175ms)
+/workspace/evals-tutorial/packages/phoenix/src/state.ts:8
+  return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);
+         ^
+
+ServiceError: Phoenix recording could not be verified
+    at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+    at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+    at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {
+  detail: {
+    code: 'telemetry_unavailable',
+    message: 'Phoenix recording could not be verified',
+    retryable: true
+  },
+  httpStatus: 503
+}
+
+Node.js v24.19.0
+  ✖ fresh Node process resumes the same journal and persisted experiment (290.905726ms)
+  ✖ two separate Node processes serialize fresh experiment creation (307.512271ms)
+  ✖ retry accepts previously attached fixture links and telemetry status changes (59.770187ms)
+  ✖ changed content creates a new version; original version stays pinned (4.64037ms)
+  ✖ reusing an application dataset version or run ID with different immutable evidence conflicts (15.017052ms)
+  ✖ cancelled execution preserves completed scores and operational error rows (4.461351ms)
+  ✖ lost experiment write response resumes by read-back without repeated execution (6.772902ms)
+  ✖ lost row write response resumes by read-back without repeated execution (4.44109ms)
+  ✖ lost evaluation write response resumes by read-back without repeated execution (3.793605ms)
+  ✖ cancellation during a committed recording write remains retryable without inference (3.128853ms)
+  ✔ missing completed-agent traces fail explicitly instead of returning fixture telemetry (2.784895ms)
+  ✖ experiment task points to the real Node/Python trace in its actual source project (1.87914ms)
+  ✔ incorrect evaluation read-back is rejected (2.908301ms)
+✖ real local Phoenix persistence of owned synthetic contracts; zero inference (785.802539ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 2
+ℹ fail 14
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1095.079794
+
+✖ failing tests:
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:2439
+✖ identical and concurrent imports reuse dataset/version and experiment without duplicate results (46.865167ms)
+  Error: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async observed (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:38:20)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:53:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:52:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    detail: { code: 'telemetry_unavailable', message: 'Phoenix recording could not be verified', retryable: true },
+    httpStatus: 503
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:2943
+✖ successful return preserves actual padded GlobalIDs and verified per-row links (20.496175ms)
+  Error: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:62:22)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:61:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    detail: { code: 'telemetry_unavailable', message: 'Phoenix recording could not be verified', retryable: true },
+    httpStatus: 503
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:3837
+✖ fresh Node process resumes the same journal and persisted experiment (290.905726ms)
+  Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import tsx packages/phoenix/tests/restart.ts /tmp/et-wp07-local-KQEMJT/restart.json
+  /workspace/evals-tutorial/packages/phoenix/src/state.ts:8
+    return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);
+           ^
+  
+  ServiceError: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {
+    detail: {
+      code: 'telemetry_unavailable',
+      message: 'Phoenix recording could not be verified',
+      retryable: true
+    },
+    httpStatus: 503
+  }
+  
+  Node.js v24.19.0
+  
+      at genericNodeError (node:internal/errors:985:15)
+      at wrappedFn (node:internal/errors:539:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:77:35)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:74:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    status: 1,
+    signal: null,
+    output: [ null, '', "/workspace/evals-tutorial/packages/phoenix/src/state.ts:8\n  return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);\n         ^\n\nServiceError: Phoenix recording could not be verified\n    at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)\n    at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)\n    at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {\n  detail: {\n    code: 'telemetry_unavailable',\n    message: 'Phoenix recording could not be verified',\n    retryable: true\n  },\n  httpStatus: 503\n}\n\nNode.js v24.19.0\n" ],
+    pid: 4034,
+    stdout: '',
+    stderr: "/workspace/evals-tutorial/packages/phoenix/src/state.ts:8\n  return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);\n         ^\n\nServiceError: Phoenix recording could not be verified\n    at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)\n    at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)\n    at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {\n  detail: {\n    code: 'telemetry_unavailable',\n    message: 'Phoenix recording could not be verified',\n    retryable: true\n  },\n  httpStatus: 503\n}\n\nNode.js v24.19.0\n"
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:4399
+✖ two separate Node processes serialize fresh experiment creation (307.512271ms)
+  Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import tsx packages/phoenix/tests/restart.ts /tmp/et-wp07-local-KQEMJT/concurrent.json
+  /workspace/evals-tutorial/packages/phoenix/src/state.ts:8
+    return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);
+           ^
+  
+  ServiceError: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {
+    detail: {
+      code: 'telemetry_unavailable',
+      message: 'Phoenix recording could not be verified',
+      retryable: true
+    },
+    httpStatus: 503
+  }
+  
+  Node.js v24.19.0
+  
+      at genericNodeError (node:internal/errors:985:15)
+      at wrappedFn (node:internal/errors:539:14)
+      at ChildProcess.exithandler (node:child_process:417:12)
+      at ChildProcess.emit (node:events:509:28)
+      at maybeClose (node:internal/child_process:1141:16)
+      at ChildProcess._handle.onexit (node:internal/child_process:306:5) {
+    code: 1,
+    killed: false,
+    signal: null,
+    cmd: '/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import tsx packages/phoenix/tests/restart.ts /tmp/et-wp07-local-KQEMJT/concurrent.json',
+    stdout: '',
+    stderr: "/workspace/evals-tutorial/packages/phoenix/src/state.ts:8\n  return new ServiceError({ code: 'telemetry_unavailable', message, retryable: true }, 503);\n         ^\n\nServiceError: Phoenix recording could not be verified\n    at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)\n    at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)\n    at async <anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/restart.ts:4:28) {\n  detail: {\n    code: 'telemetry_unavailable',\n    message: 'Phoenix recording could not be verified',\n    retryable: true\n  },\n  httpStatus: 503\n}\n\nNode.js v24.19.0\n"
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:5175
+✖ retry accepts previously attached fixture links and telemetry status changes (59.770187ms)
+  Error: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async observed (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:38:20)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:98:24)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:94:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    detail: { code: 'telemetry_unavailable', message: 'Phoenix recording could not be verified', retryable: true },
+    httpStatus: 503
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:5614
+✖ changed content creates a new version; original version stays pinned (4.64037ms)
+  Error: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async observed (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:38:20)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:103:22)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:100:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    detail: { code: 'telemetry_unavailable', message: 'Phoenix recording could not be verified', retryable: true },
+    httpStatus: 503
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:6461
+✖ reusing an application dataset version or run ID with different immutable evidence conflicts (15.017052ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: Phoenix recording could not be verified
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:113:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:111:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Phoenix recording could not be verified
+        at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+        at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:113:7)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:111:5)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:7006
+✖ cancelled execution preserves completed scores and operational error rows (4.461351ms)
+  Error: Phoenix recording could not be verified
+      at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+      at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+      at async observed (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:38:20)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:120:22)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:117:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    detail: { code: 'telemetry_unavailable', message: 'Phoenix recording could not be verified', retryable: true },
+    httpStatus: 503
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:7952
+✖ lost experiment write response resumes by read-back without repeated execution (6.772902ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert(injected)
+  
+      at TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:142:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:129:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:7952
+✖ lost row write response resumes by read-back without repeated execution (4.44109ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert(injected)
+  
+      at TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:142:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:129:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:7952
+✖ lost evaluation write response resumes by read-back without repeated execution (3.793605ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert(injected)
+  
+      at TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:142:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:129:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:9157
+✖ cancellation during a committed recording write remains retryable without inference (3.128853ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: Phoenix recording could not be verified
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:158:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:149:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Phoenix recording could not be verified
+        at unavailable (/workspace/evals-tutorial/packages/phoenix/src/state.ts:8:10)
+        at Object.record (/workspace/evals-tutorial/packages/phoenix/src/index.ts:380:15)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:158:7)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async TestContext.<anonymous> (/workspace/evals-tutorial/packages/phoenix/tests/local-phoenix.test.ts:149:5)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:10485
+✖ experiment task points to the real Node/Python trace in its actual source project (1.87914ms)
+  [TypeError: fetch failed] {
+    [cause]: Error [SocketError]: other side closed
+        at Socket.onHttpSocketEnd (node:internal/deps/undici/undici:7833:26)
+        at Socket.emit (node:events:521:24)
+        at endReadableNT (node:internal/streams/readable:1736:12)
+        at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+      code: 'UND_ERR_SOCKET',
+      socket: { localAddress: '127.0.0.1', localPort: 39456, remoteAddress: undefined, remotePort: undefined, remoteFamily: undefined, timeout: undefined, bytesWritten: 305, bytesRead: 0 }
+    }
+  }
+
+test at packages/phoenix/tests/local-phoenix.test.ts:1:1254
+✖ real local Phoenix persistence of owned synthetic contracts; zero inference (785.802539ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: read ECONNRESET
+        at TCP.onStreamRead (node:internal/stream_base_commons:216:20) {
+      errno: -104,
+      code: 'ECONNRESET',
+      syscall: 'read'
+    }
+  }
