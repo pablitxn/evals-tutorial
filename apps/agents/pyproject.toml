@@ -1,0 +1,10 @@
+[project]
+name = "evals-tutorial-agents"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "jsonschema==4.25.1",
+  "rfc8785==0.1.4",
+]
+# ET-INTEGRATOR adds MAF/provider/OTel pins after the ET-WP-00 receipt.
+# This core lock validates contracts only; it does not claim provider readiness.
