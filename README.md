@@ -110,3 +110,8 @@ and [contribution instructions](AGENTS.md) describe the implementation. Wire val
 are generated ahead of time for the production CSP. Run the documented checks
 for your checkout; historical internal task records are not distributed.
 
+
+## License
+
+[MIT](LICENSE), copyright 2026 Pablo Coronel. Original synthetic teaching
+material is included under the same license. Dependencies retain their own licenses.

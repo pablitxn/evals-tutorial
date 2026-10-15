@@ -21,9 +21,8 @@ corporate logo or real person's name. Year 2025 and currency USD throughout.
 Owned original text, layout, facts and response fixtures: no third-party dataset,
 image or license dependency. Producer records generation command/tool versions,
 authorship date, source recipe SHA, file/page SHA-256, MIME, dimensions and shared
-IDs. Use the owner repo's adopted license; until selected, record original
-project-authored material and no third-party assets without inventing a legal
-license grant. Authoring numbers below are independent of every evaluated model.
+IDs. Original project-authored material uses the repository's [MIT license](../../LICENSE).
+Do not add third-party assets without preserving their applicable license notices. Authoring numbers below are independent of every evaluated model.
 
 ## Canonical page truth
 
