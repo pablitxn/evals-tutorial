@@ -5,14 +5,14 @@ import { createContentService } from '../../server/src/http/content.js';
 import { withPreparedConsultation } from '../../server/src/http/consultation.js';
 import { localizeLesson } from '../src/i18n-core.js';
 
-test('the served prepared consultation localizes all seven lessons without changing source or evidence', async () => {
+test('the served prepared consultation localizes all eight lessons without changing source or evidence', async () => {
   const root = fileURLToPath(new URL('../../../', import.meta.url));
   const content = await createContentService(fileURLToPath(new URL('../../../content/', import.meta.url)));
   const original = await content.tutorial();
   const served = await (await withPreparedConsultation(content, root)).tutorial();
   const before = structuredClone(served);
 
-  assert.equal(served.exercises.length, 7);
+  assert.equal(served.exercises.length, 8);
   for (const exercise of served.exercises) {
     const authored = original.exercises.find(item => item.id === exercise.id)!;
     assert.equal(authored.exerciseVersion, '1.0.0');

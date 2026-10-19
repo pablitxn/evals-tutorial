@@ -27,7 +27,7 @@ test('production UI assets and actual content share the restricted HTTP origin',
     const assets=[...html.matchAll(/(?:src|href)="(\/assets\/[^" ]+)"/g)].map(match=>match[1]!);
     assert.equal(assets.length,2);
     for(const path of assets){const asset=await fetch(base+path);assert.equal(asset.status,200);assert.ok((await asset.arrayBuffer()).byteLength>0);}
-    const tutorial=await (await fetch(base+'/api/tutorial')).json() as {exercises:unknown[]};assert.equal(tutorial.exercises.length,7);
+    const tutorial=await (await fetch(base+'/api/tutorial')).json() as {exercises:unknown[]};assert.equal(tutorial.exercises.length,8);
     assert.equal((await fetch(base+'/api/status',{headers:{origin:'https://untrusted.invalid'}})).status,403);
     assert.equal((await fetch(base+'/%2e%2e%2fpackage.json')).status,404);
   }finally{server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(webRoot,{recursive:true,force:true});}

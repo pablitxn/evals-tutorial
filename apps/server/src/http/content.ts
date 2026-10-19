@@ -3,7 +3,7 @@ import { resolve, sep } from 'node:path';
 import { assertContract, validateDomain, type Dataset, type Document, type DocumentManifest, type Exercise, type Tutorial } from '@evals-tutorial/contracts';
 import { datasetHash, sha256 } from '@evals-tutorial/contracts/node';
 import { ServiceError, type ContentService } from '@evals-tutorial/contracts/services';
-const IDS=['intro','01-starred-classifier','02-document-classification','03-independent-tie-out','04-policy-recommendation','05-package-readiness','06-simulated-travel'];
+const IDS=['intro','01-starred-classifier','02-document-classification','03-independent-tie-out','04-policy-recommendation','05-package-readiness','06-simulated-travel','07-spec-regression'];
 const notFound=()=>new ServiceError({code:'not_found',message:'Installed content not found',retryable:false},404);
 /** Read-only verified snapshots; edit source and create a new version to reload. */
 export async function createContentService(contentRoot: string): Promise<ContentService> {
@@ -17,11 +17,11 @@ export async function createContentService(contentRoot: string): Promise<Content
   }
   const tutorial=JSON.parse((await read('tutorial.json')).toString('utf8')) as Tutorial;
   assertContract('Tutorial',tutorial);
-  if(tutorial.exercises.some((exercise,i)=>exercise.id!==IDS[i])) throw new Error('Content must have exactly the intro and six ordered cases');
+  if(tutorial.exercises.some((exercise,i)=>exercise.id!==IDS[i])) throw new Error('Content must have the intro, six ordered cases and final guided example');
   const datasets=new Map<string,Dataset>();
   const documents=new Map<string,Document>();
   for(const exercise of tutorial.exercises) {
-    if(exercise.readOnly!==(exercise.id==='intro')) throw new Error('Only the introduction is read-only');
+    if(exercise.readOnly!==(['intro','07-spec-regression'].includes(exercise.id))) throw new Error('Only the introduction and final guided example are read-only');
     if(!exercise.agentVariants.includes(exercise.defaultAgentVariant)) throw new Error('Default agent variant is not installed');
     if(exercise.mode==='Code' && exercise.maxJudgeCallsPerRow!==0) throw new Error('Code criteria cannot use the judge broker');
     if(!/^[a-zA-Z0-9_-]+$/.test(exercise.datasetId) || !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(exercise.datasetVersion)) throw new Error('Dataset path identifiers are invalid');

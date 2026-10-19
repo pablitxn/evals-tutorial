@@ -1,8 +1,8 @@
 import type { Dataset, Exercise, ExerciseId, RunRecord, ReviewRecord, ServiceStatus, SourceSnapshot, Tutorial } from '@evals-tutorial/contracts';
 
-export const LESSON_IDS: readonly ExerciseId[] = ['intro', '01-starred-classifier', '02-document-classification', '03-independent-tie-out', '04-policy-recommendation', '05-package-readiness', '06-simulated-travel'];
-export const LESSON_LABELS = ['Introduction', 'Starred messages', 'Document types', 'Salary tie-out', 'Policy support', 'Package readiness', 'Simulated travel'];
-export const LESSON_MINUTES = [10, 15, 20, 25, 20, 15, 20];
+export const LESSON_IDS: readonly ExerciseId[] = ['intro', '01-starred-classifier', '02-document-classification', '03-independent-tie-out', '04-policy-recommendation', '05-package-readiness', '06-simulated-travel', '07-spec-regression'];
+export const LESSON_LABELS = ['Introduction', 'Starred messages', 'Document types', 'Salary tie-out', 'Policy support', 'Package readiness', 'Simulated travel', 'Specification regression'];
+export const LESSON_MINUTES = [10, 15, 20, 25, 20, 15, 20, 15];
 
 export function snapshot(tutorial: Tutorial, exercise: Exercise, source: string): SourceSnapshot {
   return { tutorialVersion: tutorial.tutorialVersion, exerciseId: exercise.id, exerciseVersion: exercise.exerciseVersion,

@@ -4,7 +4,7 @@ from typing import Literal, NotRequired, TypedDict
 
 type JsonValue = None | bool | float | str | list[JsonValue] | dict[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
-type ExerciseId = Literal['intro', '01-starred-classifier', '02-document-classification', '03-independent-tie-out', '04-policy-recommendation', '05-package-readiness', '06-simulated-travel']
+type ExerciseId = Literal['intro', '01-starred-classifier', '02-document-classification', '03-independent-tie-out', '04-policy-recommendation', '05-package-readiness', '06-simulated-travel', '07-spec-regression']
 type EvaluationMode = Literal['Code', 'LLM Judge', 'Mixed']
 type ValidateRequest = SourceSnapshot
 type ErrorCode = Literal['invalid_request', 'not_found', 'not_implemented', 'configuration', 'source_stale', 'validation_failed', 'isolation_unavailable', 'runtime_error', 'resource_limit', 'protocol_error', 'budget_exceeded', 'provider_unavailable', 'provider_refusal', 'agent_output_schema', 'unsupported_media', 'timeout', 'cancelled', 'telemetry_unavailable', 'review_ineligible', 'review_output_schema', 'conflict', 'internal_error']
@@ -14,6 +14,7 @@ class EvalResult(TypedDict):
     score: float
     label: Literal['pass', 'fail', 'partial']
     explanation: str
+    criteria: NotRequired[list[CriterionResult]]
 
 class EvalInputMetadata(TypedDict):
     exampleId: str
@@ -337,3 +338,9 @@ class JudgeRpcResponse(TypedDict):
     id: str
     result: NotRequired[EvalResult]
     error: NotRequired[OperationError]
+
+class CriterionResult(TypedDict):
+    score: float
+    label: Literal['pass', 'fail', 'partial']
+    explanation: str
+    criterionId: str

@@ -15,4 +15,4 @@ for (const exercise of tutorial.exercises) {
 }
 assertContract('Tutorial', tutorial);
 await writeFile(resolve(root, 'tutorial.json'), JSON.stringify(tutorial, null, 2) + '\n');
-console.log('Finalized seven RFC 8785 dataset identities and Tutorial envelope.');
+console.log(`Finalized ${tutorial.exercises.length} RFC 8785 dataset identities and Tutorial envelope.`);

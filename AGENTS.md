@@ -11,7 +11,7 @@ contracts, manifests and cross-package integration with the maintainer.
 Do not rewrite history, force-push, merge automatically or deploy without
 explicit authorization.
 
-One read-only introduction and six cases. Learners edit TypeScript evaluators;
+One read-only introduction, six editable cases and a final read-only guided example. Learners edit TypeScript evaluators;
 Python agents and datasets are read-only consultation. Use owned synthetic data
 only. No credential generation, real transmission, booking or inference on
 navigation. A child process is not a sandbox. Missing isolated execution must

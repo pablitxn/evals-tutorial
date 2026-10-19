@@ -47,3 +47,4 @@ export const AcceptedRun: ValidateFunction;
 export const AcceptedReview: ValidateFunction;
 export const JudgeRpcRequest: ValidateFunction;
 export const JudgeRpcResponse: ValidateFunction;
+export const CriterionResult: ValidateFunction;

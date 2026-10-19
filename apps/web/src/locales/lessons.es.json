@@ -72,5 +72,19 @@
       "travel-no-booking": "simulated true y booked false en toda respuesta; no hay capacidad de reservar."
     },
     "rubricVersion": "1.0.0"
+  },
+  "07-spec-regression": {
+    "exerciseVersion": "1.0.0",
+    "rubricVersion": "1.0.0",
+    "title": "Ejemplo de regresión basado en una especificación",
+    "lessonMarkdown": "El **desarrollo basado en especificaciones (SDD)** expresa los requisitos antes de implementar el agente. Cada requisito se convierte en una aserción determinista y un resultado visible.\n\n## 1. Lee la especificación\n\nRecomienda un viaje de ida y vuelta **simulado** del catálogo suministrado para la ruta y las fechas exactas solicitadas. El total debe incluir la tarifa y todas las tasas obligatorias en la moneda solicitada, sin superar el presupuesto; se admite la igualdad. Si no hay opciones elegibles, devuelve no_options y todos los campos del itinerario en null. Toda respuesta debe indicar simulated true y booked false. No se reserva ni se llama a una API de viajes real.\n\nEste ejemplo guiado parte de requisitos explícitos, muestra cómo se derivaron el agente y el evaluador preparados y compara dos versiones sobre el mismo conjunto fijo de tres casos. R1–R6 son los vínculos entre la especificación, las comprobaciones y la evidencia observada. No se genera código dinámicamente.\n\nLa versión baseline cuenta la tarifa más las tasas. **omit-fees es una regresión intencionada** que omite las tasas obligatorias. Inspecciona el código antes de ejecutar ambas versiones explícitamente. Los resultados provienen de llamadas reales al agente; la navegación y los cambios de idioma no ejecutan inferencia. Una regresión requiere un pass real de baseline que se convierte en fail de omit-fees. Los errores operativos no tienen puntuación. Este ejemplo de solo lectura no añade un séptimo caso editable ni una revisión.\n\nLas referencias se escribieron antes de la inferencia: identifican opciones elegibles, totales completos y estado. Se acepta cualquier opción elegible; no se exige la más barata. Para no_options, R1, R2 y R4 no comprueban un itinerario seleccionado; R3 sigue comprobando la moneda y R5 verifica independientemente la ausencia y los cuatro campos null. El agente y el evaluador son código fijo preparado. La consulta Python muestra ambos prompts y la llamada real de Microsoft Agent Framework.\n\nLos tres casos cubren un viaje rutinario dentro del presupuesto, una tarifa base baja con tasas altas frente a otra opción asequible, y la ausencia de opciones asequibles. Una omisión de tasas puede incumplir R3, R4 o R5 de distintas formas: lee la respuesta real para explicar el cambio observado.",
+    "criteria": {
+      "R1": "La opción elegida debe existir en el catálogo suministrado y coincidir con la ruta solicitada.",
+      "R2": "Las fechas de salida y regreso deben coincidir exactamente y estar en orden cronológico.",
+      "R3": "El total debe sumar tarifa y tasas obligatorias del catálogo, con la moneda y el total declarado correctos.",
+      "R4": "Tanto el total completo del catálogo como el total declarado deben ser menores o iguales al presupuesto.",
+      "R5": "no_options si y solo si no hay opciones elegibles; los campos del itinerario deben ser null.",
+      "R6": "Toda respuesta debe indicar simulated true y booked false; no hay capacidad de reservar."
+    }
   }
 }

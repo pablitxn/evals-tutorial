@@ -8,11 +8,11 @@ const capability = { available: true };
 export const status: ServiceStatus = { schemaVersion: '1.0.0', phase: 'integrated', provider: { provider: 'openai', model: 'synthetic-ui-mock', configRevision: 'c'.repeat(64), configured: true }, automaticInference: false,
   capabilities: { content: capability, validation: capability, runner: capability, agents: capability, judge: capability, telemetry: capability, review: capability } };
 export const tutorial: Tutorial = { schemaVersion: '1.0.0', tutorialVersion: 'ui-mock-v1', title: 'Synthetic UI test mock', exercises: LESSON_IDS.map((id, i): Exercise => ({
-  id, title: LESSON_LABELS[i]!, exerciseVersion: '1', rubricVersion: '1', mode: i === 4 ? 'Mixed' : 'Code', readOnly: i === 0,
+  id, title: LESSON_LABELS[i]!, exerciseVersion: '1', rubricVersion: '1', mode: i === 4 ? 'Mixed' : 'Code', readOnly: i === 0 || i === 7,
   lessonMarkdown: 'Synthetic UI test mock. No real provider or Phoenix artifacts.\n\nWrite an evaluator that distinguishes a correct response from a known mistake. The independent reference stays separate from the agent input.',
   starterSource: source, pythonSource: '"""Synthetic prepared source for UI verification only."""\nasync def respond(input):\n    return {"label": "starred"}\n',
   datasetId: `mock-${id}`, datasetVersion: '1', datasetHash: hash, criteria: [{ id: 'criterion', description: 'Check the declared criterion and explain a known mistake.', mode: 'Code' }, ...(i === 4 ? [{ id: 'support', description: 'Judge faithful support against the synthetic policy.', mode: 'LLM Judge' as const }] : [])],
-  agentVariants: ['baseline', 'alternative'], defaultAgentVariant: 'baseline', maxJudgeCallsPerRow: i === 4 ? 2 : 0,
+  agentVariants: i === 7 ? ['baseline', 'omit-fees'] : ['baseline', 'alternative'], defaultAgentVariant: 'baseline', maxJudgeCallsPerRow: i === 4 ? 2 : 0,
   inputSchema: { type: 'object' }, outputSchema: { type: 'object' }, expectedSchema: { type: 'object' }, officialDocs: [{ title: 'Phoenix documentation', url: 'https://arize.com/docs/phoenix' }],
 })) };
 export function dataset(exercise = tutorial.exercises[1]!): Dataset { return { schemaVersion: '1.0.0', datasetId: exercise.datasetId, datasetVersion: '1', contentHash: hash, documentManifestRef: null,

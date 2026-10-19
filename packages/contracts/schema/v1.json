@@ -47,7 +47,8 @@
         "03-independent-tie-out",
         "04-policy-recommendation",
         "05-package-readiness",
-        "06-simulated-travel"
+        "06-simulated-travel",
+        "07-spec-regression"
       ]
     },
     "EvaluationMode": {
@@ -79,6 +80,14 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 4000
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/CriterionResult"
+          }
         }
       },
       "required": [
@@ -686,8 +695,8 @@
           "items": {
             "$ref": "#/$defs/Exercise"
           },
-          "maxItems": 7,
-          "minItems": 7
+          "maxItems": 8,
+          "minItems": 8
         }
       },
       "required": [
@@ -1946,6 +1955,93 @@
         "schemaVersion",
         "type",
         "id"
+      ]
+    },
+    "CriterionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "label": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "partial"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "criterionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$"
+        }
+      },
+      "required": [
+        "criterionId",
+        "score",
+        "label",
+        "explanation"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "label": {
+                "const": "pass"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "label": {
+                "const": "fail"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "label": {
+                "const": "partial"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              }
+            }
+          }
+        }
       ]
     }
   }

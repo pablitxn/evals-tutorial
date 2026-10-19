@@ -37,5 +37,5 @@ test('actual corpus schemas, all rows, document resolver and agent boundary are 
       if (response.status === 'completed') assert.equal(response.traceId, 'c'.repeat(32));
     }
   }
-  assert.equal(examples, 25); assert.equal(providerCalls, 25); assert.ok(docRequests > 0);
+  assert.equal(examples, 28); assert.equal(providerCalls, 28); assert.ok(docRequests > 0);
 });

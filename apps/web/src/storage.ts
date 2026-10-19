@@ -1,6 +1,8 @@
+import type { ComparisonAttempt } from './comparison.js';
 import type { Exercise, ExerciseId, Tutorial, RunRequest, ReviewRequest } from '@evals-tutorial/contracts';
 
 export type SavedWork = {
+  comparison?: ComparisonAttempt;
   source: string;
   rubricVersion: string;
   datasetHash: string;
@@ -33,6 +35,9 @@ export function loadWork(tutorial: Tutorial, exercise: Exercise): { work: SavedW
     const work = { ...base, source: saved.source, variant: exercise.agentVariants.includes(saved.variant ?? '') ? saved.variant! : exercise.defaultAgentVariant };
     for (const key of ['fixtureRunId', 'agentRunId', 'reviewId'] as const) if (typeof saved[key] === 'string' && /^[\w.:-]+$/.test(saved[key]!)) Object.assign(work, { [key]: saved[key] });
     if (Array.isArray(saved.pastReceiptIds)) Object.assign(work, { pastReceiptIds: saved.pastReceiptIds.filter(item => item && ['run', 'review'].includes(item.kind) && typeof item.id === 'string' && /^[\w.:-]+$/.test(item.id)).slice(-12) });
+    const pair = saved.comparison;
+    const safeId = (value: unknown): value is string => typeof value === 'string' && /^[\w.:-]+$/.test(value);
+    if (pair && safeId(pair.id) && safeId(pair.baselineRequestId) && ['candidateRequestId', 'baselineRunId', 'candidateRunId'].every(key => pair[key as keyof ComparisonAttempt] === undefined || safeId(pair[key as keyof ComparisonAttempt]))) Object.assign(work, { comparison: pair });
     return { work };
   }
   try {

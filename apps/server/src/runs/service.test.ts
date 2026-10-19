@@ -102,6 +102,31 @@ test('wrong fixture verdict differs from evaluator execution failure', async () 
   await runs.shutdown();
 });
 
+test('prepared final example rejects incomplete, duplicated and contradictory requirement evidence', async () => {
+  const prepared: Exercise = { ...exercise, id: '07-spec-regression', readOnly: true,
+    criteria: Array.from({ length: 6 }, (_, i) => ({ id: `R${i + 1}`, description: 'Prepared requirement', mode: 'Code' })) };
+  const preparedContent: ContentService = { ...content, exercise: async () => prepared };
+  const { runs, executor } = await setup({ content: preparedContent });
+  const criteria = prepared.criteria.map(item => ({ criterionId: item.id, ...success }));
+  const variants: EvalResult[] = [success,
+    { ...success, criteria: criteria.slice(1) },
+    { ...success, criteria: [criteria[0]!, ...criteria.slice(0, 5)] },
+    { ...success, criteria: [{ ...criteria[0]!, ...failure }, ...criteria.slice(1)] },
+    { ...success, criteria }];
+  for (const [i, result] of variants.entries()) {
+    executor.evaluate = async () => structuredClone(result);
+    const submitted = request(`requirement-${i}`);
+    submitted.snapshot.exerciseId = prepared.id;
+    const receipt = await finished(runs, (await runs.create(submitted)).runId);
+    assert.equal(receipt.status, i === variants.length - 1 ? 'completed' : 'failed');
+    if (receipt.status === 'failed') assert(receipt.rows.every(row => !row.evaluation && row.error?.code === 'protocol_error'));
+    else assert.equal(receipt.rows[0]!.evaluation?.criteria?.length, 6);
+  }
+  const edited = request('prepared-edit', 'edited source'); edited.snapshot.exerciseId = prepared.id;
+  await assert.rejects(runs.create(edited), matches('source_stale'));
+  await runs.shutdown();
+});
+
 test('agent sees no references/fixtures/source; malformed response has no score', async () => {
   const received: AgentRequest[] = [];
   const traceparent = '00-' + 'f'.repeat(32) + '-' + 'e'.repeat(16) + '-01';

@@ -181,6 +181,16 @@ export class RunServiceImpl implements RunService {
       const evaluation = await evaluateRow(this.executor, javascript, entry.record.runId, input, exercise, this.options.judge, rowController.signal, Math.min(deadlineEpochMs, Date.now() + (exercise.mode === 'Code' ? LIMITS.codeTimeoutMs : LIMITS.judgeTimeoutMs)), task.fixture?.id);
       if (rowController.signal.aborted) throw error('cancelled', 'Row was cancelled');
       if (!validateContract('EvalResult', evaluation).valid) throw error('protocol_error', 'Evaluator returned an invalid result');
+      if (exercise.id === '07-spec-regression') {
+        const criteria = evaluation.criteria;
+        const ids = new Set(criteria?.map(item => item.criterionId));
+        if (!criteria || criteria.length !== exercise.criteria.length || ids.size !== criteria.length
+          || exercise.criteria.some(item => !ids.has(item.id))
+          || criteria.some(item => !['pass', 'fail'].includes(item.label))
+          || evaluation.label !== (criteria.every(item => item.label === 'pass') ? 'pass' : 'fail')) {
+          throw error('protocol_error', 'Prepared evaluation must report every requirement once with a matching binary aggregate');
+        }
+      }
       const expectation = task.fixture?.expectedEvaluation;
       if (expectation && expectation.minScore > expectation.maxScore) throw error('invalid_request', 'Fixture expectation interval is invalid');
       return { ...base, status: 'completed', output: structuredClone(output), evaluation, ...(traceId ? { phoenix: { traceId } } : {}), ...(expectation ? { fixtureMatched: expectation.allowedLabels.includes(evaluation.label) && evaluation.score >= expectation.minScore && evaluation.score <= expectation.maxScore && expectation.requiredEvidence.every(item => evaluation.explanation.includes(item)) } : {}) };

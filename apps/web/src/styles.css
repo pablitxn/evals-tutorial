@@ -441,3 +441,29 @@ td .markdown-content pre { max-height: 180px; padding: 10px; font-size: .65625re
 }
 
 .table-scroll details .json-viewer { margin-top: 12px; }
+
+.spec-preparation { padding: 0 22px 22px; margin-bottom: 24px; }
+.spec-preparation > .panel-heading { padding-inline: 0; }
+.spec-preparation > p { max-width: 95ch; font-size: .8125rem; line-height: 1.75; }
+.spec-preparation th:first-child { width: 47%; }
+.spec-preparation th .markdown { font-weight: 400; }
+.spec-preparation > details { margin-top: 18px; }
+.spec-preparation article { border-top: 1px solid var(--border); padding-block: 16px; }
+.spec-preparation article h3 { margin: 0 0 5px; }
+.spec-preparation dl > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; margin-block: 10px; font-size: .75rem; }
+.spec-preparation dd { margin: 0; }
+.spec-actions .action-buttons > h2, .spec-actions .action-buttons > .help { flex-basis: 100%; }
+.spec-actions .action-buttons > h2 { font-size: 1rem; margin-bottom: 0; }
+.spec-actions .action-buttons > .help { max-width: 95ch; margin-top: 0; }
+.spec-comparison { padding: 0 22px 22px; }
+.spec-comparison > p { font-size: .8125rem; line-height: 1.75; }
+.spec-comparison table { min-width: 800px; }
+.spec-comparison th:first-child { width: 18%; }
+.spec-comparison th:last-child { width: 34%; }
+.comparison-receipt { border-top: 1px solid var(--border); margin-top: 22px; padding-top: 16px; }
+.comparison-receipt > summary { overflow-wrap: anywhere; margin-bottom: 18px; }
+.comparison-receipt > .run-results { padding-inline: 0; }
+@media (max-width: 600px) {
+  .spec-preparation { padding-inline: 16px; }
+  .spec-comparison { padding-inline: 16px; }
+}

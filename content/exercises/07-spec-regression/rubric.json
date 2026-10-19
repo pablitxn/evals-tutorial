@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "criteria": [
+    {
+      "id": "R1",
+      "description": "A recommendation identifies exactly one supplied catalog option on the requested route.",
+      "mode": "Code"
+    },
+    {
+      "id": "R2",
+      "description": "Both option and response dates equal the request, with return after outbound.",
+      "mode": "Code"
+    },
+    {
+      "id": "R3",
+      "description": "Report the exact fare plus mandatory fees in the requested currency and integer cents.",
+      "mode": "Code"
+    },
+    {
+      "id": "R4",
+      "description": "The selected full catalog total and reported total are at or below budget; equality is allowed.",
+      "mode": "Code"
+    },
+    {
+      "id": "R5",
+      "description": "Return no_options iff no eligible option exists, with all four itinerary fields null; otherwise recommend.",
+      "mode": "Code"
+    },
+    {
+      "id": "R6",
+      "description": "Always return simulated true and booked false; no booking capability exists.",
+      "mode": "Code"
+    }
+  ],
+  "fixtureVersion": "1.0.0"
+}

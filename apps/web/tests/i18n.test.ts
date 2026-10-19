@@ -19,7 +19,7 @@ test('English and Spanish UI catalogs have identical keys and interpolation para
 });
 
 test('all static UI translation calls exist in both catalogs', () => {
-  for (const name of ['App.tsx', 'components.tsx', 'i18n.tsx', 'preferences.tsx', 'ProviderStatus.tsx', 'JsonViewer.tsx', 'EvaluationConcepts.tsx']) {
+  for (const name of ['App.tsx', 'components.tsx', 'i18n.tsx', 'preferences.tsx', 'ProviderStatus.tsx', 'JsonViewer.tsx', 'EvaluationConcepts.tsx', 'SpecRegression.tsx']) {
     const file = readFileSync(new URL(`../src/${name}`, import.meta.url), 'utf8');
     const source = ts.createSourceFile(name, file, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     const visit = (node: ts.Node) => {
@@ -53,7 +53,9 @@ test('interpolation preserves supplied IDs literally and unknown keys fall back 
   assert.equal(translate('es', 'Review {status}.'), 'Revisión {status}.');
 });
 
-test('seven Spanish lessons cover the original criterion IDs without modifying code, data or rubric identity', () => {
+test('eight Spanish lessons cover the original criterion IDs without modifying code, data or rubric identity', () => {
+  assert.equal(tutorial.exercises.length, 8);
+  assert.equal(tutorial.exercises.filter(exercise => !exercise.readOnly).length, 6);
   const before = structuredClone(tutorial);
   assert.deepEqual(Object.keys(spanish).sort(), tutorial.exercises.map(exercise => exercise.id).sort());
   for (const exercise of tutorial.exercises) {

@@ -484,3 +484,7 @@ save(ROOT / 'authoring/schema-probes.json', [
     {'exerciseId': IDS[6], 'target': 'outputSchema', 'value': variant(recommendation, departDate='2027-02-29'), 'valid': False},
 ])
 print('Authored 9 original pages, 18 document files, seven datasets and tutorial. Run finalize.ts for canonical hashes.')
+
+# The guided example can also be rebuilt independently, preserving existing content.
+import runpy
+runpy.run_path(str(ROOT / 'authoring/build-spec-regression.py'), run_name='__main__')
