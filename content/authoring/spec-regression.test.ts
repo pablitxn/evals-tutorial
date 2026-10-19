@@ -58,7 +58,7 @@ test('guided example preserves travel schemas, three normal cases and one shared
       assert.deepEqual(fixture.expectedEvaluation.allowedLabels, [result.label]);
       assert.equal(fixture.expectedEvaluation.minScore, result.score);
       for (const evidence of fixture.expectedEvaluation.requiredEvidence) {
-        assert.ok(result.explanation.includes(evidence) || result.criteria!.some(item => item.explanation.includes(evidence)));
+        assert.ok(result.explanation.includes(evidence), `RunService matches required fixture evidence in the aggregate explanation: ${evidence}`);
       }
     }
   }

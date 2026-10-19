@@ -65,5 +65,5 @@ export async function evaluate(row: EvalInput, _ctx: EvalContext): Promise<EvalR
   ];
   const passed = criteria.every(criterion => criterion.score === 1);
   return { score: passed ? 1 : 0, label: passed ? 'pass' : 'fail', criteria,
-    explanation: `${exampleId}: ${passed ? 'R1-R6 passed' : 'failed ' + criteria.filter(criterion => criterion.score === 0).map(criterion => criterion.criterionId).join(', ')}.` };
+    explanation: `${exampleId}: ${passed ? criteria.map(criterion => criterion.criterionId).join(', ') + ' passed' : 'failed ' + criteria.filter(criterion => criterion.score === 0).map(criterion => criterion.criterionId).join(', ')}.` };
 }
