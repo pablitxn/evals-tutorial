@@ -125,6 +125,53 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
       assert.equal(failed[header.indexOf('annotation_tutorial_result_score')], '');
       observations.cancelled = { ...result, tasks };
     });
+    await t.test('all-error agent receipts preserve existing producer traces without scores or duplicate rows', async () => {
+      const sourceProjectName = `ET-WP07-error-source-${nonce}`;
+      const created = await fetch(`${baseUrl}/v1/projects`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: sourceProjectName }) });
+      assert(created.ok);
+      const agent = fixtureRun(dataset, `failed-agent-${nonce}`);
+      agent.request.mode = 'agent'; agent.status = 'failed'; agent.totalRows = 1; agent.completedRows = 0;
+      agent.rows = [{ exampleId: 'starred', status: 'failed', error: { code: 'provider_unavailable', message: 'Owned synthetic provider failure; no inference', retryable: true } }];
+      const original = structuredClone(agent);
+      const context = createTelemetryContext(agent.runId, 'starred');
+      const agentSpanId = nonce.replaceAll('-', '').slice(0, 16);
+      const modelSpanId = nonce.replaceAll('-', '').slice(16);
+      const exported = await fetch(`${baseUrl}/v1/projects/${sourceProjectName}/spans`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ data: [
+        { name: 'Synthetic failed agent; no inference', span_kind: 'AGENT', context: { trace_id: context.traceId, span_id: agentSpanId }, parent_id: context.spanId,
+          start_time: agent.createdAt, end_time: agent.updatedAt, status_code: 'ERROR', attributes: {} },
+        { name: 'Synthetic failed model; no inference', span_kind: 'LLM', context: { trace_id: context.traceId, span_id: modelSpanId }, parent_id: agentSpanId,
+          start_time: agent.createdAt, end_time: agent.updatedAt, status_code: 'ERROR', attributes: {} },
+      ] }) });
+      assert(exported.ok);
+      for (let attempt = 0; attempt < 20; attempt++) {
+        if ((await json(`/v1/projects/${sourceProjectName}/spans?trace_id=${context.traceId}`)).data.length === 2) break;
+        await delay(100);
+      }
+      const result = await createPhoenixTelemetry({ ...options, sourceProjectName }).record(dataset, agent, signal());
+      assert.deepEqual(await createPhoenixTelemetry({ ...options, sourceProjectName }).record(dataset, agent, signal()), result);
+      assert.deepEqual(agent, original);
+      const tasks = (await json(`/v1/experiments/${result.phoenix.experimentId}/runs`)).data;
+      assert.equal(tasks.length, 1); assert.equal(tasks[0].error, 'failed:provider_unavailable'); assert.equal(tasks[0].output, null);
+      const source = (await json(`/v1/projects/${sourceProjectName}/spans?trace_id=${context.traceId}`)).data;
+      assert.equal(source.length, 3); assert(source.some((span: { context: { span_id: string } }) => span.context.span_id === context.spanId));
+      const project = (await json(`/v1/projects/${sourceProjectName}`)).data;
+      assert(result.rowLinks[0]!.phoenix.traceUrl!.includes(`/projects/${encodeURIComponent(project.id)}/`));
+      const csv = parseCsv(await (await fetch(`${baseUrl}/v1/experiments/${result.phoenix.experimentId}/csv`)).text());
+      assert(!csv[0]!.includes('annotation_tutorial_result_score'));
+      observations.failedAgent = { ...result, inferenceCalls: 0, persistedRows: tasks.length, sourceSpans: source.length };
+    });
+    await t.test('unstarted cancelled and timed-out agent rows record without requiring a producer project', async () => {
+      for (const status of ['cancelled', 'timed_out'] as const) {
+        const agent = fixtureRun(dataset, `${status}-agent-${nonce}`);
+        agent.request.mode = 'agent'; agent.status = status; agent.totalRows = 1; agent.completedRows = 0;
+        agent.rows = [{ exampleId: 'starred', status, error: { code: status === 'cancelled' ? 'cancelled' : 'timeout', message: 'Owned synthetic unstarted row', retryable: false } }];
+        const result = await observed(dataset, agent, { ...options, sourceProjectName: `ET-WP07-absent-${nonce}` });
+        const tasks = (await json(`/v1/experiments/${result.experimentId}/runs`)).data;
+        assert.equal(tasks.length, 1); assert.equal(tasks[0].output, null);
+        assert.equal(tasks[0].error, `${status}:${agent.rows[0]!.error!.code}`);
+        observations[`${status}UnstartedAgent`] = { ...result, inferenceCalls: 0, persistedRows: tasks.length };
+      }
+    });
     for (const stage of ['experiment', 'row', 'evaluation'] as const) {
       await t.test(`lost ${stage} write response resumes by read-back without repeated execution`, async () => {
         const retryRun = fixtureRun(dataset, `${stage}-${nonce}`);

@@ -178,7 +178,7 @@ export class RunServiceImpl implements RunService {
       }
       if (!validateDomain(exercise.outputSchema, output).valid) throw error('agent_output_schema', 'Output violates the installed domain schema');
       const input: EvalInput = { input: task.example.input, output, expected: task.example.expected, metadata: { exampleId: task.example.id, exerciseId: exercise.id, datasetVersion: entry.dataset!.datasetVersion } };
-      const evaluation = await evaluateRow(this.executor, javascript, entry.record.runId, input, exercise, this.options.judge, rowController.signal, Math.min(deadlineEpochMs, Date.now() + (exercise.mode === 'Code' ? LIMITS.codeTimeoutMs : LIMITS.judgeTimeoutMs)));
+      const evaluation = await evaluateRow(this.executor, javascript, entry.record.runId, input, exercise, this.options.judge, rowController.signal, Math.min(deadlineEpochMs, Date.now() + (exercise.mode === 'Code' ? LIMITS.codeTimeoutMs : LIMITS.judgeTimeoutMs)), task.fixture?.id);
       if (rowController.signal.aborted) throw error('cancelled', 'Row was cancelled');
       if (!validateContract('EvalResult', evaluation).valid) throw error('protocol_error', 'Evaluator returned an invalid result');
       const expectation = task.fixture?.expectedEvaluation;

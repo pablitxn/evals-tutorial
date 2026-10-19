@@ -1,4 +1,4 @@
-import { createClient, type PhoenixClient, type Types } from '@arizeai/phoenix-client';
+import { createClient, HttpError, type PhoenixClient, type Types } from '@arizeai/phoenix-client';
 import { getDatasetUrl, getExperimentUrl } from '@arizeai/phoenix-client/utils/urlUtils';
 import type { Dataset, PhoenixLinks, RowResult, RunRecord } from '@evals-tutorial/contracts';
 import { validateContract } from '@evals-tutorial/contracts';
@@ -211,25 +211,37 @@ function attributes(run: RunRecord, row: RowResult): Record<string, string | num
     ...(row.evaluation ? { 'tutorial.score': row.evaluation.score, 'tutorial.label': row.evaluation.label } : {}) };
 }
 
-async function spansIn(client: PhoenixClient, project: string, traceId: string): Promise<Span[]> {
-  const response = await client.GET('/v1/projects/{project_identifier}/spans', { params: {
-    path: { project_identifier: project }, query: { trace_id: [traceId], limit: 1000 },
-  } });
-  need(Array.isArray(response.data?.data) && !response.data.next_cursor, 'Trace is absent or exceeds bounded span count');
-  return response.data.data;
+async function spansIn(client: PhoenixClient, project: string, traceId: string, allowMissingProject = false): Promise<Span[]> {
+  try {
+    const response = await client.GET('/v1/projects/{project_identifier}/spans', { params: {
+      path: { project_identifier: project }, query: { trace_id: [traceId], limit: 1000 },
+    } });
+    need(Array.isArray(response.data?.data) && !response.data.next_cursor, 'Trace is absent or exceeds bounded span count');
+    return response.data.data;
+  } catch (error) {
+    // A terminal error can precede the first producer export (for example, a
+    // cancelled row that never started). Other failures must not look like absence.
+    if (allowMissingProject && error instanceof HttpError && error.status === 404) return [];
+    throw error;
+  }
 }
 
 async function recordTrace(client: PhoenixClient, options: PhoenixTelemetryOptions, experiment: Experiment, run: RunRecord, row: RowResult, signal: AbortSignal): Promise<{ traceId: string; projectId: string }> {
   const { traceId, spanId } = createTelemetryContext(run.runId, row.exampleId, row.fixtureId);
-  const isAgent = run.request.mode === 'agent' && row.status === 'completed';
-  if (isAgent) need(row.phoenix?.traceId === traceId && options.sourceProjectName, 'Real agent trace context/read-back is required for completed agent rows');
+  const completedAgent = run.request.mode === 'agent' && row.status === 'completed';
+  if (completedAgent) need(row.phoenix?.traceId === traceId && options.sourceProjectName, 'Real agent trace context/read-back is required for completed agent rows');
   // Phoenix traces and span IDs are global, including across projects. Preserve
   // producer spans in their actual source project; the experiment result stores
-  // their verified trace ID. Never copy/replay AGENT or LLM spans as new activity.
-  const projectName = isAgent ? options.sourceProjectName! : experiment.project_name!;
-  const existing = await spansIn(client, projectName, traceId);
-  if (isAgent) {
-    need(existing.some(span => span.span_kind === 'AGENT') && existing.some(span => span.span_kind === 'LLM'), 'Real agent/model spans are unavailable');
+  // their verified trace ID, including failed invocations. An unstarted error row
+  // may have no producer spans and gets only a stored-receipt span. Never
+  // copy/replay AGENT or LLM spans as new activity.
+  const sourceSpans = run.request.mode === 'agent' && options.sourceProjectName
+    ? await spansIn(client, options.sourceProjectName, traceId, !completedAgent) : [];
+  const usesSourceProject = completedAgent || sourceSpans.length > 0;
+  const projectName = usesSourceProject ? options.sourceProjectName! : experiment.project_name!;
+  const existing = usesSourceProject ? sourceSpans : await spansIn(client, projectName, traceId);
+  if (completedAgent) need(existing.some(span => span.span_kind === 'AGENT') && existing.some(span => span.span_kind === 'LLM'), 'Real agent/model spans are unavailable');
+  if (usesSourceProject) {
     const parents = new Map(existing.map(span => [span.context.span_id, span.parent_id]));
     need(parents.size === existing.length, 'Duplicate producer span IDs');
     for (const span of existing) {
@@ -262,7 +274,7 @@ async function recordTrace(client: PhoenixClient, options: PhoenixTelemetryOptio
   }
   const actual = persisted.find(span => span.context.span_id === spanId);
   need(actual && actual.context.trace_id === traceId && actual.parent_id === null && equal(actual.attributes, root.attributes));
-  if (isAgent) need(existing.every(span => persisted.some(actual => actual.context.span_id === span.context.span_id)), 'Producer spans disappeared during recording');
+  if (usesSourceProject) need(existing.every(span => persisted.some(actual => actual.context.span_id === span.context.span_id)), 'Producer spans disappeared during recording');
   const actualProject = data(await client.GET('/v1/projects/{project_identifier}', { params: { path: { project_identifier: projectName } } }));
   need(typeof actualProject.id === 'string' && actualProject.name === projectName);
   return { traceId, projectId: actualProject.id };

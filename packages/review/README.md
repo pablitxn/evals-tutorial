@@ -49,6 +49,15 @@ add an explicit fallibility notice. Exact quotes establish inspectable anchors;
 they do not prove the model's interpretation is correct. No LLM review is proof of
 correctness or authorization to send, file or book anything.
 
+The host supplies a bounded catalog of literal source/output/evaluation quotes
+alongside the complete original evidence. Only deterministic ASCII quote IDs enter
+the provider schema. The private Python transport requires `evidenceQuoteId`,
+rejects unknown IDs and model-supplied `evidence`, then resolves each ID to the
+unchanged catalog quote before validating the public `ReviewAssessment`. Public
+receipts retain exact evidence text. Example correlation, criterion coverage,
+input/output bounds and the no-retry policy still apply; a catalog is a selection
+aid, never a substitute for the original grounding checks.
+
 Offline verification (root manifest updates belong to ET-INTEGRATOR):
 
 ```sh

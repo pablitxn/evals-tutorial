@@ -24,13 +24,17 @@ export function createProviderBroker(transport: BrokerTransport, content?: Pick<
   }
   return {
     bind(binding: JudgeBinding) {
+      const rowIdentity = { exampleId: binding.exampleId, ...(binding.fixtureId !== undefined ? { fixtureId: binding.fixtureId } : {}), status: 'completed' };
+      if (!validateContract('RowResult', rowIdentity).valid) throw operation('invalid_request', 'Invalid trusted judge row identity.');
       if (!validateContract('EvalInput', binding.row).valid || binding.exampleId !== binding.row.metadata.exampleId || !['Code', 'Mixed', 'LLM Judge'].includes(binding.mode) || !Number.isInteger(binding.maxCalls) || binding.maxCalls < 0 || binding.maxCalls > LIMITS.maxJudgeCallsPerRow || !Number.isInteger(binding.maxOutputTokens) || binding.maxOutputTokens < 1 || binding.maxOutputTokens > LIMITS.maxProviderOutputTokens || !Number.isFinite(binding.deadlineEpochMs)) throw operation('invalid_request', 'Invalid trusted judge binding.');
       if (Buffer.byteLength(JSON.stringify(binding.row)) > LIMITS.protocolBytes) throw operation('resource_limit', 'Judge row exceeds the protocol limit.');
       const row = structuredClone(binding.row);
       const criteria = [...binding.criterionIds];
       const mode = binding.mode, maxCalls = binding.maxCalls, maxOutputTokens = binding.maxOutputTokens;
       const deadlineEpochMs = binding.deadlineEpochMs, signal = binding.signal;
-      const key = JSON.stringify([binding.runId, binding.exampleId]);
+      // Each installed fixture is a distinct row, including fixtures with equal outputs.
+      // The absent fixture ID gives real-agent rows a separate namespace.
+      const key = JSON.stringify([binding.runId, binding.exampleId, binding.fixtureId ?? null]);
       const identity = sha256(canonicalJson({ row, criteria, mode, maxCalls, maxOutputTokens, deadlineEpochMs }));
       let budget = budgets.get(key);
       if (budget && budget.identity !== identity) throw operation('conflict', 'Judge row binding cannot change within a run.');

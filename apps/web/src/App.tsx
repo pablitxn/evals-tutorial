@@ -1,11 +1,18 @@
 import type { Message, Parameters } from './i18n-core.js';
-import { useI18n, LanguageSelector, localizeLesson } from './i18n.js';
+import { useI18n, localizeLesson } from './i18n.js';
 import { useEffect, useRef, useState } from 'react';
 import { LIMITS, validateContract, type AcceptedReview, type AcceptedRun, type Dataset, type Exercise, type ExerciseId, type ReviewRecord, type RunRecord, type ServiceStatus, type Tutorial, type ValidationResult } from '@evals-tutorial/contracts';
 import { ApiError, errorText, request } from './api.js';
 import { DocumentPreviews, Editor, ExternalLink, LessonText, ModeBadge, ReferenceTabs, ReviewFeedback, RunResults } from './components.js';
 import { fixturesDiscriminate, LESSON_IDS, LESSON_LABELS, LESSON_MINUTES, lessonFromHash, reviewActive, reviewCurrent, reviewFindingsValid, runActive, runCurrent, sameSnapshot, snapshot, sourceHash } from './model.js';
 import { loadWork, PENDING_KEY, read, remove, resetStorage, save, storageKey, type PendingSubmission, type SavedWork } from './storage.js';
+import { Preferences } from './preferences.js';
+import { Markdown } from './Markdown.js';
+import { ProviderStatus } from './ProviderStatus.js';
+import { BrandMark } from './BrandMark.js';
+import { EvaluationConcepts } from './EvaluationConcepts.js';
+import type { EditorHandle } from './CodeEditor.js';
+import { Dropdown } from './Dropdown.js';
 
 type Work = SavedWork & { oldSource?: string; validation?: ValidationResult; fixture?: RunRecord; agent?: RunRecord; review?: ReviewRecord; history: (RunRecord | ReviewRecord)[]; evidenceError?: string };
 type Works = Partial<Record<ExerciseId, Work>>;
@@ -36,10 +43,12 @@ export function App() {
   const [saved, setSaved] = useState(true);
   const [resultTab, setResultTab] = useState<'fixtures' | 'agent'>('fixtures');
   const [reset, setReset] = useState<'exercise' | 'tutorial'>();
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const [lessonsOpen, setLessonsOpen] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
   const [announcement, setMessage] = useState<Message>();
   function setAnnouncement(key: string, parameters?: Parameters) { setMessage({ key, parameters }); }
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<EditorHandle>(null);
   const resultsRef = useRef<HTMLElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const restoreFocus = useRef<HTMLElement | null>(null);
@@ -91,6 +100,12 @@ export function App() {
   }
 
   useEffect(() => { void boot(); }, []);
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const updateMenu = () => setLessonsOpen(desktop.matches);
+    desktop.addEventListener('change', updateMenu);
+    return () => desktop.removeEventListener('change', updateMenu);
+  }, []);
   useEffect(() => {
     const change = () => { setActive(lessonFromHash()); setError(undefined); setResultTab('fixtures'); };
     window.addEventListener('hashchange', change);
@@ -285,7 +300,9 @@ export function App() {
     setResultTab('agent'); requestAnimationFrame(() => { const row = document.querySelector<HTMLElement>(`[id^="row-${CSS.escape(encodeURIComponent(id))}-"]`); if (row) { row.tabIndex = -1; row.focus(); row.scrollIntoView({ block: 'center' }); } });
   }
 
-  if (!tutorial || !exercise || !work) return <main className="startup"><LanguageSelector /><div className="brand-mark">E</div><h1>{t("Evals tutorial")}</h1><p>{bootError ? t("Local tutorial is not ready yet.") : t("Loading the local workshop…")}</p>{bootError && <><p role="alert" className="error-text">{t("Raw service diagnostics (original language).")} {bootError}</p><p>{t("Start the local services with")}{' '}<code>npm run start</code>{t(". No provider calls have been made.")}</p><button className="primary" onClick={() => void boot()}>{t("Retry connection")}</button></>}</main>;
+  const preferencesButton = <button type="button" className="profile-avatar" aria-label={t('Open preferences')} title={t('Preferences')} aria-haspopup="dialog" aria-expanded={preferencesOpen} onClick={() => setPreferencesOpen(true)}>PA</button>;
+  const preferencesDialog = preferencesOpen && <Preferences onClose={() => setPreferencesOpen(false)} />;
+  if (!tutorial || !exercise || !work) return <><main className="startup">{preferencesButton}<BrandMark /><h1>{t("Evals tutorial")}</h1><p>{bootError ? t("Local tutorial is not ready yet.") : t("Loading the local workshop…")}</p>{bootError && <><p role="alert" className="error-text">{t("Raw service diagnostics (original language).")} {bootError}</p><p>{t("Start the local services with")}{' '}<code>npm run start</code>{t(". No provider calls have been made.")}</p><button className="primary" onClick={() => void boot()}>{t("Retry connection")}</button></>}</main>{preferencesDialog}</>;
 
   const index = LESSON_IDS.indexOf(active);
   const currentRun = resultTab === 'fixtures' ? work.fixture : work.agent;
@@ -293,14 +310,14 @@ export function App() {
   const missingReview = !valid ? 'Validate the current evaluator.' : !fixtureReady ? 'Match the known correct and incorrect fixtures for this version.' : !agentCurrent || work.agent?.status !== 'completed' ? 'Complete a real agent run for the same version.' : !cap?.review.available ? 'Review service unavailable.' : !paidReady ? 'Configure the selected local provider.' : busy ? 'Finish or cancel the active operation first.' : undefined;
   const lesson = localizeLesson(exercise, locale);
   const activeOperation = pending?.acceptedId || activeRecords;
+  const providerLabel = status?.provider ? `${status.provider.provider === 'openai' ? 'OpenAI' : 'Azure Foundry'} · ${status.provider.model}` : t('Provider setup required');
   return <>
     <a className="skip-link" href="#lesson-title">{t("Skip to lesson")}</a>
-    <header className="app-header"><a className="brand" href="#intro"><span className="brand-mark" aria-hidden="true">E</span><span>{t("Evals tutorial")}<small>{t("A local developer workshop")}</small></span></a>
-      <div className="provider-status"><span className={`status-dot ${paidReady ? 'available' : ''}`} aria-hidden="true" /><span>{status?.provider ? `${status.provider.provider === 'openai' ? 'OpenAI' : 'Azure Foundry'} · ${status.provider.model}` : t("Provider setup required")}<small>{status?.phase === 'foundation' ? t("Foundation · services still integrating") : t("Local services · no automatic inference")}</small></span></div>
-      <LanguageSelector />
+    <header className="app-header"><a className="brand" href="#intro"><BrandMark /><span>{t("Evals tutorial")}</span></a>
+      <div className="header-actions"><ProviderStatus label={providerLabel} configured={paidReady} />{preferencesButton}</div>
     </header>
     <div className="app-layout">
-      <aside className="sidebar"><details className="lesson-menu" open={window.matchMedia('(min-width: 1200px)').matches}><summary>{t("Lessons")}{' '}<span>{reviewed} {t("/ 6 reviewed")}</span></summary><nav aria-label={t("Tutorial lessons")}><p className="eyebrow">{t("YOUR WORKSHOP")}</p><div className="progress-label">{reviewed} {t("/ 6 cases reviewed")}</div><div className="progress-track" aria-hidden="true"><span style={{ width: `${reviewed / 6 * 100}%` }} /></div>
+      <aside className="sidebar"><details className="lesson-menu" open={lessonsOpen} onToggle={event => setLessonsOpen(event.currentTarget.open)}><summary>{t("Lessons")}{' '}<span>{reviewed} {t("/ 6 reviewed")}</span></summary><nav aria-label={t("Tutorial lessons")}><p className="eyebrow">{t("YOUR WORKSHOP")}</p><div className="progress-label">{reviewed} {t("/ 6 cases reviewed")}</div><div className="progress-track" aria-hidden="true"><span style={{ width: `${reviewed / 6 * 100}%` }} /></div>
         {tutorial.exercises.map((e, i) => {
           const w = works[e.id]; const bound = w && reviewCurrent(w.review, snapshot(tutorial, e, w.source), hashes[e.id] ?? null, w.fixture, w.agent, w.variant, status);
           const label = e.readOnly ? w?.agent?.status === 'completed' ? 'Run completed' : 'Read-only introduction' : bound && w?.review?.status === 'ready' && reviewFindingsValid(w.review, e, w.fixture, w.agent) ? 'Reviewed' : w?.review ? 'Needs new review' : w?.source !== e.starterSource ? 'Draft' : 'Not started';
@@ -308,27 +325,25 @@ export function App() {
         })}</nav></details><div className="sidebar-footer"><p>{t("Make the criterion visible.")}<br />{t("Test the evaluator, then the agent.")}</p><button className="text-button" disabled={busy} onClick={() => setReset('tutorial')}>{t("Reset Tutorial")}</button></div></aside>
       <main className="main-content">
         <section className="lesson-intro"><p className="eyebrow">{exercise.readOnly ? t("START HERE") : t("CASE {case} OF 6", { case: index })}<span> / {LESSON_MINUTES[index]} {t("MIN")}</span><ModeBadge mode={exercise.mode} /></p><h1 ref={headingRef} tabIndex={-1} id="lesson-title">{lesson.title}</h1><LessonText text={lesson.lessonMarkdown} />
-          <div className="criteria">{lesson.criteria.map(criterion => <div key={criterion.id}><ModeBadge mode={criterion.mode} /><span>{criterion.description}</span></div>)}</div>
+          <div className="criteria">{lesson.criteria.map(criterion => <div key={criterion.id}><ModeBadge mode={criterion.mode} /><Markdown text={criterion.description} /></div>)}</div>
           <div className="docs-links">{exercise.officialDocs.map(doc => <ExternalLink key={doc.url} url={doc.url}>{t(doc.title)}</ExternalLink>)}</div>
         </section>
-        {exercise.readOnly && <details className="concepts"><summary>{t("The evaluation loop, in eight terms")}</summary><dl>{[['Input', 'Synthetic material given to the agent.'], ['Response', 'What the agent actually returned.'], ['Reference', 'An independently authored expected answer; separate from agent input.'], ['Evaluator', 'A criterion checked with code or a model judge.'], ['Score', 'Normalized criterion result, separate from execution success.'], ['Dataset', 'Versioned inputs and references.'], ['Experiment', 'Recorded outputs and evaluations on a pinned dataset.'], ['Trace', 'Recorded steps of an actual invocation.']].map(([term, text]) => <div key={term}><dt>{t(term!)}</dt><dd>{t(text!)}</dd></div>)}</dl></details>}
-        <details className="setup"><summary>{t("Local setup & service status")}</summary><p>{t("Install both language stacks:")}{' '}<code>npm run install:all</code>{t(". Configure the existing backend-only credentials, then")}{' '}<code>npm run env:check</code> {t("and")}{' '}<code>npm run start</code>. <code>npm run demo:check</code> {t("is offline; its explicit")}{' '}<code>--live</code> {t("check uses provider tokens.")}</p><ul>{status && Object.entries(status.capabilities).map(([name, value]) => <li key={name}><strong>{t(name)}</strong>: {value.available ? t("available") : <>{t("unavailable")} · {value.reason}</>}</li>)}</ul><button className="text-button" onClick={() => request<ServiceStatus>('/api/status', 'ServiceStatus').then(setStatus).catch(problem => setError(errorText(problem)))}>{t("Refresh service status")}</button></details>
+        {exercise.readOnly && <EvaluationConcepts />}
         {!saved && <div className="notice warning" role="status">{t("Edits are not saved in this browser. Keep this tab open and copy your evaluator.")}</div>}
         {work.oldSource !== undefined && <div className="notice warning"><strong>{t("Saved work belongs to an older version.")}</strong><p>{t("The new starter is loaded. Old work carries no completion.")}</p><details><summary>{t("Inspect old evaluator")}</summary><pre>{work.oldSource}</pre></details><button disabled={busy || exercise.readOnly} onClick={() => { edit(work.oldSource!); update(active, { oldSource: undefined }); }}>{t("Copy old source into editor")}</button></div>}
         {work.evidenceError && <div className="notice warning">{t("Raw service diagnostics (original language).")} {work.evidenceError} {t("New evidence is required for completion.")}</div>}
         {(error || pollError) && <div className="notice error-text" role="alert">{typeof error === "object" ? t(error.key, error.parameters) : <>{t("Raw service diagnostics (original language).")} {error ?? pollError}</>}</div>}
         {pending && !pending.acceptedId && <div className="notice warning"><strong>{t("Submission outcome unknown.")}</strong><p>{t("Recover the same request ID. This does not create a new attempt.")}</p><button disabled={!!action} onClick={() => void submit(pending)}>{t("Recover submission")}</button></div>}
-        <div className="workspace"><Editor source={work.source} readOnly={exercise.readOnly} busy={busy} onChange={edit} editorRef={editorRef} diagnostics={work.validation?.codeHash === hash ? work.validation.diagnostics : (resultTab === 'fixtures' ? fixtureCurrent : agentCurrent) ? currentRun?.diagnostics ?? [] : []} valid={valid} saving={saved} />
+        <div className="workspace"><Editor key={`editor-${exercise.id}`} source={work.source} readOnly={exercise.readOnly} busy={busy} onChange={edit} editorRef={editorRef} diagnostics={work.validation?.codeHash === hash ? work.validation.diagnostics : (resultTab === 'fixtures' ? fixtureCurrent : agentCurrent) ? currentRun?.diagnostics ?? [] : []} onCopy={() => navigator.clipboard.writeText(work.source).then(() => setAnnouncement('Evaluator copied.')).catch(() => { editorRef.current?.focus(); editorRef.current?.select(); setAnnouncement('Select and copy the evaluator with your keyboard.'); })} />
         <section className="actions" aria-label={t("Evaluator actions")}><div className="action-buttons">
           {exercise.readOnly ? <button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => run('agent')}>{t("Run Introduction")}</button> : <><button disabled={busy || !cap?.validation.available} onClick={() => void validate()}>{t("Validate")}</button><button disabled={!canTest} onClick={() => run('fixtures')}>{t("Test Fixtures")}</button><button className="primary" disabled={!canRun} onClick={() => run('agent')}>{t("Run Agent")}{' '}<span aria-hidden="true">→</span></button></>}
           {activeOperation && <button className="cancel-button" disabled={!!action} onClick={() => void cancel()}>{action === 'Cancelling…' ? t("Cancelling…") : pending?.kind === 'review' ? t("Cancel Review") : t("Cancel")}</button>}
           <button className="text-button" onClick={() => { resultsRef.current?.focus(); resultsRef.current?.scrollIntoView({ block: 'start' }); }}>{t("Inspect results ↓")}</button>
           {!exercise.readOnly && <button className="text-button" disabled={busy} onClick={() => setReset('exercise')}>{t("Reset Exercise")}</button>}
-          <button className="text-button" onClick={() => navigator.clipboard.writeText(work.source).then(() => setAnnouncement('Evaluator copied.')).catch(() => { editorRef.current?.focus(); editorRef.current?.select(); setAnnouncement('Select and copy the evaluator with your keyboard.'); })}>{t("Copy evaluator")}</button>
-        </div><p className="cost-cue">{exercise.readOnly ? t("Run uses agent tokens.") : usesJudge ? t("Fixtures use judge tokens. Agent runs use agent + judge tokens.") : t("Code fixtures: no provider calls. Agent runs use agent tokens.")} {t("No inference on navigation.")}</p><p className="help">{t("At most")}{' '}{dataset?.examples.length ?? '—'} {t("agent rows;")}{' '}{exercise.maxJudgeCallsPerRow} {t("judge calls / row;")}{' '}{LIMITS.maxProviderOutputTokens} {t("output tokens / call;")}{' '}{LIMITS.maxRetries} {t("automatic retries;")}{' '}{LIMITS.runTimeoutMs / 60000} {t("minute run deadline. Accepted provider calls may still cost tokens after cancellation.")}</p>
+        </div><p className="cost-cue">{exercise.readOnly ? t("Run uses agent tokens.") : usesJudge ? t("Fixtures use judge tokens. Agent runs use agent + judge tokens.") : t("Code fixtures: no provider calls. Agent runs use agent tokens.")} {t("No inference on navigation.")}</p><details className="execution-details"><summary>{t('Execution details')}</summary><p className="help">{t("At most")}{' '}{dataset?.examples.length ?? '—'} {t("agent rows;")}{' '}{exercise.maxJudgeCallsPerRow} {t("judge calls / row;")}{' '}{LIMITS.maxProviderOutputTokens} {t("output tokens / call;")}{' '}{LIMITS.maxRetries} {t("automatic retries;")}{' '}{LIMITS.runTimeoutMs / 60000} {t("minute run deadline. Accepted provider calls may still cost tokens after cancellation.")}</p></details>
           {!exercise.readOnly && !fixtureReady && <p className="help">{t("Run Agent unlocks after the current evaluator distinguishes known correct and incorrect fixtures.")}</p>}
           {action && <p role="status">{t(action)}</p>}
-          {!exercise.readOnly && exercise.agentVariants.length > 1 && <div className="comparison-controls"><label>{t("Prepared agent variant")}{' '}<select disabled={busy} value={work.variant} onChange={event => update(active, { variant: event.target.value })}>{exercise.agentVariants.map(variant => <option key={variant}>{variant}</option>)}</select></label><button disabled={!canRun || !agentCurrent || !alternative} onClick={() => run('agent', alternative)}>{t("Compare Prepared Agent")}</button><span className="help">{t("Optional paid comparison on identical source and dataset. Changing variant needs new review evidence.")}</span></div>}
+          {!exercise.readOnly && exercise.agentVariants.length > 1 && <div className="comparison-controls"><label>{t("Prepared agent variant")}{' '}<Dropdown label={t("Prepared agent variant")} disabled={busy} value={work.variant} onValueChange={variant => update(active, { variant })} options={exercise.agentVariants.map(variant => ({ value: variant, label: variant }))} /></label><button disabled={!canRun || !agentCurrent || !alternative} onClick={() => run('agent', alternative)}>{t("Compare Prepared Agent")}</button><span className="help">{t("Optional paid comparison on identical source and dataset. Changing variant needs new review evidence.")}</span></div>}
         </section><ReferenceTabs key={exercise.id} exercise={exercise} dataset={dataset} /></div>
         {(active === '02-document-classification' || active === '03-independent-tie-out') && <DocumentPreviews dataset={dataset} />}
         <section className="panel results-panel" ref={resultsRef} tabIndex={-1} aria-labelledby="results-heading"><div className="panel-heading"><h2 id="results-heading">{t("Results")}</h2><div className="result-tabs" aria-label={t("Result views")}><button aria-pressed={resultTab === 'fixtures'} onClick={() => setResultTab('fixtures')}>{t("Fixture tests")}</button><button aria-pressed={resultTab === 'agent'} onClick={() => setResultTab('agent')}>{t("Agent run")}</button></div></div><RunResults run={currentRun} dataset={dataset} current={resultTab === 'fixtures' ? fixtureCurrent : agentCurrent} />{currentRun && !runActive(currentRun) && currentRun.rows.length > 0 && ['failed', 'not_requested'].includes(currentRun.telemetryStatus) && <button disabled={busy} onClick={() => void retryRecording(currentRun)}>{t("Retry Phoenix recording · no inference")}</button>}</section>
@@ -342,9 +357,10 @@ export function App() {
         }).catch(problem => setError(errorText(problem)))}>{t("Inspect")}{' '}{t(receipt.kind)} {receipt.id}</button>)}</details>}
         {work.history.length > 0 && <details className="previous-attempts"><summary>{t("Previous attempts (")}{work.history.length})</summary>{work.history.map(record => 'runId' in record ? <details key={record.runId}><summary>{t("Run")}{' '}{record.runId} · {record.request.agentVariant} · {t(record.status)}</summary><RunResults run={record} dataset={dataset} current={false} /></details> : <details key={record.reviewId}><summary>{t("Review")}{' '}{record.reviewId} · {t(record.status)}</summary><ReviewFeedback review={record} current={false} jumpToRow={jumpToRow} /></details>)}</details>}
         {reviewed === 6 && <div className="notice success">{t("All six current cases reviewed.")}{' '}{tutorial.exercises.filter(e => !e.readOnly).every(e => works[e.id]?.agent?.telemetryStatus === 'recorded' && works[e.id]?.agent?.phoenix?.experimentUrl) && works.intro?.agent?.telemetryStatus === 'recorded' ? t("Inspect the actual Phoenix evidence to finish the workshop.") : t("Phoenix evidence is still incomplete; the full demonstration is not complete.")}</div>}
-        <footer className="lesson-footer">{index > 0 ? <a href={`#${LESSON_IDS[index - 1]}`}>← {t(LESSON_LABELS[index - 1]!)}</a> : <span>{t("One introduction. Six practical cases.")}</span>}{index < 6 && <a className="next-lesson" href={`#${LESSON_IDS[index + 1]}`}>{t("Next:")}{' '}{t(LESSON_LABELS[index + 1]!)} →</a>}</footer>
+        <footer className="lesson-footer">{index > 0 && <a href={`#${LESSON_IDS[index - 1]}`}>← {t(LESSON_LABELS[index - 1]!)}</a>}{index < 6 && <a className="next-lesson" href={`#${LESSON_IDS[index + 1]}`}>{t("Next:")}{' '}{t(LESSON_LABELS[index + 1]!)} →</a>}</footer>
       </main>
     </div>
+    {preferencesDialog}
     <div className="sr-only" role="status" aria-live="polite">{announcement && t(announcement.key, Object.fromEntries(Object.entries(announcement.parameters ?? {}).map(([key, value]) => [key, key === "status" ? t(String(value)) : value])))}</div>
     <dialog ref={dialogRef} aria-labelledby="reset-title" onCancel={() => setReset(undefined)}><h2 id="reset-title">{reset === 'tutorial' ? t("Reset all local tutorial work?") : t("Reset this exercise?")}</h2><p>{t(reset === "tutorial" ? "Restore the starter evaluators and clear local tutorial progress and evidence bindings. Phoenix history and other applications’ storage are retained." : "Restore the starter evaluator and clear this exercise’s progress and evidence bindings. Phoenix history and other applications’ storage are retained.")}</p><div className="action-buttons"><button data-cancel onClick={() => setReset(undefined)}>{t("Cancel")}</button><button className="danger" disabled={busy} onClick={doReset}>{t("Reset")}{' '}{reset === 'tutorial' ? t("Tutorial") : t("Exercise")}</button></div></dialog>
   </>;

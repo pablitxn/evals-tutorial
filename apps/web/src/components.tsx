@@ -2,6 +2,9 @@ import { useI18n } from './i18n.js';
 import React, { useRef, useState, type KeyboardEvent } from 'react';
 import type { Dataset, Diagnostic, EvaluationMode, Exercise, PhoenixLinks, ReviewRecord, RunRecord } from '@evals-tutorial/contracts';
 import { safeUrl } from './model.js';
+import { Markdown } from './Markdown.js';
+import { CodeEditor, type EditorHandle } from './CodeEditor.js';
+import { JsonViewer } from './JsonViewer.js';
 
 export function ModeBadge({ mode }: { mode: EvaluationMode }) {
   const { t } = useI18n();
@@ -24,49 +27,34 @@ export function PhoenixEvidence({ links, state }: { links?: PhoenixLinks; state:
   </div>;
 }
 
-/** Small, escaped Markdown view: authored headings, lists, paragraphs and code only. */
 export function LessonText({ text }: { text: string }) {
-  return <div className="lesson-text">{text.split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => {
-    if (/^#{1,6} /.test(paragraph)) return <h3 key={index}>{paragraph.replace(/^#{1,6} /, '')}</h3>;
-    if (paragraph.split('\n').every(line => /^[-*] /.test(line))) return <ul key={index}>{paragraph.split('\n').map((line, i) => <li key={i}>{line.slice(2)}</li>)}</ul>;
-    if (paragraph.startsWith('```')) return <pre key={index}>{paragraph.replace(/^```[^\n]*\n/, '').replace(/\n```$/, '')}</pre>;
-    return <p key={index}>{paragraph}</p>;
-  })}</div>;
+  return <Markdown text={text} className="lesson-text" />;
 }
 
-export function Editor({ source, readOnly, busy, onChange, editorRef, diagnostics, valid, saving }: {
+export function Editor({ source, readOnly, busy, onChange, editorRef, diagnostics, onCopy }: {
   source: string; readOnly: boolean; busy: boolean; onChange: (source: string) => void;
-  editorRef: React.RefObject<HTMLTextAreaElement | null>; diagnostics: Diagnostic[]; valid: boolean; saving: boolean;
+  editorRef: React.RefObject<EditorHandle | null>; diagnostics: Diagnostic[]; onCopy: () => void;
 }) {
   const { t } = useI18n();
-  const expanded = useRef(false);
+  const [expanded, setExpanded] = useState(false);
   function position(diagnostic: Diagnostic) {
-    const editor = editorRef.current;
-    if (!editor) return;
-    const lines = source.split('\n');
-    const offset = lines.slice(0, diagnostic.line - 1).reduce((sum, line) => sum + line.length + 1, 0) + diagnostic.column - 1;
-    editor.focus(); editor.setSelectionRange(offset, offset + 1);
-    const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 24;
-    editor.scrollTop = Math.max(0, (diagnostic.line - 3) * lineHeight);
-  }
-  function indent(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (readOnly || busy || !(event.key === ']' && (event.ctrlKey || event.metaKey))) return;
-    event.preventDefault();
-    const editor = event.currentTarget; const start = editor.selectionStart;
-    onChange(source.slice(0, start) + '  ' + source.slice(editor.selectionEnd));
-    requestAnimationFrame(() => editor.setSelectionRange(start + 2, start + 2));
+    editorRef.current?.reveal(diagnostic.line, diagnostic.column);
   }
   return <section className="panel editor-panel" aria-labelledby="editor-heading">
-    <div className="panel-heading"><h2 id="editor-heading">evaluator.ts</h2><span className="read-label">{readOnly ? t("Read-only") : busy ? t("Locked during operation") : t("Editable")}<span> · {saving ? t("Saved locally") : t("Not saved")}</span></span></div>
-    <div className="editor-area"><div className="line-numbers" aria-hidden="true">{source.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div>
-      <textarea id="evaluator-source" ref={editorRef} value={source} onChange={event => onChange(event.target.value)} onKeyDown={indent} readOnly={readOnly || busy}
-        onScroll={event => { const gutter = event.currentTarget.previousElementSibling; if (gutter) gutter.scrollTop = event.currentTarget.scrollTop; }}
-        aria-label={t(readOnly ? 'Read-only TypeScript evaluator' : 'Editable TypeScript evaluator')} aria-describedby="editor-help" aria-invalid={diagnostics.some(d => d.severity === 'error')}
-        spellCheck={false} wrap="off" autoCapitalize="off" autoComplete="off" autoCorrect="off" />
+    <div className="panel-heading"><h2 id="editor-heading">evaluator.ts</h2>
+      <div className="editor-tools">
+        <button type="button" className="editor-icon-button" aria-label={t("Copy evaluator")} title={t("Copy evaluator")} onClick={onCopy}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3" /></svg>
+        </button>
+        <button type="button" className="editor-icon-button" aria-label={t("Expand / reduce")} title={t("Expand / reduce")} aria-expanded={expanded} aria-controls="evaluator-source" onClick={() => setExpanded(value => !value)}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={expanded ? 'M4 9h5V4m6 16v-5h5M9 9 3 3m12 12 6 6' : 'M9 3H3v6m12 12h6v-6M3 3l6 6m6 6 6 6'} /></svg>
+        </button>
+      </div>
     </div>
-    <div className="editor-footer"><span className={valid ? 'success' : 'muted'}>{valid ? t("✓ Validated current source") : t("Validate this version before reviewing")}</span>
-      <button className="text-button" onClick={() => { const el = editorRef.current; if (el) { expanded.current = !expanded.current; el.style.height = expanded.current ? '640px' : ''; } }}>{t("Expand / reduce")}</button></div>
-    <p id="editor-help" className="help">{t("Tab leaves the editor. Ctrl / Cmd + ] indents. Your evaluator is validated and run by the local isolated service.")}</p>
+    <div id="evaluator-source" className="editor-area">
+      <CodeEditor source={source} language="typescript" readOnly={readOnly || busy} onChange={onChange} editorRef={editorRef}
+        label={t(readOnly ? 'Read-only TypeScript evaluator' : 'Editable TypeScript evaluator')} unavailableLabel={t("Editor unavailable. Source remains available to select and copy.")} diagnostics={diagnostics} expanded={expanded} />
+    </div>
     {diagnostics.length > 0 && <p className="help">{t("Raw TypeScript diagnostics and execution evidence keep their original text.")}</p>}
     {diagnostics.length > 0 && <ul className="diagnostics" aria-label={t("TypeScript diagnostics")}>{diagnostics.map((d, i) => <li key={i}><button className="text-button" onClick={() => position(d)}>{d.code} {t("· line")}{' '}{d.line}{t(", column")}{' '}{d.column}</button><span>{d.message}</span></li>)}</ul>}
   </section>;
@@ -95,9 +83,9 @@ export function ReferenceTabs({ exercise, dataset }: { exercise: Exercise; datas
     </div>
     <div id="dataset-panel" role="tabpanel" aria-labelledby="dataset-tab" tabIndex={0} hidden={selected !== 0}>
       <p className="help">{t("Version")}{' '}{exercise.datasetVersion} · {dataset?.examples.length ?? '—'} {t("examples. Reference answers are separate from agent input.")}</p>
-      <pre>{dataset ? JSON.stringify(dataset, null, 2) : t("Loading the versioned dataset…")}</pre>
+      <>{dataset ? <JsonViewer value={dataset} label={t("Dataset JSON")} /> : <p className="help">{t("Loading the versioned dataset…")}</p>}</>
     </div>
-    <div id="python-panel" role="tabpanel" aria-labelledby="python-tab" tabIndex={0} hidden={selected !== 1}><p className="help">{t("Prepared source for consultation. Variant-specific source is not exposed separately by v1; the configured variant is recorded with each run.")}</p><pre>{exercise.pythonSource}</pre></div>
+    <div id="python-panel" role="tabpanel" aria-labelledby="python-tab" tabIndex={0} hidden={selected !== 1}><p className="help">{t("Prepared source for consultation. Variant-specific source is not exposed separately by v1; the configured variant is recorded with each run.")}</p><CodeEditor source={exercise.pythonSource} language="python" readOnly unavailableLabel={t("Editor unavailable. Source remains available to select and copy.")} label={t("Python agent")} /></div>
   </section>;
 }
 
@@ -119,10 +107,10 @@ export function RunResults({ run, dataset, current }: { run?: RunRecord; dataset
           const assertion = row.status !== 'completed' ? 'Error' : row.fixtureMatched === true ? 'Matched' : row.fixtureMatched === false ? 'Mismatch' : 'Inconclusive';
           return <tr key={`${row.exampleId}:${row.fixtureId ?? index}`} id={`row-${encodeURIComponent(row.exampleId)}-${index}`}><th scope="row">{row.exampleId}{row.fixtureId && <small>{row.fixtureId}</small>}<small>{t(row.status)}</small></th>
             <td><pre>{JSON.stringify(run.request.mode === 'fixtures' ? fixture?.expectedEvaluation : example?.expected, null, 2) ?? t("Not available")}</pre></td>
-            <td>{run.request.mode === 'fixtures' ? evaluation ? <><strong className={evaluation.label === 'pass' ? 'success' : 'warning'}>{t(evaluation.label)} / {evaluation.score}</strong><p>{evaluation.explanation}</p></> : '—' : <pre>{JSON.stringify(row.output, null, 2) ?? '—'}</pre>}</td>
-            <td><strong>{run.request.mode === 'fixtures' ? t(assertion) : evaluation ? `${t(evaluation.label)} / ${evaluation.score}` : '—'}</strong>{run.request.mode === 'agent' && evaluation && <p>{evaluation.explanation}</p>}{row.error && <p className="error-text">{t("Raw service diagnostics (original language).")} {row.error.code}: {row.error.message}</p>}</td>
+            <td>{run.request.mode === 'fixtures' ? evaluation ? <><strong className={evaluation.label === 'pass' ? 'success' : 'warning'}>{t(evaluation.label)} / {evaluation.score}</strong><Markdown text={evaluation.explanation} /></> : '—' : <pre>{JSON.stringify(row.output, null, 2) ?? '—'}</pre>}</td>
+            <td><strong>{run.request.mode === 'fixtures' ? t(assertion) : evaluation ? `${t(evaluation.label)} / ${evaluation.score}` : '—'}</strong>{run.request.mode === 'agent' && evaluation && <Markdown text={evaluation.explanation} />}{row.error && <p className="error-text">{t("Raw service diagnostics (original language).")} {row.error.code}: {row.error.message}</p>}</td>
             <td><ExternalLink url={row.phoenix?.traceUrl}>{t("Actual trace")}</ExternalLink>{!safeUrl(row.phoenix?.traceUrl) && <span className="help">{t("Trace")}{' '}{run.telemetryStatus === 'pending' ? t("pending") : t("unavailable")}</span>}
-              <details><summary>{t("Row details")}</summary><p>{fixture?.rationale}</p><h4>{t("Input")}</h4><pre>{JSON.stringify(example?.input, null, 2)}</pre><h4>{t("Reference")}</h4><pre>{JSON.stringify(example?.expected, null, 2)}</pre><h4>{t("Response")}</h4><pre>{JSON.stringify(row.output ?? fixture?.output, null, 2)}</pre></details>
+              <details><summary>{t("Row details")}</summary><p className="evidence-quote">{fixture?.rationale}</p><JsonViewer compact label={t("Input")} value={example?.input} /><JsonViewer compact label={t("Reference")} value={example?.expected} /><JsonViewer compact label={t("Response")} value={row.output ?? fixture?.output} />{evaluation && <JsonViewer compact label={t("Evaluation")} value={evaluation} />}</details>
             </td></tr>;
         })}</tbody></table>
     </div>
@@ -152,7 +140,7 @@ export function ReviewFeedback({ review, current, jumpToRow }: { review: ReviewR
   return <div className="review-feedback"><strong className={current && review.status === 'ready' ? 'success' : 'warning'}>{current ? t(labels[review.status]) : t("Previous review is stale")}</strong>
     {!current && <p>{t("Retest and rerun this version before requesting a new review. Previous feedback is retained below.")}</p>}
     {review.error && <p className="error-text">{t("Raw service diagnostics (original language).")} {review.error.code}: {review.error.message}</p>}
-    {review.assessment && <><p className="help">{review.feedbackLocale ? t("Requested feedback language: {language}. Original feedback is retained; the provider may not follow the requested language.", { language: t(review.feedbackLocale === "es" ? "Spanish" : "English") }) : t("Feedback language was not recorded for this older result. Original feedback is retained.")}</p><p className="help">{t("Changing language does not translate stored feedback or request another review. Request a new paid review explicitly if needed.")}</p><p>{review.assessment.summary}</p>{review.assessment.findings.map((finding, i) => <article className="finding" key={i}><h3>{finding.criterionId}</h3><p><strong>{t("Evidence:")}{' '}</strong>{finding.evidence}</p><p>{finding.feedback}</p><p className="next-action"><strong>{t("Next:")}{' '}</strong>{finding.nextAction}</p><div>{finding.exampleIds.map(id => <button className="text-button" key={id} onClick={() => jumpToRow(id)}>{t("Jump to")}{' '}{id}</button>)}</div></article>)}</>}
+    {review.assessment && <><p className="help">{review.feedbackLocale ? t("Requested feedback language: {language}. Original feedback is retained; the provider may not follow the requested language.", { language: t(review.feedbackLocale === "es" ? "Spanish" : "English") }) : t("Feedback language was not recorded for this older result. Original feedback is retained.")}</p><p className="help">{t("Changing language does not translate stored feedback or request another review. Request a new paid review explicitly if needed.")}</p><Markdown text={review.assessment.summary} />{review.assessment.findings.map((finding, i) => <article className="finding" key={i}><h3>{finding.criterionId}</h3><p className="evidence-quote"><strong>{t("Evidence:")}{' '}</strong>{finding.evidence}</p><Markdown text={finding.feedback} /><div className="next-action"><strong>{t("Next:")}</strong><Markdown text={finding.nextAction} /></div><div>{finding.exampleIds.map(id => <button className="text-button" key={id} onClick={() => jumpToRow(id)}>{t("Jump to")}{' '}{id}</button>)}</div></article>)}</>}
     <p className="receipt-caption">{t("Review")}{' '}{review.reviewId} {t("· source")}{' '}{review.binding.codeHash.slice(0, 10)} {t("· rubric")}{' '}{review.binding.rubricVersion}</p>
   </div>;
 }

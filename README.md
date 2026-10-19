@@ -20,6 +20,7 @@ local socket address, without forwarding registry/proxy credentials into workers
 
 ```sh
 npm run install:all
+npm run env:check
 npm run start
 ```
 
@@ -28,6 +29,11 @@ never call a model. Without credentials, read-only lessons, validation and Code
 fixtures work; model actions are unavailable. The six editable starters deliberately
 throw until completed. The introduction supplies a complete evaluator, including
 correct rejection of known bad responses.
+
+`env:check` reports whether the explicit provider configuration is present; it does
+not authenticate, run inference or check Docker/Phoenix readiness. A missing
+provider is allowed for offline work. Use `--require-provider` below when setting
+up model actions.
 
 `install:all` installs the npm lock and hashed Python lock into `.venv`, checks and
 builds source, pulls pinned images, then builds the evaluator image without network
@@ -69,6 +75,30 @@ npm run demo:check -- --live   # Explicit paid intro-only probe; no automatic re
 npm run telemetry:retry -- RUN_ID # Re-record stored results; no inference repeated.
 npm run stop                   # Stop tutorial/Phoenix; preserve local evidence and volume.
 ```
+
+For read-only service diagnostics, inspect the local status endpoint:
+
+```sh
+curl --fail --silent --show-error http://127.0.0.1:3000/api/status
+```
+
+The response includes a non-secret provider summary, `automaticInference: false`
+and capability flags. Unavailable capabilities include a `reason` to help identify
+the missing setup:
+
+| Capability | What availability means |
+| --- | --- |
+| `content` | The verified tutorial, datasets and synthetic documents loaded. |
+| `validation`, `runner` | The restricted Docker executor was available at backend startup. Missing isolation disables evaluator execution. |
+| `agents`, `judge` | The selected provider profile is configured. Authentication and model support still need an explicit live run. |
+| `review` | Provider and isolated run services are connected. Each review also needs eligible validation, fixture and agent evidence. |
+| `telemetry` | Phoenix passed its health check during this status request. This does not prove that a particular run was recorded. |
+
+Docker and provider flags reflect startup configuration; after fixing those
+services or changing `.env`, stop and restart the tutorial. If isolation is
+unavailable, check the local Docker daemon and rerun `install:all`. If only
+telemetry is unavailable, restore local Phoenix and retry recording the existing
+run ID. Reading status performs no inference or execution.
 
 The live probe calls each intro example once, at most 2048 output tokens per call;
 it prints the exact call count first. It verifies real agent traces and recording.

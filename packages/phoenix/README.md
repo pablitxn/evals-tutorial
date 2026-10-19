@@ -24,8 +24,12 @@ than asserting that recording executed the agent or evaluator.
 
 Phoenix 20.21.3 traces are globally identified. Existing producer spans stay in
 their actual source project. Each experiment task binds the verified trace ID;
-its link uses the source project's read-back GlobalID. Fixture receipt spans live
-in the actual experiment project. No AGENT/LLM span is replayed or invented.
+its link uses the source project's read-back GlobalID, including failed agent
+invocations. Failed or cancelled rows with no producer trace, and fixture receipt
+spans, live in the actual experiment project. Only completed agent rows require
+both AGENT and LLM spans; any existing producer trace must retain its trusted
+parent graph and pass the credential-attribute check. No AGENT/LLM span is
+replayed or invented.
 Exporter credentials, request headers and secrets must be excluded at the producer
 boundary. Recording refuses known credential attribute names in producer spans.
 This check is not a general detector of secrets embedded in arbitrary values.

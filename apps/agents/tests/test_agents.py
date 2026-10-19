@@ -132,6 +132,8 @@ class SDKTests(unittest.IsolatedAsyncioTestCase):
             for role, text in (("judge", '{"score":1,"label":"pass","explanation":"Evidence matches."}'), ("review", '{"status":"inconclusive","summary":"Inspect evidence.","findings":[]}')):
                 code = "__import__('os').system('touch /tmp/never-execute-review')"
                 payload = {"role": role, "material": {"source": code}, "maxOutputTokens": 128, "deadlineMs": 1000}
+                if role == "review":
+                    payload["material"]["evidenceQuotes"] = [{"id": "quote-1", "kind": "source", "quote": code, "exampleIds": []}]
                 output, calls = await self.run_mock(payload, text=text, broker=True, provider=provider)
                 self.assertIn("result", output)
                 self.assertEqual(calls[0][1]["max_output_tokens"], 128)
@@ -146,6 +148,7 @@ class SDKTests(unittest.IsolatedAsyncioTestCase):
             output, _ = await self.run_mock(payload, text=text, broker=True)
             self.assertEqual(output["error"]["code"], "agent_output_schema")
         payload["role"] = "review"
+        payload["material"] = {"evidenceQuotes": [{"id": "quote-1", "kind": "source", "quote": "synthetic source", "exampleIds": []}]}
         output, _ = await self.run_mock(payload, text='{"status":"ready"}', broker=True)
         self.assertEqual(output["error"]["code"], "review_output_schema")
 

@@ -3,7 +3,7 @@ import { ServiceError, type EvalContext, type JudgeBroker } from '@evals-tutoria
 import type { IsolatedExecutor } from '@evals-tutorial/evaluator-runtime';
 
 /** Only this trusted host adapter can invoke a judge; the worker chooses no row or provider. */
-export async function evaluateRow(executor: IsolatedExecutor, javascript: string, runId: string, row: EvalInput, exercise: Exercise, broker: JudgeBroker | undefined, signal: AbortSignal, deadlineEpochMs: number): Promise<EvalResult> {
+export async function evaluateRow(executor: IsolatedExecutor, javascript: string, runId: string, row: EvalInput, exercise: Exercise, broker: JudgeBroker | undefined, signal: AbortSignal, deadlineEpochMs: number, fixtureId?: string): Promise<EvalResult> {
   const controller = new AbortController();
   const abort = () => controller.abort();
   signal.addEventListener('abort', abort, { once: true });
@@ -33,7 +33,7 @@ export async function evaluateRow(executor: IsolatedExecutor, javascript: string
     }
   };
   try {
-    if (maxCalls > 0) context = broker?.bind({ runId, exampleId: row.metadata.exampleId, row: structuredClone(row), criterionIds: exercise.criteria.map(item => item.id), mode: exercise.mode, maxCalls, maxOutputTokens: LIMITS.maxProviderOutputTokens, deadlineEpochMs, signal: boundSignal });
+    if (maxCalls > 0) context = broker?.bind({ runId, exampleId: row.metadata.exampleId, ...(fixtureId !== undefined ? { fixtureId } : {}), row: structuredClone(row), criterionIds: exercise.criteria.map(item => item.id), mode: exercise.mode, maxCalls, maxOutputTokens: LIMITS.maxProviderOutputTokens, deadlineEpochMs, signal: boundSignal });
     return await executor.evaluate({ runId, row: structuredClone(row), javascript, timeoutMs: Math.max(1, Math.min(deadlineEpochMs - Date.now(), exercise.mode === 'Code' ? LIMITS.codeTimeoutMs : LIMITS.judgeTimeoutMs)) }, response, boundSignal);
   } catch (error) {
     if (!signal.aborted && boundSignal.aborted) throw new ServiceError({ code: 'timeout', message: 'Evaluator deadline expired', retryable: false });

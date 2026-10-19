@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readdir, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateContract, type AgentRequest, type Dataset, type Exercise, type RunRequest, type RunRecord, type JudgeRpcRequest, type JudgeRpcResponse } from '@evals-tutorial/contracts';
+import { validateContract, type AgentRequest, type Dataset, type EvalResult, type Exercise, type RunRequest, type RunRecord, type JudgeRpcRequest, type JudgeRpcResponse } from '@evals-tutorial/contracts';
 import { datasetHash, sha256 } from '@evals-tutorial/contracts/node';
 import { ServiceError, type ContentService, type JudgeBroker } from '@evals-tutorial/contracts/services';
 import type { IsolatedExecutor, EvaluationJob } from '@evals-tutorial/evaluator-runtime';
 import { createRunnerServices, type RunnerServiceOptions } from './index.js';
 import { evaluateRow } from '../runner/index.js';
+import { createProviderBroker } from '../judge-broker/index.js';
 import { DockerExecutor } from '@evals-tutorial/evaluator-runtime';
 
 const success = { score: 1, label: 'pass' as const, explanation: 'synthetic evidence' };
@@ -31,7 +32,7 @@ class MockExecutor implements IsolatedExecutor {
     this.compilations++;
     return { codeHash: sha256(source), valid: source !== 'invalid source', diagnostics: source === 'invalid source' ? [{ file: 'evaluator.ts' as const, line: 2, column: 3, code: '2322', severity: 'error' as const, message: 'Synthetic type error' }] : [], javascript: 'explicit mock artifact' };
   };
-  evaluate = async (job: EvaluationJob, _judge: (request: JudgeRpcRequest) => Promise<JudgeRpcResponse>, signal?: AbortSignal) => {
+  evaluate = async (job: EvaluationJob, _judge: (request: JudgeRpcRequest) => Promise<JudgeRpcResponse>, signal?: AbortSignal): Promise<EvalResult> => {
     this.active++; this.peak = Math.max(this.peak, this.active);
     try { await pause(15); if (signal?.aborted) throw new ServiceError({ code: 'cancelled', message: 'Mock cancelled', retryable: false }); return job.row.output.correct ? success : failure; }
     finally { this.active--; }
@@ -171,6 +172,39 @@ test('host judge rejects binding abuse, Code mode, unknown criteria and exhauste
   executor.evaluate = async (_job, judge) => { responses = [await judge(rpc('1', { request: { rubric: 'Synthetic', criterionIds: ['unknown'] } }))]; return success; };
   await evaluateRow(executor, 'mock', 'bound-run', row, mixed, broker, new AbortController().signal, Date.now() + 1000);
   assert.equal(responses[0]!.error?.code, 'invalid_request'); assert.equal(brokerCalls, 2);
+});
+
+test('mixed fixture runs bind each installed fixture while worker RPC cannot select its scope', async () => {
+  const mixed: Exercise = { ...exercise, mode: 'Mixed', maxJudgeCallsPerRow: 2, criteria: [{ id: 'correct', mode: 'LLM Judge', description: 'Synthetic judge' }] };
+  const judged: Array<{ correct: boolean }> = [];
+  const broker = createProviderBroker(async call => {
+    const output = (call.material as { row: { output: { correct: boolean } } }).row.output;
+    judged.push(output);
+    return output.correct ? success : failure;
+  });
+  const { runs, executor } = await setup({ content: { ...content, exercise: async () => mixed }, judge: broker });
+  executor.evaluate = async (job, judge) => {
+    assert(!('fixtureId' in job));
+    assert(!('fixtureId' in job.row.metadata));
+    const rpc = (id: string, patch = {}): JudgeRpcRequest => ({ schemaVersion: '1.0.0', type: 'judge.request', id, runId: job.runId, exampleId: job.row.metadata.exampleId, request: { rubric: 'Synthetic rubric', criterionIds: ['correct'] }, ...patch });
+    assert.equal((await judge(rpc('spoofed-fixture', { fixtureId: 'other-fixture' }))).error?.code, 'protocol_error');
+    assert.equal((await judge(rpc('spoofed-example', { exampleId: 'other-example' }))).error?.code, 'protocol_error');
+    const first = await judge(rpc('first'));
+    assert(first.result);
+    assert.equal((await judge(rpc('first'))).error?.code, 'protocol_error');
+    assert((await judge(rpc('second'))).result);
+    assert.equal((await judge(rpc('third'))).error?.code, 'budget_exceeded');
+    return first.result;
+  };
+  try {
+    const accepted = await runs.create(request('mixed-fixtures'));
+    const record = await finished(runs, accepted.runId);
+    assert.equal(record.status, 'completed', JSON.stringify(record));
+    assert.equal(record.completedRows, 6);
+    assert(record.rows.every(row => row.fixtureMatched));
+    assert.equal(judged.length, 12);
+    assert.equal(judged.filter(output => output.correct).length, 6);
+  } finally { await runs.shutdown(); }
 });
 
 test('actual Docker RunService validates before mocked paid calls and records real fixture verdicts', { skip: !process.env.ET_RUNNER_IMAGE, timeout: 60000 }, async () => {

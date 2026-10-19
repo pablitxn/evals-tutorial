@@ -18,18 +18,21 @@ function render(locale: Locale, content: ReactElement): string {
 
 test('localized selector, badges, editor accessibility and diagnostics preserve executable source and raw diagnostics', () => {
   const props = { source, readOnly: false, busy: false, onChange() {}, editorRef: { current: null },
-    diagnostics: [{ file: 'evaluator.ts', line: 2, column: 3, code: 'TS123', severity: 'error' as const, message: 'RAW_DIAGNOSTIC <untranslated>' }], valid: true, saving: true };
+    diagnostics: [{ file: 'evaluator.ts', line: 2, column: 3, code: 'TS123', severity: 'error' as const, message: 'RAW_DIAGNOSTIC <untranslated>' }], onCopy() {} };
   const english = render('en', createElement(Editor, props));
   const spanish = render('es', createElement(Editor, props));
   assert.match(english, /Editable TypeScript evaluator/);
   assert.match(spanish, /Evaluador TypeScript editable/);
-  assert.match(spanish, /Código actual validado/);
   assert.match(spanish, /TS123.*línea.*2.*columna.*3/);
-  assert.equal(spanish.match(/<textarea[^>]*>(.*?)<\/textarea>/s)?.[1], english.match(/<textarea[^>]*>(.*?)<\/textarea>/s)?.[1]);
+  const fallbackSource = (html: string) => html.match(/<pre[^>]*>(.*?)<\/pre>/s)?.[1];
+  const escapedSource = renderToStaticMarkup(createElement('pre', null, source)).slice(5, -6);
+  assert.equal(fallbackSource(english), escapedSource);
+  assert.equal(fallbackSource(spanish), escapedSource);
   assert.match(spanish, /RAW_DIAGNOSTIC &lt;untranslated&gt;/);
   assert.match(render('es', createElement(ModeBadge, { mode: 'Mixed' })), /Mixto/);
   const selector = render('es', createElement(LanguageSelector));
-  assert.match(selector, /Idioma/); assert.match(selector, /value="es" selected="" lang="es"|value="es" lang="es" selected=""/);
+  assert.match(selector, /Idioma/); assert.match(selector, /role="combobox"[^>]*aria-label="Idioma"/);
+  assert.match(selector, /class="dropdown-value" lang="es">Español<\/span>/);
 });
 
 test('localized run and review chrome preserves original data, errors, quotes, feedback and receipt binding', () => {

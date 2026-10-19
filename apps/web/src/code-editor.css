@@ -1,0 +1,100 @@
+.editor-panel,
+.code-editor {
+  color-scheme: dark;
+  --ink: #e0e8ed;
+  --muted: #9aabb5;
+  --border: #34424c;
+  --paper: #202b33;
+  --surface: #2a3842;
+  --primary: #9bd4c5;
+  --accent: #354d50;
+  --error: #ffaaa3;
+  --warning: #e5bf86;
+  --code-surface: #182229;
+}
+.editor-panel { overflow: hidden; background: var(--code-surface); }
+.editor-panel > .panel-heading { min-height: 54px; padding: 8px 14px 8px 18px; background: var(--paper); color: var(--ink); }
+.editor-panel > .panel-heading h2 { font-size: 12px; color: #c3d0d8; }
+.editor-tools { display: flex; align-items: center; gap: 4px; }
+.editor-tools .editor-icon-button { display: grid; place-items: center; width: 34px; min-height: 34px; padding: 7px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--muted); }
+.editor-tools .editor-icon-button:hover:enabled { background: var(--surface); border-color: var(--border); color: var(--ink); }
+.editor-tools .editor-icon-button svg { width: 17px; height: 17px; }
+.editor-panel .editor-area { border-bottom: 0; }
+.editor-panel > .help { margin-top: 12px; }
+.code-editor {
+  --editor-height: 320px;
+  --syntax-keyword: #c4a7e7;
+  --syntax-type: #e7cb94;
+  --syntax-string: #add3a0;
+  --syntax-literal: #e6b080;
+  --syntax-function: #8fcbdc;
+  --syntax-property: #b6cbd8;
+  --syntax-comment: #92a6b1;
+  --syntax-meta: #c4a7e7;
+  min-width: 0;
+  background: var(--code-surface);
+  color: var(--ink);
+  overflow: hidden;
+}
+.code-editor--python { --editor-height: 300px; }
+.code-editor--expanded { --editor-height: 640px; }
+.code-editor-mount { min-width: 0; }
+.code-editor .cm-editor { height: var(--editor-height); background: transparent; color: var(--ink); font-size: 12px; }
+.code-editor .cm-editor.cm-focused { outline: none; }
+.code-editor:has(.cm-focused) { box-shadow: inset 0 0 0 2px var(--primary); }
+.code-editor .cm-scroller { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; line-height: 1.75; overflow: auto; scrollbar-width: thin; }
+.code-editor .cm-content { min-height: 100%; padding: 16px 0; caret-color: var(--primary); }
+.code-editor .cm-line { padding-inline: 8px 22px; }
+.code-editor .cm-gutters { border: 0; background: var(--code-surface); color: var(--muted); user-select: none; }
+.code-editor .cm-lineNumbers .cm-gutterElement { min-width: 35px; padding-inline: 12px 6px; font-size: 10px; }
+.code-editor .cm-foldGutter .cm-gutterElement { padding-inline: 2px 6px; }
+.code-editor .cm-gutter-lint .cm-gutterElement { padding-inline: 3px; }
+.code-editor .cm-foldGutter span { cursor: pointer; }
+.code-editor .cm-activeLine { background: color-mix(in srgb, var(--primary) 4%, transparent); }
+.code-editor .cm-activeLineGutter { color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, var(--code-surface)); }
+.code-editor[data-readonly="true"] .cm-activeLine,
+.code-editor[data-readonly="true"] .cm-activeLineGutter { background: transparent; }
+.code-editor .cm-cursor, .code-editor .cm-dropCursor { border-left-color: var(--primary); }
+.code-editor .cm-selectionBackground,
+.code-editor .cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground { background: color-mix(in srgb, var(--primary) 18%, transparent); }
+.code-editor .cm-content ::selection { background: color-mix(in srgb, var(--primary) 18%, transparent); }
+.code-editor .cm-matchingBracket { color: var(--ink); background: var(--accent); outline: 1px solid var(--border); border-radius: 2px; }
+.code-editor .cm-nonmatchingBracket { color: var(--error); text-decoration: underline wavy; }
+.code-editor .cm-foldPlaceholder { color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
+.code-editor .cm-tooltip { max-width: min(500px, 80vw); border: 1px solid var(--border); border-radius: 8px; background: var(--paper); color: var(--ink); box-shadow: var(--shadow); font-family: inherit; font-size: .75rem; line-height: 1.65; }
+.code-editor .cm-tooltip-lint { padding: 4px; }
+.code-editor .cm-diagnostic { padding: 9px 12px; font-size: .75rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.code-editor .cm-diagnostic-error { border-left-color: var(--error); }
+.code-editor .cm-diagnostic-warning { border-left-color: var(--warning); }
+.code-editor .cm-diagnosticSource { color: var(--muted); font-size: .6875rem; }
+.code-editor .cm-lintRange-error { text-decoration-color: var(--error); }
+.code-editor .cm-lintRange-warning { text-decoration-color: var(--warning); }
+.code-editor .cm-panel { background: var(--paper); color: var(--ink); border-color: var(--border); }
+.code-editor .cm-panel button { min-height: 28px; font-size: .6875rem; padding: 2px 8px; }
+.code-editor .cm-specialChar { color: var(--error); }
+.code-editor .tok-keyword { color: var(--syntax-keyword); }
+.code-editor .tok-name { color: var(--ink); }
+.code-editor .tok-type { color: var(--syntax-type); }
+.code-editor .tok-string { color: var(--syntax-string); }
+.code-editor .tok-literal { color: var(--syntax-literal); }
+.code-editor .tok-function { color: var(--syntax-function); }
+.code-editor .tok-property { color: var(--syntax-property); }
+.code-editor .tok-comment { color: var(--syntax-comment); font-style: italic; }
+.code-editor .tok-punctuation { color: var(--muted); }
+.code-editor .tok-meta { color: var(--syntax-meta); }
+.code-editor .tok-invalid { color: var(--error); }
+.code-editor-fallback { height: var(--editor-height); margin: 0; padding: 17px 22px; overflow: auto; white-space: pre; font-size: 12px; line-height: 1.75; scrollbar-width: thin; }
+.code-editor-fallback:focus-visible { outline-offset: -3px; }
+.code-editor-unavailable { margin: 0; padding: 12px 18px; border-top: 1px solid var(--border); background: var(--paper); color: var(--muted); font-size: .75rem; }
+.reference-panel .code-editor { margin-top: 14px; border: 1px solid var(--border); border-radius: 9px; }
+.reference-panel .code-editor .cm-editor { font-size: .75rem; }
+.reference-panel .code-editor-fallback { max-width: none; height: var(--editor-height); padding: 17px 18px; }
+@media (max-width: 679px) {
+  .code-editor { --editor-height: 280px; }
+  .code-editor--python { --editor-height: 260px; }
+  .code-editor--expanded { --editor-height: 640px; }
+  .code-editor .cm-lineNumbers .cm-gutterElement { min-width: 26px; padding-left: 7px; font-size: 10px; }
+  .code-editor .cm-foldGutter .cm-gutterElement { padding-right: 4px; }
+  .code-editor .cm-line { padding-right: 14px; }
+  .reference-panel .code-editor .cm-editor { font-size: .75rem; }
+}

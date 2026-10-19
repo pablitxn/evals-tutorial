@@ -1,17 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { JudgeBinding } from '@evals-tutorial/contracts/services';
+import { ServiceError } from '@evals-tutorial/contracts/services';
 import { createProviderBroker, parseBrokerResponse } from './index.js';
 
 const binding = (changes: Partial<JudgeBinding> = {}): JudgeBinding => ({ runId: 'run-1', exampleId: 'row-1', row: { input: { message: 'synthetic' }, output: { recommendation: 'demo' }, expected: { required: true }, metadata: { exampleId: 'row-1', exerciseId: '04-policy-recommendation', datasetVersion: '1' } }, criterionIds: ['support'], mode: 'Mixed', maxCalls: 2, maxOutputTokens: 128, deadlineEpochMs: Date.now() + 2000, signal: new AbortController().signal, ...changes });
 const verdict = { score: 1, label: 'pass', explanation: 'Supported by synthetic evidence.' };
 const judge = { rubric: 'Check faithful support.', criterionIds: ['support'] };
+const matches = (code: string) => (error: unknown) => error instanceof ServiceError && error.detail.code === code;
 test('Code mode and malicious worker-selected routing cannot invoke provider', async () => {
   let calls = 0;
   const broker = createProviderBroker(async () => { calls++; return verdict; });
   await assert.rejects(broker.bind(binding({ mode: 'Code' })).judge(judge));
   const ctx = broker.bind(binding({ runId: 'other' }));
-  for (const change of [{ model: 'other' }, { row: {} }, { endpoint: 'https://attacker.invalid' }, { tools: [] }, { criterionIds: ['unknown'] }, { criterionIds: ['support', 'support'] }]) await assert.rejects(ctx.judge({ ...judge, ...change }));
+  for (const change of [{ model: 'other' }, { row: {} }, { fixtureId: 'other-fixture' }, { endpoint: 'https://attacker.invalid' }, { tools: [] }, { criterionIds: ['unknown'] }, { criterionIds: ['support', 'support'] }]) await assert.rejects(ctx.judge({ ...judge, ...change }));
   assert.equal(calls, 0);
 });
 test('lifetime budget is atomic under concurrency and persists across rebinds', async () => {
@@ -31,6 +33,34 @@ test('binding is an immutable row snapshot, preserves reference for judge only',
   await ctx.judge(judge);
   assert.deepEqual((captured as { row: JudgeBinding['row'] }).row.expected, { required: true });
   assert.deepEqual((captured as { row: JudgeBinding['row'] }).row.output, { recommendation: 'demo' });
+});
+test('fixtures and real-agent rows have independent immutable lifetime budgets', async () => {
+  const outputs: unknown[] = [];
+  const broker = createProviderBroker(async call => { outputs.push((call.material as { row: JudgeBinding['row'] }).row.output); return verdict; });
+  const realRow = binding();
+  const rows = [
+    realRow,
+    { ...realRow, fixtureId: 'positive' },
+    { ...realRow, fixtureId: 'same-output' },
+    { ...realRow, fixtureId: 'negative', row: { ...realRow.row, output: { recommendation: 'unsupported' } } },
+  ];
+  for (const row of rows) {
+    const context = broker.bind(row);
+    const attempts = await Promise.allSettled([context.judge(judge), context.judge(judge), context.judge(judge)]);
+    assert.equal(attempts.filter(attempt => attempt.status === 'fulfilled').length, 2);
+    assert(attempts.some(attempt => attempt.status === 'rejected' && matches('budget_exceeded')(attempt.reason)));
+    await assert.rejects(broker.bind(row).judge(judge), matches('budget_exceeded'));
+    assert.throws(() => broker.bind({ ...row, row: { ...row.row, output: { recommendation: 'replacement' } } }), matches('conflict'));
+    assert.throws(() => broker.bind({ ...row, deadlineEpochMs: row.deadlineEpochMs + 1 }), matches('conflict'));
+    assert.throws(() => broker.bind({ ...row, maxCalls: 1 }), matches('conflict'));
+  }
+  assert.deepEqual(outputs, rows.flatMap(row => [row.row.output, row.row.output]));
+});
+test('malformed fixture identities cannot create a lifetime budget', () => {
+  const broker = createProviderBroker(async () => verdict);
+  for (const fixtureId of ['', null, 1, {}, 'invalid/id', 'x'.repeat(129)]) {
+    assert.throws(() => broker.bind(binding({ fixtureId: fixtureId as string })), matches('invalid_request'));
+  }
 });
 test('failed/refused provider attempts consume budget and expose only typed errors', async () => {
   let calls = 0;

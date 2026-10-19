@@ -22,6 +22,8 @@ export interface ReviewService {
 /** Construct once per frozen row. Caller cannot replace the row/provider or reset limits. */
 export interface JudgeBinding {
   runId: string; exampleId: string; row: EvalInput; criterionIds: readonly string[];
+  /** Host-only fixture identity; omitted for a real-agent row. Never worker-selected. */
+  fixtureId?: string;
   mode: Exercise['mode']; maxCalls: number; maxOutputTokens: number;
   deadlineEpochMs: number; signal: AbortSignal;
 }

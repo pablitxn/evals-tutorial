@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useId, useState, type ReactNode } from 'react';
 import { initialLocale, isLocale, LOCALE_KEY, translate, type Locale, type Parameters } from './i18n-core.js';
 import { save } from './storage.js';
+import { Dropdown } from './Dropdown.js';
 export { localizeLesson } from './i18n-core.js';
 
 type I18n = { locale: Locale; setLocale(locale: Locale): void; t(key: string, parameters?: Parameters): string; saved: boolean };
@@ -33,7 +34,9 @@ export function useI18n(): I18n {
 
 export function LanguageSelector() {
   const { locale, setLocale, t, saved } = useI18n();
-  return <div className="language-control"><label>{t('Language')}<select value={locale} onChange={event => { if (isLocale(event.target.value)) setLocale(event.target.value); }}>
-    <option value="en" lang="en">English</option><option value="es" lang="es">Español</option>
-  </select></label>{!saved && <p className="help" role="status">{t('Language preference could not be saved. This tab keeps your selection.')}</p>}</div>;
+  const id = useId();
+  return <div className="language-control"><div className="language-control-row"><label htmlFor={id}>{t('Language')}</label>
+    <Dropdown id={id} label={t('Language')} value={locale} onValueChange={value => { if (isLocale(value)) setLocale(value); }}
+      options={[{ value: 'en', label: 'English', lang: 'en' }, { value: 'es', label: 'Español', lang: 'es' }]} />
+  </div>{!saved && <p className="help" role="status">{t('Language preference could not be saved. This tab keeps your selection.')}</p>}</div>;
 }

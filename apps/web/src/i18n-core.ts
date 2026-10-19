@@ -30,7 +30,12 @@ export function translate(locale: Locale, key: string, parameters: Parameters = 
 /** Presentation-only overlay: never pass this copy to the source/evidence contracts. */
 export function localizeLesson(exercise: Exercise, locale: Locale): Pick<Exercise, 'title' | 'lessonMarkdown' | 'criteria'> {
   const overlay = lessons[exercise.id];
-  if (locale === 'en' || !overlay || overlay.exerciseVersion !== exercise.exerciseVersion || overlay.rubricVersion !== exercise.rubricVersion) return exercise;
+  // The verified consultation adapter only replaces Python source in runtime1;
+  // its 1.0.0 lesson prose and rubric still match the authored Spanish overlay.
+  // Keep this exact compatibility pair so future content cannot reuse stale text.
+  const samePresentation = overlay && (overlay.exerciseVersion === exercise.exerciseVersion
+    || (overlay.exerciseVersion === '1.0.0' && exercise.exerciseVersion === '1.0.0-runtime1'));
+  if (locale === 'en' || !samePresentation || overlay.rubricVersion !== exercise.rubricVersion) return exercise;
   const descriptions: Record<string, string> = overlay.criteria;
   return { title: overlay.title, lessonMarkdown: overlay.lessonMarkdown,
     criteria: exercise.criteria.map(criterion => ({ ...criterion, description: descriptions[criterion.id] ?? criterion.description })) };

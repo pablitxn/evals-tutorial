@@ -1,8 +1,9 @@
 """Production-build browser rehearsal with synthetic, schema-checked v1 API data.
 Run Vite preview at 127.0.0.1:4173 first. No real inference or Phoenix recording.
 """
-import copy, hashlib, json, subprocess, time
+import copy, hashlib, json, re, subprocess, time
 from pathlib import Path
+from uuid import uuid4
 from playwright.sync_api import sync_playwright, expect
 from browser_harness import launch_browser, new_artifact_directory, revision, write_report
 
@@ -80,46 +81,135 @@ class Backend:
 
 def record(name): checks.append({'check':name,'result':'passed','evidence':'synthetic production-build UI; no live inference'})
 
+
+def editor_for(page, label='Editable TypeScript evaluator'):
+    editor = page.get_by_role('textbox', name=label, exact=True)
+    expect(page.locator('#evaluator-source .code-editor')).to_have_attribute('data-editor-state', 'ready')
+    expect(editor).to_be_visible()
+    return editor
+
+
+def replace_source(editor, source):
+    editor.focus()
+    editor.press('ControlOrMeta+A')
+    editor.page.keyboard.insert_text(source)
+
+
+def editor_source(editor):
+    # Use the public copy action: CodeMirror virtualizes long documents, and
+    # contenteditable textContent/input_value cannot establish exact source bytes.
+    page = editor.page
+    marker = 'browser-copy-pending-' + uuid4().hex
+    page.evaluate('(value) => navigator.clipboard.writeText(value)', marker)
+    page.get_by_role('button', name=re.compile(r'^(Copy evaluator|Copiar evaluador)$')).click()
+    page.wait_for_function('(marker) => navigator.clipboard.readText().then(text => text !== marker)', arg=marker)
+    return page.evaluate('navigator.clipboard.readText()')
+
+
+def expect_source(editor, source):
+    expect(editor).to_be_visible()
+    assert editor_source(editor) == source
+
+
+def preferences_language(page):
+    page.get_by_role('button', name=re.compile(r'^(Open preferences|Abrir preferencias)$')).click()
+    dialog = page.get_by_role('dialog', name=re.compile(r'^(Preferences|Preferencias)$'))
+    expect(dialog).to_be_visible()
+    dialog.get_by_role('button', name=re.compile(r'^(Language|Idioma)$'), exact=True).click()
+    return dialog.get_by_role('combobox', name=re.compile(r'^(Language|Idioma)$'), exact=True)
+
+
+def close_preferences(page):
+    page.get_by_role('button', name=re.compile(r'^(Close preferences|Cerrar preferencias)$')).click()
+    expect(page.get_by_role('dialog', name=re.compile(r'^(Preferences|Preferencias)$'))).not_to_be_visible()
+
+
+def set_language(page, locale):
+    choice = preferences_language(page)
+    choice.click()
+    page.get_by_role('option', name='Español' if locale == 'es' else 'English', exact=True).click()
+    expect(page.locator('html')).to_have_attribute('lang', locale)
+    close_preferences(page)
+
+
+def expect_language(page, locale):
+    expect(page.locator('html')).to_have_attribute('lang', locale)
+    expect(preferences_language(page)).to_contain_text('Español' if locale == 'es' else 'English')
+    close_preferences(page)
+
+
+def select_lesson(page, exercise_id):
+    menu = page.locator('details.lesson-menu')
+    if not menu.get_attribute('open') == '':
+        menu.locator('summary').click()
+    page.locator(f'nav a[href="#{exercise_id}"]').click()
+
+
 with sync_playwright() as p:
     browser=launch_browser(p, ARTIFACTS, PROVENANCE)
-    context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
+    context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce',permissions=['clipboard-read','clipboard-write'])
     page=context.new_page(); backend=Backend(); errors=[]
     page.on('pageerror',lambda error: errors.append(str(error)))
     page.route('**/api/**',backend.route)
     page.goto('http://127.0.0.1:4173/')
     expect(page.get_by_role('heading',name='Introduction',exact=True)).to_be_visible()
     assert page.get_by_role('navigation',name='Tutorial lessons').get_by_role('link').count()==7
-    expect(page.get_by_role('textbox',name='Read-only TypeScript evaluator')).to_have_attribute('readonly','')
-    for e in MOCK['tutorial']['exercises']: page.locator(f'nav a[href="#{e["id"]}"]').click()
+    expect(editor_for(page, 'Read-only TypeScript evaluator')).to_have_attribute('aria-readonly','true')
+    for e in MOCK['tutorial']['exercises']: select_lesson(page, e['id'])
     assert not backend.posts; record('Seven destinations; read-only intro; navigation causes zero POSTs')
     # Locale is independent from work/progress; switching never issues a POST.
-    language=page.get_by_role('combobox',name='Language',exact=True)
     before=len(backend.posts)
-    language.select_option('es')
-    expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+    set_language(page, 'es')
+    expect_language(page, 'es')
     expect(page.locator('html')).to_have_attribute('lang','es')
     expect(page.get_by_role('navigation',name='Lecciones del tutorial')).to_be_visible()
     assert len(backend.posts)==before
-    page.reload();expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
-    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
+    page.reload();expect_language(page, 'es')
+    set_language(page, 'en')
     record('Accessible selector updates document language, persists on refresh, and issues no inference')
 
-    page.locator('nav a[href="#01-starred-classifier"]').click()
-    editor=page.get_by_role('textbox',name='Editable TypeScript evaluator')
-    editor.fill(MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
-    page.locator('nav a[href="#02-document-classification"]').click();page.go_back()
-    expect(editor).to_have_value(MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
-    page.reload();expect(editor).to_have_value(MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
+    select_lesson(page, '01-starred-classifier')
+    editor=editor_for(page)
+    replace_source(editor, MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
+    select_lesson(page, '02-document-classification');page.go_back()
+    expect_source(editor, MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
+    page.reload();expect_source(editor, MOCK['fixtures']['request']['snapshot']['source']+'// retained draft')
     record('Draft survives navigation/back/refresh without inference')
-    editor.fill('export function evaluate() {\n  SYNTAX_ERROR\n}')
+    # Preserve exact bytes through the native drag/drop path, not only paste.
+    original = 'first\nsecond\r\nthird\rfourth'
+    editor.focus(); editor.press('ControlOrMeta+A')
+    editor.evaluate("""(element, source) => {
+        const data = new DataTransfer(); data.setData('text/plain', source);
+        element.dispatchEvent(new ClipboardEvent('paste', {clipboardData:data,bubbles:true,cancelable:true}));
+    }""", original)
+    expect_source(editor, original)
+    editor.focus(); editor.press('ControlOrMeta+A'); editor.press('ArrowLeft'); editor.press('ArrowDown')
+    editor.press('Shift+ArrowDown'); editor.press('Shift+ArrowDown')
+    transfer = page.evaluate_handle('new DataTransfer()')
+    editor.dispatch_event('dragstart', {'dataTransfer':transfer})
+    assert transfer.evaluate("data => data.getData('Text')") == 'second\r\nthird\r'
+    point = editor.locator('.cm-line').last.evaluate("""element => {
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        let text; while (walker.nextNode()) text = walker.currentNode;
+        const range = document.createRange(); range.setStart(text, text.textContent.length); range.collapse(true);
+        const bounds = range.getBoundingClientRect();
+        return {clientX:bounds.right,clientY:(bounds.top+bounds.bottom)/2};
+    }""")
+    editor.dispatch_event('drop', {'dataTransfer':transfer, **point})
+    expect_source(editor, 'first\nfourthsecond\r\nthird\r')
+    editor.focus(); editor.press('ControlOrMeta+z'); expect_source(editor, original)
+    editor.focus(); editor.press('ControlOrMeta+Shift+z'); expect_source(editor, 'first\nfourthsecond\r\nthird\r')
+    transfer.dispose()
+    record('Native drag/drop and undo/redo preserve mixed CRLF/CR source bytes')
+    replace_source(editor, 'export function evaluate() {\n  SYNTAX_ERROR\n}')
     page.get_by_role('button',name='Validate',exact=True).click()
     expect(page.get_by_role('button',name='SYNTAX_ERROR · line 2, column 3')).to_be_visible()
     page.get_by_role('button',name='SYNTAX_ERROR · line 2, column 3').click();expect(editor).to_be_focused()
-    editor.fill('export function evaluate() {\n  TYPE_ERROR\n}')
+    replace_source(editor, 'export function evaluate() {\n  TYPE_ERROR\n}')
     page.get_by_role('button',name='Validate',exact=True).click()
     expect(page.get_by_role('button',name='TYPE_ERROR · line 2, column 3')).to_be_visible()
     assert not any(path=='runs' for path,_ in backend.posts);record('Syntax/type positions focus source; validation causes no run')
-    editor.fill(MOCK['fixtures']['request']['snapshot']['source']);page.get_by_role('button',name='Validate',exact=True).click()
+    replace_source(editor, MOCK['fixtures']['request']['snapshot']['source']);page.get_by_role('button',name='Validate',exact=True).click()
     expect(page.get_by_text('✓ Validated current source')).to_be_visible()
     page.get_by_role('button',name='Test Fixtures',exact=True).click()
     expect(page.get_by_role('cell',name='Matched',exact=True)).to_have_count(2)
@@ -134,28 +224,28 @@ with sync_playwright() as p:
     expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
     before=len(backend.posts); page.reload();expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
     assert len(backend.posts)==before;record('Current bound review restores by GET after refresh; no duplicate paid request')
-    old_source=editor.input_value(); old_receipts=copy.deepcopy(backend.reviews)
+    old_source=editor_source(editor); old_receipts=copy.deepcopy(backend.reviews)
     before=len(backend.posts)
-    page.get_by_role('combobox',name='Language',exact=True).select_option('es')
-    expect(page.get_by_role('textbox',name='Evaluador TypeScript editable')).to_have_value(old_source)
+    set_language(page, 'es')
+    expect_source(editor_for(page, 'Evaluador TypeScript editable'), old_source)
     expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
     expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
     expect(page.get_by_text('Idioma solicitado para los comentarios: Inglés.',exact=False)).to_be_visible()
     assert backend.reviews==old_receipts and len(backend.posts)==before
     page.reload()
     expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
-    expect(page.get_by_role('textbox',name='Evaluador TypeScript editable')).to_have_value(old_source)
+    expect_source(editor_for(page, 'Evaluador TypeScript editable'), old_source)
     assert len(backend.posts)==before
     # Only the explicit new review captures Spanish; its English mock feedback remains honest.
     page.get_by_role('button',name='Revisar de nuevo',exact=True).click()
     expect(page.get_by_text('Idioma solicitado para los comentarios: Español.',exact=False)).to_be_visible()
     assert backend.posts[-1][0]=='reviews' and backend.posts[-1][1]['feedbackLocale']=='es'
     expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
-    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
-    expect(editor).to_have_value(old_source)
+    set_language(page, 'en')
+    expect_source(editor, old_source)
     record('Language switch preserves source, validation, run evidence, progress and original feedback; only explicit review requests capture locale')
 
-    editor.fill(MOCK['fixtures']['request']['snapshot']['source']+'// new version')
+    replace_source(editor, MOCK['fixtures']['request']['snapshot']['source']+'// new version')
     expect(page.get_by_text('Previous review is stale',exact=True)).to_be_visible()
     expect(page.get_by_role('button',name='Review Again',exact=True)).to_be_disabled();record('Edit immediately invalidates review and evidence')
     # Source copy retained; current receipts re-created before retry scenarios.
@@ -191,14 +281,14 @@ with sync_playwright() as p:
     expect(page.get_by_role('button',name='Recover submission',exact=True)).to_be_visible()
     first=backend.posts[-1][1]['requestId'];page.get_by_role('button',name='Recover submission',exact=True).click();expect(page.get_by_role('button',name='Run Agent',exact=True)).to_be_enabled()
     assert backend.posts[-1][1]['requestId']==first;record('Lost accepted response recovery reuses original idempotent request ID')
-    backend.outage=True;page.get_by_text('Local setup & service status',exact=True).click();page.get_by_role('button',name='Refresh service status',exact=True).click()
+    backend.outage=True;before=len(backend.posts);page.reload();expect(editor_for(page)).to_be_visible();assert len(backend.posts)==before
     expect(page.get_by_role('button',name='Run Agent',exact=True)).to_be_disabled();expect(page.get_by_role('button',name='Test Fixtures',exact=True)).to_be_enabled();record('Provider outage leaves healthy Code fixtures usable and prevents paid action')
     page.evaluate("localStorage.setItem('another-application', 'keep')")
-    old=editor.input_value();page.get_by_role('button',name='Reset Exercise',exact=True).click();expect(page.get_by_role('dialog')).to_be_visible();expect(page.get_by_role('button',name='Cancel',exact=True)).to_be_focused()
-    page.get_by_role('button',name='Cancel',exact=True).click();expect(editor).to_have_value(old)
+    old=editor_source(editor);page.get_by_role('button',name='Reset Exercise',exact=True).click();expect(page.get_by_role('dialog')).to_be_visible();expect(page.get_by_role('button',name='Cancel',exact=True)).to_be_focused()
+    page.get_by_role('button',name='Cancel',exact=True).click();expect_source(editor, old)
     page.get_by_role('button',name='Reset Exercise',exact=True).click();page.get_by_role('dialog').get_by_role('button',name='Reset Exercise',exact=True).click()
-    expect(editor).to_have_value(MOCK['fixtures']['request']['snapshot']['source']);assert page.evaluate("localStorage.getItem('another-application')")=='keep';record('Reset cancel/confirm scopes local work and preserves unrelated storage')
-    backend.outage=False;page.locator('nav a[href="#04-policy-recommendation"]').click();page.get_by_role('button',name='Refresh service status',exact=True).click()
+    expect_source(editor, MOCK['fixtures']['request']['snapshot']['source']);assert page.evaluate("localStorage.getItem('another-application')")=='keep';record('Reset cancel/confirm scopes local work and preserves unrelated storage')
+    backend.outage=False;page.reload();select_lesson(page, '04-policy-recommendation')
     expect(page.get_by_text('Fixtures use judge tokens. Agent runs use agent + judge tokens. No inference on navigation.')).to_be_visible()
     page.get_by_role('tab',name='Python agent',exact=True).click();expect(page.locator('#python-panel')).to_be_visible()
     page.get_by_role('tab',name='Python agent',exact=True).press('ArrowLeft');expect(page.get_by_role('tab',name='Dataset JSON',exact=True)).to_be_focused()
@@ -213,10 +303,10 @@ with sync_playwright() as p:
             page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
             page.screenshot(path=str(ARTIFACTS/'narrow-ui-mock.png'),full_page=True)
     record('1024/390/320 layouts avoid document overflow and allow editor keyboard escape')
-    page.get_by_role('combobox',name='Language',exact=True).select_option('es')
+    set_language(page, 'es')
     for width in [1440,1024,390,320]:
         page.set_viewport_size({'width':width,'height':1000});page.reload()
-        expect(page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+        expect_language(page, 'es')
         assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'),width
         page.get_by_role('textbox',name='Evaluador TypeScript editable').focus()
         page.get_by_role('textbox',name='Evaluador TypeScript editable').press('Tab')
@@ -224,20 +314,20 @@ with sync_playwright() as p:
             page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
             page.screenshot(path=str(ARTIFACTS/f'spanish-{width}-ui-mock.png'),full_page=True)
     record('Spanish labels and long help text fit 1440/1024/390/320 widths with keyboard editor escape')
-    page.get_by_role('combobox',name='Idioma',exact=True).select_option('en')
+    set_language(page, 'en')
 
     page.set_viewport_size({'width':720,'height':700});page.evaluate("document.documentElement.style.fontSize='200%'")
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth');record('200% font zoom with narrow viewport keeps page width bounded')
-    old_context=browser.new_context(viewport={'width':390,'height':900})
+    old_context=browser.new_context(viewport={'width':390,'height':900},permissions=['clipboard-read','clipboard-write'])
     old_page=old_context.new_page();old_page.route('**/api/**',backend.route)
     old_page.add_init_script("localStorage.setItem('evals-tutorial:old:01-starred-classifier:old', JSON.stringify({source:'old evaluator source'}));")
     old_page.goto('http://127.0.0.1:4173/#01-starred-classifier')
     expect(old_page.get_by_text('Saved work belongs to an older version.',exact=True)).to_be_visible()
-    expect(old_page.get_by_role('textbox',name='Editable TypeScript evaluator')).to_have_value(MOCK['fixtures']['request']['snapshot']['source'])
+    expect_source(editor_for(old_page), MOCK['fixtures']['request']['snapshot']['source'])
     old_context.close();record('Changed content version retains inspectable old source without inheriting progress')
     # Use the actual credential-free lesson corpus for all seven localized descriptions.
     actual=json.loads((ROOT/'content/tutorial.json').read_text())
-    actual_context=browser.new_context(viewport={'width':390,'height':900},locale='es-AR')
+    actual_context=browser.new_context(viewport={'width':390,'height':900},locale='es-AR',permissions=['clipboard-read','clipboard-write'])
     actual_page=actual_context.new_page()
     def actual_route(route):
         if route.request.url.endswith('/api/tutorial'):
@@ -246,24 +336,24 @@ with sync_playwright() as p:
     actual_page.route('**/api/**',actual_route)
     before=len(backend.posts)
     actual_page.goto('http://127.0.0.1:4173/')
-    expect(actual_page.get_by_role('combobox',name='Idioma',exact=True)).to_have_value('es')
+    expect_language(actual_page, 'es')
     translations=json.loads((ROOT/'apps/web/src/locales/lessons.es.json').read_text())
     for exercise in actual['exercises']:
-        actual_page.locator(f'nav a[href="#{exercise["id"]}"]').click()
+        select_lesson(actual_page, exercise['id'])
         expect(actual_page.get_by_role('heading',name=translations[exercise['id']]['title'],exact=True)).to_be_visible()
-        expect(actual_page.get_by_role('textbox',name='Evaluador TypeScript de solo lectura' if exercise['readOnly'] else 'Evaluador TypeScript editable')).to_have_value(exercise['starterSource'])
+        expect_source(editor_for(actual_page, 'Evaluador TypeScript de solo lectura' if exercise['readOnly'] else 'Evaluador TypeScript editable'), exercise['starterSource'])
         assert actual_page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
     assert len(backend.posts)==before
     actual_context.close()
     record('Spanish browser preference selects all seven actual translated lessons with unchanged starter code and zero POSTs')
 
-    blocked_context=browser.new_context(viewport={'width':390,'height':900})
+    blocked_context=browser.new_context(viewport={'width':390,'height':900},permissions=['clipboard-read','clipboard-write'])
     blocked_page=blocked_context.new_page();blocked_page.route('**/api/**',backend.route)
     blocked_page.add_init_script("Storage.prototype.setItem = function(){throw new Error('Synthetic full storage')};")
     blocked_page.goto('http://127.0.0.1:4173/#01-starred-classifier')
-    blocked_page.get_by_role('textbox',name='Editable TypeScript evaluator').fill('retained in-memory work')
+    replace_source(editor_for(blocked_page), 'retained in-memory work')
     expect(blocked_page.get_by_text('Edits are not saved in this browser.',exact=False)).to_be_visible()
-    expect(blocked_page.get_by_role('textbox',name='Editable TypeScript evaluator')).to_have_value('retained in-memory work')
+    expect_source(editor_for(blocked_page), 'retained in-memory work')
     blocked_context.close();record('Storage failure stays visible and preserves in-memory edits with copy control')
     assert not errors,errors
     record('Production bundle runs without browser page errors')

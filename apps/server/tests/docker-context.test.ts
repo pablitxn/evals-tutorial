@@ -16,7 +16,14 @@ test('only a trusted local socket reaches the private Docker CLI; backend creden
     await executor.available();
     const rows=(await readFile(observations,'utf8')).trim().split('\n').map(line=>JSON.parse(line));
     assert.equal(rows.length,3);
-    for(const row of rows){assert.equal(row.host,'unix:///tmp/trusted-test-only.sock');assert.deepEqual(row.keys.sort(),['DOCKER_HOST','PATH']);assert.equal(row.args[0],'--config');}
+    for(const row of rows){
+      assert.equal(row.host,'unix:///tmp/trusted-test-only.sock');
+      // macOS may inject CoreFoundation's text encoding into a launched process.
+      // It is not an executor allowlist entry; every other ambient key is rejected.
+      const keys=process.platform==='darwin'?row.keys.filter((key:string)=>key!=='__CF_USER_TEXT_ENCODING'):row.keys;
+      assert.deepEqual(keys.sort(),['DOCKER_HOST','PATH']);
+      assert.equal(row.args[0],'--config');
+    }
     for(const host of ['tcp://127.0.0.1:2375','ssh://remote','unix:///tmp/socket\n'])assert.throws(()=>new DockerExecutor({imageDigest,dockerHost:host}),/local Unix socket/);
   }finally{await executor.shutdown();await rm(root,{recursive:true,force:true});}
 });

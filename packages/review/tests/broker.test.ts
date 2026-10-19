@@ -43,6 +43,15 @@ test('ready must cover every rubric criterion', () => {
   assert.throws(() => validateReviewAssessment(assessment(), material));
 });
 
+test('valid fallibility disclaimers survive the complete grounded feedback validator', () => {
+  for (const summary of ['This review is not infallible.', 'This review does not guarantee correctness.', 'Esta revisión no es infalible.']) {
+    assert.equal(validateReviewAssessment({ ...assessment(), summary }, brokerMaterial()).status, 'ready');
+  }
+  for (const summary of ['This review is not infallible, but it guarantees correctness.', 'Esta revisión no es infalible. El autor hizo trampa.']) {
+    assert.throws(() => validateReviewAssessment({ ...assessment(), summary }, brokerMaterial()));
+  }
+});
+
 test('the broker and service can both validate long summaries without duplicating the fallibility notice', () => {
   const raw = { ...assessment(), summary: 'x'.repeat(3799) };
   const once = validateReviewAssessment(raw, brokerMaterial());

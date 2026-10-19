@@ -1,0 +1,135 @@
+.preferences-dialog {
+  width: min(820px, calc(100vw - 48px));
+  height: min(560px, calc(100dvh - 48px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 28px 100px rgb(10 25 18 / .2);
+}
+.preferences-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.preferences-dialog::backdrop { background: rgb(10 25 18 / .46); backdrop-filter: blur(5px); }
+.preferences-dialog .preferences-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--line);
+}
+.preferences-dialog .preferences-heading h2 { margin: 0; font-size: 23px; letter-spacing: -.045em; }
+.preferences-dialog .preferences-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+}
+.preferences-dialog .preferences-close:hover { color: var(--ink); background: var(--surface); border-color: var(--line); }
+.preferences-dialog svg { width: 22px; height: 22px; flex: 0 0 auto; }
+.preferences-dialog .preferences-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: 0; }
+.preferences-dialog .preferences-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 12px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+.preferences-dialog .preferences-nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+}
+.preferences-dialog .preferences-nav button:hover { color: var(--ink); background: var(--paper); }
+.preferences-dialog .preferences-nav button[aria-current="page"] { color: var(--ink); background: var(--paper); border-color: var(--line); font-weight: 650; }
+.preferences-dialog .preferences-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 34px 32px 24px;
+}
+.preferences-dialog .preferences-content > section { min-width: 0; flex: 1 0 auto; }
+.preferences-dialog h3 { margin: 0 0 10px; font-size: 25px; letter-spacing: -.04em; line-height: 1.25; }
+.preferences-dialog .preferences-description { max-width: 38ch; margin: 0 0 28px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.preferences-dialog .theme-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.preferences-dialog .theme-choices legend { margin: 0 0 12px; padding: 0; font-size: 13px; font-weight: 600; }
+.preferences-dialog .theme-choice { position: relative; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 7px; border: 1px solid var(--line); border-radius: 13px; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.preferences-dialog .theme-choice:hover { border-color: var(--muted); }
+.preferences-dialog .theme-choice:has(input:checked) { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+.preferences-dialog .theme-choice:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 4px; }
+.preferences-dialog .theme-choice input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.preferences-dialog .theme-preview { display: grid; align-items: end; width: 100%; aspect-ratio: 1.4; overflow: hidden; padding: 14px 12px 0; border-radius: 7px; background: #eceee5; border: 1px solid rgb(32 59 50 / .08); }
+.preferences-dialog .theme-preview-window { display: flex; width: 100%; height: 100%; min-height: 42px; overflow: hidden; background: #fffefa; border: 1px solid #d9dfd5; border-radius: 5px 5px 0 0; }
+.preferences-dialog .theme-preview-sidebar { flex: 0 0 23%; background: #eef1e8; border-right: 1px solid #d9dfd5; }
+.preferences-dialog .theme-preview-lines { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 12px 9px; }
+.preferences-dialog .theme-preview-lines i { display: block; height: 4px; border-radius: 2px; background: #d9dfd5; }
+.preferences-dialog .theme-preview-lines i:first-child { width: 70%; background: #08675f; }
+.preferences-dialog .theme-preview-lines i:last-child { width: 80%; }
+.preferences-dialog .theme-preview-dark { background: #15221b; }
+.preferences-dialog .theme-preview-dark .theme-preview-window { background: #202d26; border-color: #3c4d43; }
+.preferences-dialog .theme-preview-dark .theme-preview-sidebar { background: #2a392f; border-color: #3c4d43; }
+.preferences-dialog .theme-preview-dark .theme-preview-lines i { background: #43554a; }
+.preferences-dialog .theme-preview-dark .theme-preview-lines i:first-child { background: #a7d9bd; }
+.preferences-dialog .theme-preview-system { background: linear-gradient(110deg, #eceee5 50%, #15221b 50%); }
+.preferences-dialog .theme-preview-system .theme-preview-window { background: linear-gradient(110deg, #fffefa 46%, #202d26 46%); }
+.preferences-dialog .theme-preview-system .theme-preview-lines i { background: #829587; }
+.preferences-dialog .theme-choice-label { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 0 3px 3px; font-size: 13px; font-weight: 550; }
+.preferences-dialog .theme-check { display: grid; place-items: center; flex: 0 0 17px; width: 17px; height: 17px; border: 1px solid var(--line); border-radius: 50%; color: transparent; }
+.preferences-dialog .theme-check svg { width: 12px; height: 12px; }
+.preferences-dialog .theme-choice:has(input:checked) .theme-check { color: var(--primary-ink); background: var(--primary); border-color: var(--primary); }
+.preferences-dialog .preferences-hint { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.preferences-dialog .preferences-storage-notice { margin: 16px 0 0; padding: 12px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+.preferences-dialog .preferences-language { padding: 18px; border: 1px solid var(--line); border-radius: 14px; }
+.preferences-dialog .preferences-language .language-control { display: block; }
+.preferences-dialog .language-control-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; font-size: 14px; }
+.preferences-dialog .language-control-row label { font-size: 14px; }
+.preferences-dialog .preferences-language .dropdown-trigger { width: 150px; max-width: 65%; }
+@media (max-width: 620px) {
+  .preferences-dialog { width: calc(100vw - 24px); height: min(620px, calc(100dvh - 24px)); max-height: calc(100dvh - 24px); border-radius: 20px; }
+  .preferences-dialog .preferences-heading { padding: 15px 18px; }
+  .preferences-dialog .preferences-heading h2 { font-size: 21px; }
+  .preferences-dialog .preferences-layout { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  .preferences-dialog .preferences-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 10px; gap: 8px; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
+  .preferences-dialog .preferences-nav button { justify-content: center; gap: 8px; min-height: 44px; padding: 9px 8px; }
+  .preferences-dialog .preferences-nav svg { width: 18px; height: 18px; }
+  .preferences-dialog .preferences-content { padding: 24px 18px 18px; scrollbar-gutter: auto; }
+  .preferences-dialog h3 { font-size: 23px; }
+  .preferences-dialog .preferences-description { margin-bottom: 24px; }
+  .preferences-dialog .theme-choices { gap: 8px; }
+  .preferences-dialog .theme-choice { padding: 5px; border-radius: 10px; }
+  .preferences-dialog .theme-preview { padding: 10px 7px 0; }
+  .preferences-dialog .theme-preview-lines { padding: 10px 6px; gap: 5px; }
+  .preferences-dialog .theme-choice-label { padding: 0 1px 3px; font-size: 12px; }
+  .preferences-dialog .preferences-language { padding: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preferences-dialog .theme-choice { transition: none; }
+}

@@ -19,7 +19,7 @@ test('English and Spanish UI catalogs have identical keys and interpolation para
 });
 
 test('all static UI translation calls exist in both catalogs', () => {
-  for (const name of ['App.tsx', 'components.tsx', 'i18n.tsx']) {
+  for (const name of ['App.tsx', 'components.tsx', 'i18n.tsx', 'preferences.tsx', 'ProviderStatus.tsx', 'JsonViewer.tsx', 'EvaluationConcepts.tsx']) {
     const file = readFileSync(new URL(`../src/${name}`, import.meta.url), 'utf8');
     const source = ts.createSourceFile(name, file, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     const visit = (node: ts.Node) => {

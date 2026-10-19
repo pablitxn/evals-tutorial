@@ -1,14 +1,19 @@
 """Append-only evidence helpers for the sandboxed browser rehearsal."""
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import subprocess
+import tempfile
 from uuid import uuid4
 
 
 def new_artifact_directory(root: Path) -> Path:
     timestamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    directory = root / '.local/browser-evidence' / f'browser-{timestamp}-{uuid4().hex[:8]}'
+    base = Path(os.environ.get('TUTORIAL_BROWSER_ARTIFACTS', str(Path(tempfile.gettempdir()) / 'evals-tutorial-browser-evidence'))).expanduser().resolve()
+    if base.is_relative_to(root.resolve()):
+        raise ValueError('Browser evidence must be outside the repository.')
+    directory = base / f'browser-{timestamp}-{uuid4().hex[:8]}'
     directory.mkdir(parents=True, exist_ok=False)
     return directory
 
@@ -30,7 +35,8 @@ def write_report(directory: Path, report: dict) -> Path:
 def launch_browser(playwright, directory: Path, provenance: dict):
     try:
         # Playwright defaults Chromium's sandbox off; explicitly require it.
-        return playwright.chromium.launch(executable_path='/usr/bin/chromium', headless=True, chromium_sandbox=True)
+        executable = os.environ.get('TUTORIAL_BROWSER_EXECUTABLE', '/usr/bin/chromium')
+        return playwright.chromium.launch(executable_path=executable, headless=True, chromium_sandbox=True)
     except Exception as error:
         report = {
             **provenance,
