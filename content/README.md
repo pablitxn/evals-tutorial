@@ -56,6 +56,16 @@ and installed prompts. The final example also stores that complete consultation
 in `exercises/07-spec-regression/agent_consultation.py`; the original authoring
 boundary helpers remain preserved beside the original seven entries.
 
+After changing runtime prompts or broker code, refresh the shown prompts and
+their provenance without regenerating any dataset, fixture or document:
+
+```sh
+python3 content/authoring/sync-consultation.py
+```
+
+This refreshes every installed variant. The guided-example builder also invokes
+it, so editing a baseline prompt cannot leave the read-only consultation stale.
+
 To rebuild only the final example without regenerating documents or the original
 seven exercises, run:
 

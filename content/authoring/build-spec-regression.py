@@ -4,11 +4,9 @@ Run from the repository root, then run finalize.ts for canonical dataset hashes.
 No provider calls, inference results or document regeneration occur here.
 """
 from copy import deepcopy
-from hashlib import sha256
 from pathlib import Path
-import importlib.util
 import json
-import sys
+import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
@@ -122,36 +120,9 @@ def build():
     projection = json.loads(projection_path.read_text())
     projection['exercises'][EXERCISE_ID] = {key: exercise[key] for key in ('inputSchema', 'outputSchema')}
     save(projection_path, projection)
-    # Import only the source-owned prompts; this module performs no provider calls.
-    module_spec = importlib.util.spec_from_file_location('prepared_for_authoring', agent_root / 'prepared.py')
-    prepared = importlib.util.module_from_spec(module_spec)
-    sys.modules[module_spec.name] = prepared
-    module_spec.loader.exec_module(prepared)
-    maf = (agent_root / 'maf.py').read_text()
-    snapshot_path = ROOT / 'consultation-sources.json'
-    snapshot = json.loads(snapshot_path.read_text())
-    source_files = sorted([*agent_root.glob('*.py'), agent_root / 'domains.json'])
-    source_hash = sha256(b''.join(path.name.encode() + b'\0' + path.read_bytes() for path in source_files)).hexdigest()
-    for source in snapshot['sources'].values():
-        source['sourceHash'] = source_hash
-    consultation = maf
-    for variant in exercise['agentVariants']:
-        prompt = prepared.prepared_agent(EXERCISE_ID, variant).instructions
-        consultation += f'\n# Installed exercise: {EXERCISE_ID}; variant: {variant}.\n'
-        consultation += '# This exact primitive is called by runtime.infer under the host deadline.\n'
-        consultation += '# Input and document bytes are supplied by the trusted supervisor.\n'
-        consultation += '# Output schema is installed from the schema-only projection in domains.json.\n'
-        consultation += '# Installed prompt:\n' + ''.join('# ' + line + '\n' for line in prompt.splitlines())
-    schema_json = json.dumps(exercise['outputSchema'], sort_keys=True, separators=(',', ':'), ensure_ascii=False)
-    prompt_hashes = {variant: sha256((prepared.prepared_agent(EXERCISE_ID, variant).instructions + '\n' + schema_json).encode()).hexdigest()
-                     for variant in exercise['agentVariants']}
-    snapshot['sources'][EXERCISE_ID] = {'pythonSource': consultation, 'sourceHash': source_hash,
-        'promptHash': prompt_hashes['baseline'], 'promptHashes': prompt_hashes}
-    snapshot['sourceFileHash'] = sha256((agent_root / 'maf.py').read_bytes()).hexdigest()
-    save(snapshot_path, snapshot)
-    (DIRECTORY / 'agent_consultation.py').write_text(consultation)
-    exercise['pythonSource'] = consultation
     save(ROOT / 'tutorial.json', tutorial)
+    # Rebuild every shown prompt, not just the final example, after runtime edits.
+    runpy.run_path(str(ROOT / 'authoring/sync-consultation.py'), run_name='__main__')
     print('Appended one guided SDD exercise, one three-case dataset and five explicit fixtures; no inference. Run finalize.ts for canonical hashes.')
 
 
