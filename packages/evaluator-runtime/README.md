@@ -75,6 +75,24 @@ provider replies cannot rewrite receipts. Calls already accepted upstream may
 still incur cost. Startup preflight removes abandoned containers only for the
 stable receipt-directory session label. A failed cleanup closes that executor.
 
+Before submitting each create, the supervisor flushes a private cleanup obligation
+to the host temporary directory `et-wp06-docker-quarantine-<session-key-hash>`.
+If the CLI fails or times out, a successful early removal and empty inventory do
+not prove that the daemon finished creating the container. The obligation remains
+on disk and execution fails closed with a sanitized `isolation_unavailable` cleanup
+error. Shutdown and the next executor for that same stable session reconcile the
+recorded names. Once creation was acknowledged or the exact owned name was observed,
+successful removal plus empty readback can release the obligation. Removal/readback
+share the existing five-second cleanup budget; create and execution deadlines and
+isolation flags are unchanged. No evaluator or create is retried.
+
+If creation stays invisible, shutdown reports the unresolved quarantine and retains
+its record rather than certifying cleanup. A later visible resource can be removed
+by the same-session recovery path. A daemon operation that never becomes visible
+requires operator disposition; do not delete obligations just to resume execution.
+These host-local records survive process replacement while temporary storage is
+retained, not loss of that storage. Raw CLI stderr/commands are never row errors.
+
 Fixture mismatch is `status: completed, fixtureMatched: false`; a valid failing
 criterion is also completed execution. Runtime/protocol/provider/timeout failures
 have separate operational errors. Agent inputs contain no expected references,

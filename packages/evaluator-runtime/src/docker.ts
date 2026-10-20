@@ -1,7 +1,7 @@
 import { execFile, spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { promisify } from 'node:util';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LIMITS, validateContract, type EvalResult, type JudgeRpcRequest, type JudgeRpcResponse } from '@evals-tutorial/contracts';
@@ -41,6 +41,9 @@ export class DockerExecutor implements IsolatedExecutor {
   private readonly sessionKey: string;
   private readonly dockerHost?: string;
   private initialization?: Promise<void>;
+  private readonly cleanupDirectory: string;
+  private readonly pendingCleanup = new Map<string, boolean>();
+  private cleanupFailed = false;
   constructor(options: DockerExecutorOptions) {
     if (!/^sha256:[a-f0-9]{64}$/.test(options.imageDigest)) throw fault('configuration', 'Runner requires an immutable local image digest');
     this.imageDigest = options.imageDigest;
@@ -49,10 +52,12 @@ export class DockerExecutor implements IsolatedExecutor {
     this.dockerHost = options.dockerHost;
     this.sessionKey = options.sessionKey ?? randomUUID();
     if (!/^[a-zA-Z0-9-]{1,128}$/.test(this.sessionKey)) throw fault('configuration', 'Invalid runner session key');
+    this.cleanupDirectory = join(tmpdir(), 'et-wp06-docker-quarantine-' + sha256(this.sessionKey));
     this.compileTimeout = Math.min(options.compileTimeoutMs ?? LIMITS.codeTimeoutMs, LIMITS.codeTimeoutMs);
     if (this.compileTimeout < 1) throw fault('configuration', 'Invalid compiler deadline');
   }
   async available(signal?: AbortSignal): Promise<void> {
+    if (this.closed && (this.cleanupFailed || this.pendingCleanup.size)) throw fault('isolation_unavailable', 'Docker worker cleanup remains quarantined');
     if (signal?.aborted || this.closed) throw fault('cancelled', 'Execution was cancelled');
     try {
       const options = { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost), signal };
@@ -64,16 +69,65 @@ export class DockerExecutor implements IsolatedExecutor {
       if (image.stdout.trim() !== this.imageDigest) throw new Error('Image mismatch');
       this.initialization ??= this.reapAbandoned(cli);
       await this.initialization;
-    } catch {
+    } catch (reason) {
       if (signal?.aborted) throw fault('cancelled', 'Execution was cancelled');
+      if (reason instanceof ServiceError) throw reason;
       throw fault('isolation_unavailable', 'Restricted Docker execution or the pinned worker image is unavailable');
     }
   }
   private async reapAbandoned(cli: string[]): Promise<void> {
+    await this.reconcileCleanup(cli);
     const options = { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) };
     const ids = (await exec(this.docker, [...cli, 'ps', '-aq', '--filter', 'label=evals-tutorial.owner=et-wp06', '--filter', 'label=evals-tutorial.session=' + this.sessionKey], options)).stdout.trim().split(/\s+/).filter(Boolean);
     if (ids.some(id => !/^[a-f0-9]{12,64}$/.test(id))) throw new Error('Invalid Docker inventory');
     if (ids.length) await exec(this.docker, [...cli, 'rm', '-f', ...ids], options);
+  }
+  private async retainCleanup(name: string): Promise<void> {
+    // Write before submitting create: a killed CLI cannot acknowledge the daemon's outcome.
+    await mkdir(this.cleanupDirectory, { recursive: true, mode: 0o700 });
+    await writeFile(join(this.cleanupDirectory, name + '.json'), JSON.stringify({ version: 1, name }), { flag: 'wx', mode: 0o600, flush: true });
+    this.pendingCleanup.set(name, false);
+  }
+  private async reconcileCleanup(cli: string[]): Promise<void> {
+    try {
+      let files: string[];
+      try { files = await readdir(this.cleanupDirectory); }
+      catch (reason) { if ((reason as NodeJS.ErrnoException).code === 'ENOENT') files = []; else throw reason; }
+      if (files.length > LIMITS.rowConcurrency) throw new Error('Invalid cleanup inventory');
+      for (const file of files) {
+        if (!/^et-wp06-[a-f0-9-]{36}\.json$/.test(file)) throw new Error('Invalid cleanup obligation');
+        const record = JSON.parse(await readFile(join(this.cleanupDirectory, file), 'utf8'));
+        if (record.version !== 1 || record.name + '.json' !== file) throw new Error('Invalid cleanup obligation');
+        if (!this.pendingCleanup.has(record.name)) this.pendingCleanup.set(record.name, false);
+      }
+      let failed = false;
+      for (const name of this.pendingCleanup.keys()) {
+        try { await this.removeWorker(cli, name); } catch { failed = true; }
+      }
+      if (failed) throw new Error('Unresolved cleanup obligation');
+    } catch {
+      this.closed = true; this.cleanupFailed = true;
+      throw fault('isolation_unavailable', 'Docker worker cleanup remains quarantined; daemon creation or removal is unconfirmed');
+    }
+  }
+  private async removeWorker(cli: string[], name: string): Promise<void> {
+    // Removal and readback share the existing five-second cleanup budget.
+    const deadline = Date.now() + 5000;
+    const command = async (args: string[]) => {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) throw new Error('Cleanup deadline expired');
+      return exec(this.docker, [...cli, ...args], { timeout: remaining, maxBuffer: 65536, env: environment(this.dockerHost) });
+    };
+    const visible = async () => {
+      const ids = (await command(['ps', '-aq', '--filter', 'label=evals-tutorial.owner=et-wp06', '--filter', 'label=evals-tutorial.session=' + this.sessionKey, '--filter', 'name=^/' + name + '$'])).stdout.trim().split(/\s+/).filter(Boolean);
+      if (ids.length > 1 || ids.some(id => !/^[a-f0-9]{12,64}$/.test(id))) throw new Error('Invalid worker inventory');
+      return ids.length === 1;
+    };
+    if (!this.pendingCleanup.get(name) && await visible()) this.pendingCleanup.set(name, true);
+    await command(['rm', '-f', name]);
+    if (await visible() || !this.pendingCleanup.get(name)) throw new Error('Worker creation or removal remains unconfirmed');
+    await unlink(join(this.cleanupDirectory, name + '.json'));
+    this.pendingCleanup.delete(name);
   }
   async compile(source: string, signal?: AbortSignal): Promise<Compilation> {
     if (Buffer.byteLength(source) > LIMITS.sourceBytes) throw fault('resource_limit', 'Evaluator source exceeds 64 KiB');
@@ -103,6 +157,7 @@ export class DockerExecutor implements IsolatedExecutor {
     if (signal?.aborted) controller.abort();
     const name = 'et-wp06-' + randomUUID();
     let child: ReturnType<typeof spawn> | undefined;
+    let phase = 'preparation';
     let result: Record<string, unknown> | undefined;
     let error: unknown;
     let removeError: unknown;
@@ -120,10 +175,14 @@ export class DockerExecutor implements IsolatedExecutor {
     try {
       if (controller.signal.aborted) throw fault('cancelled', 'Execution was cancelled');
       const cli = ['--config', await this.config];
-      // Separate create from start: aborting an in-flight docker run can race daemon creation.
-      // Await creation without the caller signal, then remove the confirmed name on every path.
-      await exec(this.docker, [...cli, 'create', '--name', name, '--label', 'evals-tutorial.owner=et-wp06', '--label', 'evals-tutorial.session=' + this.sessionKey, '-i', ...dockerSecurityArgs, this.imageDigest], { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) });
+      await this.retainCleanup(name);
       if (controller.signal.aborted) throw error ?? fault('cancelled', 'Execution was cancelled');
+      phase = 'create';
+      // Caller cancellation does not cancel daemon creation; retain an obligation before it.
+      await exec(this.docker, [...cli, 'create', '--name', name, '--label', 'evals-tutorial.owner=et-wp06', '--label', 'evals-tutorial.session=' + this.sessionKey, '-i', ...dockerSecurityArgs, this.imageDigest], { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) });
+      this.pendingCleanup.set(name, true);
+      if (controller.signal.aborted) throw error ?? fault('cancelled', 'Execution was cancelled');
+      phase = 'start';
       child = spawn(this.docker, [...cli, 'start', '-ai', name], { stdio: ['pipe', 'pipe', 'pipe'], env: environment(this.dockerHost) });
       await new Promise<void>(resolve => {
         child!.on('error', () => { error ??= fault('isolation_unavailable', 'Docker could not start the restricted worker'); resolve(); });
@@ -171,13 +230,20 @@ export class DockerExecutor implements IsolatedExecutor {
         });
         child!.stdin!.write(payload);
       });
+    } catch (reason) {
+      if (phase === 'preparation' && !(reason instanceof ServiceError)) this.closed = true;
+      error ??= reason instanceof ServiceError ? reason : fault('isolation_unavailable', 'Docker worker ' + phase + ' failed');
     } finally {
       clearTimeout(timeout);
       signal?.removeEventListener('abort', abort);
       controller.signal.removeEventListener('abort', cancelled);
-      // The daemon may outlive the CLI. Remove by the host-created name even on abort.
-      try { await exec(this.docker, ['--config', await this.config, 'rm', '-f', name], { timeout: 5000, maxBuffer: 65536, env: environment(this.dockerHost) }); }
-      catch { removeError = fault('isolation_unavailable', 'Docker worker cleanup could not be confirmed'); this.closed = true; }
+      try {
+        if (this.pendingCleanup.has(name)) {
+          if (phase === 'preparation') { await unlink(join(this.cleanupDirectory, name + '.json')); this.pendingCleanup.delete(name); }
+          else await this.removeWorker(['--config', await this.config], name);
+        }
+      }
+      catch { removeError = fault('isolation_unavailable', 'Docker worker cleanup remains quarantined after ' + phase + '; daemon creation or removal is unconfirmed'); this.closed = true; this.cleanupFailed = true; }
       this.active.delete(controller);
       this.finished.delete(completion); completed();
     }
@@ -189,6 +255,7 @@ export class DockerExecutor implements IsolatedExecutor {
     this.closed = true;
     for (const controller of this.active) controller.abort();
     await Promise.all([...this.finished]);
+    await this.reconcileCleanup(['--config', await this.config]);
     await rm(await this.config, { recursive: true, force: true });
     // Active exchanges own and await their cleanup; RunService awaits those tasks.
   }
