@@ -14,12 +14,16 @@ export async function withPreparedConsultation(content:ContentService,root:strin
   const sourceHash=sha256(Buffer.concat(chunks));
   if(snapshot.sourceFile!=='apps/agents/src/tutorial_agents/maf.py'||sha256(await readFile(resolve(root,snapshot.sourceFile)))!==snapshot.sourceFileHash)throw new Error('Prepared consultation primitive is stale');
   const tutorial=await content.tutorial();
-  // A changed consultation surface invalidates previous browser work versions.
-  tutorial.tutorialVersion+='-runtime1';
+  // Bind saved work to the verified runtime while staying within the 64-character version limit.
+  const runtimeVersion=(version:string)=>{
+    const suffix='-runtime-'+sha256(version+'\0'+sourceHash).slice(0,24);
+    return version.slice(0,64-suffix.length)+suffix;
+  };
+  tutorial.tutorialVersion=runtimeVersion(tutorial.tutorialVersion);
   for(const exercise of tutorial.exercises){
     const source=snapshot.sources[exercise.id];
     if(!source||source.sourceHash!==sourceHash)throw new Error('Prepared consultation snapshot is stale');
-    exercise.pythonSource=source.pythonSource;exercise.exerciseVersion+='-runtime1';
+    exercise.pythonSource=source.pythonSource;exercise.exerciseVersion=runtimeVersion(exercise.exerciseVersion);
   }
   assertContract('Tutorial',tutorial);
   return {...content,tutorial:async()=>structuredClone(tutorial),exercise:async id=>{

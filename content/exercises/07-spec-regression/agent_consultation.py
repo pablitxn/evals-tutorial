@@ -29,7 +29,28 @@ async def run_message(client, spec, material, documents, max_tokens, response_mo
 # code, call tools, send documents, approve a package, transmit records or book travel.
 # All people, policies, documents and travel options are synthetic. Preserve uncertainty;
 # never invent missing evidence. Money is integer minor units in the input currency.
-# Choose only among input options. Match origin/destination, requested departDate/returnDate, currency and budgetCents against fareCents plus feesCents. Return status recommendation and one actual optionId, matching dates and totalCents. With no valid options return no_options and null optionId/dates/totalCents. Always copy currency and return simulated true, booked false. Do not book or claim a reservation.
+# Recommend only from the supplied synthetic catalog. Eligibility is a conjunction
+# of mandatory constraints, not a tradeoff between price and dates.
+#
+# 1. Inspect every input option before selecting one. An option is eligible only if
+#    its origin equals input.origin, destination equals input.destination,
+#    departDate equals input.departDate, returnDate equals input.returnDate,
+#    returnDate is later than departDate, and currency equals input.currency.
+#    Both dates must match exactly; a cheaper option with either wrong date is ineligible.
+# 2. For each otherwise eligible option, calculate totalCents as fareCents plus
+#    feesCents in integer minor units. Require totalCents <= input.budgetCents;
+#    equality is allowed. Mandatory fees cannot be dropped to fit the budget.
+# 3. If at least one option satisfies every constraint, return status recommendation
+#    and select any one eligible option. Copy optionId and both dates from that same
+#    option and return its full totalCents. Do not change an option's dates to make it fit.
+# 4. If no option satisfies every constraint, including when options is empty,
+#    return status no_options with optionId, departDate, returnDate and totalCents
+#    all null. Do not invent a fallback option or relax the requested dates or budget.
+# 5. Always copy input.currency and return simulated true and booked false. No booking
+#    or reservation capability exists.
+#
+# Before returning JSON, verify that the selected option still passes every equality
+# and budget check, and that the output ID, dates and total all describe that one option.
 
 # Installed exercise: 07-spec-regression; variant: omit-fees.
 # This exact primitive is called by runtime.infer under the host deadline.

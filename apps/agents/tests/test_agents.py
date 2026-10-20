@@ -210,7 +210,7 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual((root / "content/exercises/07-spec-regression/agent_consultation.py").read_text(), consultation["pythonSource"])
         for variant in ("baseline", "omit-fees"):
             prompt = prepared_agent("07-spec-regression", variant).instructions
-            self.assertIn("".join("# " + line + "\n" for line in prompt.splitlines()), consultation["pythonSource"])
+            self.assertIn("".join(("# " + line if line else "#") + "\n" for line in prompt.splitlines()), consultation["pythonSource"])
             expected_hash = sha256(prompt + "\n" + canonical_json(DOMAINS["07-spec-regression"]["outputSchema"]))
             self.assertEqual(consultation["promptHashes"][variant], expected_hash)
         self.assertNotEqual(consultation["promptHashes"]["baseline"], consultation["promptHashes"]["omit-fees"])
