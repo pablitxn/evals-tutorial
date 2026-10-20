@@ -10,7 +10,7 @@ import { datasetHash, sha256 } from '@evals-tutorial/contracts/node';
 import { createPhoenixTelemetry } from '../src/index.js';
 import { fixtureRun } from './fixtures.js';
 
-test('actual seven-exercise corpus imports and version pins; synthetic recording receipts only', { skip: !process.env.ET_WP07_CORPUS_ROOT }, async t => {
+test('actual eight-exercise corpus imports and version pins; synthetic recording receipts only', { skip: !process.env.ET_WP07_CORPUS_ROOT }, async t => {
   const root = process.env.ET_WP07_CORPUS_ROOT!;
   const tutorial: Tutorial = JSON.parse(await readFile(join(root, 'content/tutorial.json'), 'utf8'));
   assert(validateContract('Tutorial', tutorial).valid);
@@ -43,7 +43,7 @@ test('actual seven-exercise corpus imports and version pins; synthetic recording
         const run = fixtureRun(dataset, `actual-corpus-${exercise.id}-${nonce}`);
         run.request.snapshot.exerciseId = exercise.id; run.request.snapshot.exerciseVersion = exercise.exerciseVersion;
         run.request.snapshot.rubricVersion = exercise.rubricVersion; run.request.snapshot.tutorialVersion = tutorial.tutorialVersion;
-        run.request.agentVariant = exercise.defaultAgentVariant;
+        run.request.agentVariant = 'synthetic-telemetry-probe';
         run.rows = dataset.examples.flatMap(example => example.fixtures.map(fixture => {
           const label = fixture.expectedEvaluation.allowedLabels[0]!;
           const score = label === 'pass' ? 1 : label === 'fail' ? 0 : Math.max(0.001, Math.min(0.999, (fixture.expectedEvaluation.minScore + fixture.expectedEvaluation.maxScore) / 2));
@@ -60,9 +60,9 @@ test('actual seven-exercise corpus imports and version pins; synthetic recording
           receiptMode: 'synthetic stored results over actual owned corpus; no inference/evaluator execution' });
       });
     }
-    assert.equal(observations.length, 7);
+    assert.equal(observations.length, 8);
     if (process.env.ET_WP07_CORPUS_RECEIPT) await writeFile(process.env.ET_WP07_CORPUS_RECEIPT, JSON.stringify({
-      corpusHead: 'd9ab77508f6f6892f4de57594146abbd629ea471', inferenceCalls: 0,
+      tutorialVersion: tutorial.tutorialVersion, inferenceCalls: 0,
       serviceReturn: 'verified', observations,
     }, null, 2));
   } finally { await rm(stateDirectory, { recursive: true }); }

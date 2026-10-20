@@ -25,11 +25,22 @@ than asserting that recording executed the agent or evaluator.
 Phoenix 20.21.3 traces are globally identified. Existing producer spans stay in
 their actual source project. Each experiment task binds the verified trace ID;
 its link uses the source project's read-back GlobalID, including failed agent
-invocations. Failed or cancelled rows with no producer trace, and fixture receipt
-spans, live in the actual experiment project. Only completed agent rows require
+invocations. Judges share their immutable fixture or agent row context and retain
+their real model spans in the source project. Failed or cancelled rows with no
+producer trace, and fixtures that perform no inference, live in the actual
+experiment project. Only completed agent rows require
 both AGENT and LLM spans; any existing producer trace must retain its trusted
 parent graph and pass the credential-attribute check. No AGENT/LLM span is
 replayed or invented.
+
+DOUBLE CHECK creates a separate `tutorial.review` trace with real model children.
+Its safe attributes identify `tutorial.review_id`, `tutorial.exercise_id`,
+`tutorial.fixture_run_id` and `tutorial.agent_run_id`. Search those attributes in
+the source project to correlate feedback with its exact reviewed receipts.
+The review contract does not expose a Phoenix link or an experiment score.
+Judge and review correlation is host-owned and never enters learner RPC or model
+input; sensitive-data export remains disabled.
+
 Exporter credentials, request headers and secrets must be excluded at the producer
 boundary. Recording refuses known credential attribute names in producer spans.
 This check is not a general detector of secrets embedded in arbitrary values.
@@ -51,6 +62,15 @@ map score/label/explanation to the `tutorial_result` evaluation. The annotation'
 `CODE` kind describes this receipt exporter; the frozen aggregate result does not
 expose the original per-criterion Code/LLM/Mixed evaluator kinds. Metadata explicitly
 marks `recorded_from_immutable_receipt`; no new judgment is made.
+
+New experiments have readable names with the exercise, mode, agent variant,
+timestamp and short run ID. Where the receipt contains criterion results, each
+also becomes a `tutorial_criterion_<id>` evaluation, making R1–R6 visible in
+Phoenix comparisons. Fixture receipts additionally expose `tutorial_fixture_match`:
+an expected rejection can have `tutorial_result = 0` and a successful fixture
+match of 1. Operational errors receive neither score. All these annotations are
+read back before recording succeeds. Older experiments retain their original
+aggregate-only annotations on retry.
 
 The adapter reads back tasks, errors, scores/labels/explanations from Phoenix CSV,
 and trace identities before returning links. UI routes must return the Phoenix

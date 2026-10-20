@@ -2,7 +2,7 @@ import { globSync, existsSync } from 'node:fs';
 import { resolve, delimiter } from 'node:path';
 import { fail, root, python, run } from './lib.mjs';
 try {
-  const patterns=['packages/contracts/tests/*.test.ts','packages/review/tests/*.test.ts','packages/phoenix/tests/record.test.ts','apps/server/tests/*.test.ts','apps/server/src/providers/*.test.ts','apps/server/src/judge-broker/*.test.ts','apps/server/src/runs/service.test.ts','content/authoring/*.test.ts','tests/integration/*.test.ts'];
+  const patterns=['packages/contracts/tests/*.test.ts','packages/review/tests/*.test.ts','packages/phoenix/tests/record.test.ts','packages/phoenix/tests/annotations.test.ts','apps/server/tests/*.test.ts','apps/server/src/providers/*.test.ts','apps/server/src/judge-broker/*.test.ts','apps/server/src/runs/service.test.ts','content/authoring/*.test.ts','tests/integration/*.test.ts'];
   if(existsSync(resolve(root,'apps/web/tests/model.test.ts'))) patterns.push('apps/web/tests/*.test.ts');
   patterns.push('packages/evaluator-runtime/tests/lifecycle.test.ts');
   const files=[...globSync(patterns,{cwd:root})].sort();

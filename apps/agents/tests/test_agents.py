@@ -159,6 +159,8 @@ class SDKTests(unittest.IsolatedAsyncioTestCase):
                 payload = {"role": role, "material": {"source": code}, "maxOutputTokens": 128, "deadlineMs": 1000}
                 if role == "review":
                     payload["material"]["evidenceQuotes"] = [{"id": "quote-1", "kind": "source", "quote": code, "exampleIds": []}]
+                    payload["material"]["rubric"] = {"criteria": [{"id": "classification"}]}
+                    payload["material"]["dataset"] = {"examples": [{"id": "example-1"}]}
                 output, calls = await self.run_mock(payload, text=text, broker=True, provider=provider)
                 self.assertIn("result", output)
                 self.assertEqual(calls[0][1]["max_output_tokens"], 128)
@@ -173,20 +175,24 @@ class SDKTests(unittest.IsolatedAsyncioTestCase):
             output, _ = await self.run_mock(payload, text=text, broker=True)
             self.assertEqual(output["error"]["code"], "agent_output_schema")
         payload["role"] = "review"
-        payload["material"] = {"evidenceQuotes": [{"id": "quote-1", "kind": "source", "quote": "synthetic source", "exampleIds": []}]}
+        payload["material"] = {"evidenceQuotes": [{"id": "quote-1", "kind": "source", "quote": "synthetic source", "exampleIds": []}],
+            "rubric": {"criteria": [{"id": "classification"}]}, "dataset": {"examples": [{"id": "example-1"}]}}
         output, _ = await self.run_mock(payload, text='{"status":"ready"}', broker=True)
         self.assertEqual(output["error"]["code"], "review_output_schema")
 
     async def test_w3c_trace_continuity_without_sensitive_telemetry(self):
         from tutorial_agents import runtime
         from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+        from opentelemetry.util._once import Once
         exporter = InMemorySpanExporter()
         configure = runtime.configure_otel_providers
         def in_memory(**kwargs):
             kwargs["exporters"] = [exporter]
             return configure(**kwargs)
         payload = request(traceparent="00-" + "1" * 32 + "-" + "2" * 16 + "-01")
-        with patch.dict(os.environ, {"TUTORIAL_TRACE_PROJECT": "mock-source-project"}, clear=True), patch.object(runtime, "configure_otel_providers", side_effect=in_memory):
+        with patch.dict(os.environ, {"TUTORIAL_TRACE_PROJECT": "mock-source-project"}, clear=True), \
+             patch.object(runtime.trace, "_TRACER_PROVIDER", None), patch.object(runtime.trace, "_TRACER_PROVIDER_SET_ONCE", Once()), \
+             patch.object(runtime, "configure_otel_providers", side_effect=in_memory):
             with runtime.tracing(payload) as trace_id:
                 output, _ = await self.run_mock(payload, trace_id=trace_id)
         spans = exporter.get_finished_spans()
@@ -195,6 +201,72 @@ class SDKTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(format(span.context.trace_id, "032x") == "1" * 32 for span in spans))
         self.assertTrue(all(span.resource.attributes["openinference.project.name"] == "mock-source-project" for span in spans))
         self.assertNotIn("offline-placeholder", str([dict(span.attributes) for span in spans]))
+
+    async def test_broker_tracing_correlates_judges_and_reviews_without_exporting_evidence(self):
+        from tutorial_agents import runtime
+        from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+        from opentelemetry.util._once import Once
+        for role in ("judge", "review"):
+            exporter = InMemorySpanExporter()
+            configure = runtime.configure_otel_providers
+            def in_memory(**kwargs):
+                kwargs["exporters"] = [exporter]
+                return configure(**kwargs)
+            telemetry = (
+                {"runId": "run-1", "exampleId": "row-1", "fixtureId": "negative",
+                 "exerciseId": "04-policy-recommendation", "traceparent": "00-" + "3" * 32 + "-" + "4" * 16 + "-01"}
+                if role == "judge" else
+                {"reviewId": "review-1", "exerciseId": "04-policy-recommendation",
+                 "fixtureRunId": "fixtures-1", "agentRunId": "agents-1"}
+            )
+            material = {"source": "synthetic-private-evaluator-marker"}
+            if role == "review":
+                material["evidenceQuotes"] = [{"id": "quote-1", "kind": "source",
+                    "quote": material["source"], "exampleIds": []}]
+                material["rubric"] = {"criteria": [{"id": "classification"}]}
+                material["dataset"] = {"examples": [{"id": "example-1"}]}
+            payload = {"role": role, "material": material, "telemetry": telemetry, "maxOutputTokens": 128, "deadlineMs": 1000}
+            text = ('{"score":1,"label":"pass","explanation":"Evidence matches."}' if role == "judge" else
+                    '{"status":"inconclusive","summary":"Inspect evidence.","findings":[]}')
+            # Production uses one provider per short-lived Python process.
+            with patch.object(runtime.trace, "_TRACER_PROVIDER", None), patch.object(runtime.trace, "_TRACER_PROVIDER_SET_ONCE", Once()), \
+                 patch.object(runtime, "configure_otel_providers", side_effect=in_memory):
+                output, calls = await self.run_mock(payload, text=text, broker=True)
+            self.assertIn("result", output)
+            self.assertEqual(len(calls), 1)
+            self.assertNotIn("telemetry", json.dumps(calls[0][1]))
+            spans = exporter.get_finished_spans()
+            root = next(span for span in spans if span.name == "tutorial." + role)
+            self.assertGreaterEqual(len(spans), 3)
+            self.assertTrue(all(span.context.trace_id == root.context.trace_id for span in spans))
+            parents = {span.context.span_id: span.parent.span_id if span.parent else None for span in spans}
+            for span in spans:
+                current = span.context.span_id
+                while current != root.context.span_id:
+                    self.assertIn(current, parents)
+                    current = parents[current]
+            if role == "judge":
+                self.assertEqual(format(root.context.trace_id, "032x"), "3" * 32)
+                self.assertEqual(format(root.parent.span_id, "016x"), "4" * 16)
+                self.assertEqual(root.attributes["tutorial.fixture_id"], "negative")
+            else:
+                self.assertIsNone(root.parent)
+                self.assertEqual(root.attributes["tutorial.review_id"], "review-1")
+                self.assertEqual(root.attributes["tutorial.fixture_run_id"], "fixtures-1")
+                self.assertEqual(root.attributes["tutorial.agent_run_id"], "agents-1")
+            attributes = str([dict(span.attributes) for span in spans])
+            self.assertNotIn("offline-placeholder", attributes)
+            self.assertNotIn("synthetic-private-evaluator-marker", attributes)
+
+    async def test_invalid_broker_telemetry_is_rejected_before_inference(self):
+        valid = {"runId": "run-1", "exampleId": "row-1", "exerciseId": "04-policy-recommendation",
+                 "traceparent": "00-" + "3" * 32 + "-" + "4" * 16 + "-01"}
+        for context in ({}, {**valid, "api_key": "forbidden"}, {**valid, "runId": "../escape"},
+                        {**valid, "traceparent": "invalid"}):
+            payload = {"role": "judge", "material": {}, "telemetry": context, "maxOutputTokens": 128, "deadlineMs": 1000}
+            output, calls = await self.run_mock(payload, broker=True)
+            self.assertEqual(output["error"]["code"], "invalid_request")
+            self.assertEqual(calls, [])
 
 class ProfileTests(unittest.TestCase):
     def test_regression_consultation_contains_both_exact_prompts_and_runtime_hashes(self):

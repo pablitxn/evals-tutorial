@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import type { JudgeBinding } from '@evals-tutorial/contracts/services';
 import { ServiceError } from '@evals-tutorial/contracts/services';
 import { createProviderBroker, parseBrokerResponse } from './index.js';
+import { createTelemetryContext } from '@evals-tutorial/phoenix';
 
 const binding = (changes: Partial<JudgeBinding> = {}): JudgeBinding => ({ runId: 'run-1', exampleId: 'row-1', row: { input: { message: 'synthetic' }, output: { recommendation: 'demo' }, expected: { required: true }, metadata: { exampleId: 'row-1', exerciseId: '04-policy-recommendation', datasetVersion: '1' } }, criterionIds: ['support'], mode: 'Mixed', maxCalls: 2, maxOutputTokens: 128, deadlineEpochMs: Date.now() + 2000, signal: new AbortController().signal, ...changes });
 const verdict = { score: 1, label: 'pass', explanation: 'Supported by synthetic evidence.' };
@@ -33,6 +34,23 @@ test('binding is an immutable row snapshot, preserves reference for judge only',
   await ctx.judge(judge);
   assert.deepEqual((captured as { row: JudgeBinding['row'] }).row.expected, { required: true });
   assert.deepEqual((captured as { row: JudgeBinding['row'] }).row.output, { recommendation: 'demo' });
+});
+test('judge correlation uses the host immutable row and distinct fixture identities', async () => {
+  for (const fixtureId of [undefined, 'positive', 'negative']) {
+    const row = binding({ fixtureId });
+    const expected = createTelemetryContext(row.runId, row.exampleId, fixtureId).traceparent;
+    const context = createProviderBroker(async call => {
+      assert.equal(call.telemetry?.traceparent, expected);
+      assert.equal(call.telemetry?.runId, 'run-1');
+      assert.equal(call.telemetry?.exampleId, 'row-1');
+      assert.equal(call.telemetry?.fixtureId, fixtureId);
+      assert.equal(call.telemetry?.exerciseId, '04-policy-recommendation');
+      assert.equal('telemetry' in (call.material as object), false);
+      return verdict;
+    }).bind(row);
+    row.runId = 'mutated'; row.exampleId = 'mutated'; row.fixtureId = 'mutated';
+    await context.judge(judge);
+  }
 });
 test('fixtures and real-agent rows have independent immutable lifetime budgets', async () => {
   const outputs: unknown[] = [];

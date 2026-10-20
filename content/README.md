@@ -6,7 +6,8 @@ regression example, with immutable dataset JSON and read-only Python consultatio
 The corpus supplies 65 response fixtures: the original 60 plus five explicit
 author fixtures for the guided example. All content is original project-authored
 training material; no downloaded dataset, corporate image or personal identifier.
-The project has not selected a source license; no new legal grant is invented here.
+Original project-authored material is covered by the repository's
+[MIT license](../LICENSE). Dependencies retain their own licenses.
 
 `documents/tax-demo-v1/manifest.json` binds nine opaque primary PNG document IDs
 TD-001 through TD-009 and nine matching PDF representations. C2 and C3 reference

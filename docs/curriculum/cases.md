@@ -1,7 +1,7 @@
-# Six cases: proposed schemas, rubrics and fixture matrix
+# Six cases: schemas, rubrics and fixture matrix
 
-All examples here are authored specifications. ET-WP-03 owns executable schemas;
-ET-WP-04 produces actual versioned corpus JSON/files after contract freeze.
+All examples here are authored specifications. The executable schemas and
+versioned corpus are packaged in `content/tutorial.json` and `content/datasets`.
 Common envelope follows the [integration contract](../contracts/v1.md).
 `evaluate({input,output,expected,metadata}, ctx)` is the learner's asynchronous
 TypeScript function. Fixtures replace `output`; `expected` stays the independent
