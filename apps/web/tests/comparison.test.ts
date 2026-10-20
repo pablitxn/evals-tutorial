@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import type { Dataset, EvalInput, EvalResult, Exercise, RunRecord, Tutorial } from '@evals-tutorial/contracts';
 import { sha256 } from '@evals-tutorial/contracts/node';
-import { comparePreparedRuns, type ComparisonAttempt } from '../src/comparison.js';
-import { snapshot } from '../src/model.js';
+import { comparePreparedRuns, preparedBaselineProblem, rejectedCandidate, type ComparisonAttempt } from '../src/comparison.js';
+import { runActive, snapshot, unavailableRunPatch } from '../src/model.js';
 import { loadWork, save, storageKey } from '../src/storage.js';
 import { run, status } from './mock-data.js';
 
@@ -24,7 +24,7 @@ async function receipts() {
   const make = async (variant: string): Promise<RunRecord> => {
     const record = run('agent', exercise);
     record.runId = variant === 'baseline' ? pair.baselineRunId! : pair.candidateRunId!;
-    record.request = { requestId: variant === 'baseline' ? pair.baselineRequestId : pair.candidateRequestId!, snapshot: current, mode: 'agent', agentVariant: variant };
+    record.request = { requestId: variant === 'baseline' ? pair.baselineRequestId : pair.candidateRequestId!, snapshot: structuredClone(current), mode: 'agent', agentVariant: variant };
     record.codeHash = codeHash; record.provenance.codeHash = codeHash; record.provenance.datasetHash = dataset.contentHash;
     record.provenance.agentSourceHash = 'e'.repeat(64); record.provenance.promptHash = (variant === 'baseline' ? 'b' : 'c').repeat(64);
     record.totalRows = record.completedRows = dataset.examples.length;
@@ -69,6 +69,14 @@ test('operational errors, cancellation and incomplete rows never become scored r
   }
 });
 
+test('failed execution without agent provenance reports the operational failure before comparison identity', async () => {
+  const { candidate, compare } = await receipts();
+  candidate.status = 'failed'; candidate.completedRows = 0; candidate.rows = [];
+  candidate.error = { code: 'provider_unavailable', message: 'Synthetic provider failure before output', retryable: true };
+  delete candidate.provenance.agentVersion; delete candidate.provenance.agentSourceHash; delete candidate.provenance.promptHash;
+  assert.equal(compare().reason, 'Execution incomplete or operational error. Results are not compared.');
+});
+
 test('comparison refuses mismatched source, data, variants, mode, provider, config and execution provenance', async () => {
   const changes: Array<(r: RunRecord) => void> = [
     r => { r.request.snapshot = { ...r.request.snapshot, source: 'different' }; },
@@ -97,6 +105,67 @@ test('repeat attempts cannot reuse the prior candidate or unrelated receipts', a
   assert.equal(comparePreparedRuns(pair, baseline, undefined, dataset, current, codeHash, status).comparable, false);
   assert.equal(comparePreparedRuns({ ...pair, candidateRequestId: 'unrelated' }, baseline, candidate, dataset, current, codeHash, status).comparable, false);
   assert.equal(comparePreparedRuns(pair, baseline, candidate, dataset, current, codeHash, { ...status, provider: { ...status.provider!, configRevision: 'e'.repeat(64) } }).comparable, false);
+});
+
+test('candidate eligibility requires complete current baseline evidence, including all requirement scores', async () => {
+  const changes: Array<(record: RunRecord) => void> = [
+    ...(['queued', 'running', 'cancelled', 'failed', 'partial', 'invalid', 'timed_out'] as const).map(value => (record: RunRecord) => { record.status = value; }),
+    record => { record.error = { code: 'runtime_error', message: 'Synthetic failure', retryable: false }; },
+    record => { record.rows.pop(); },
+    record => { record.rows[1]!.exampleId = record.rows[0]!.exampleId; },
+    record => { record.rows[0]!.status = 'failed'; },
+    record => { delete record.rows[0]!.evaluation!.criteria; },
+    record => { record.rows[0]!.evaluation!.criteria![0]!.score = 0; },
+    record => { record.request.snapshot.source += '\n'; },
+    record => { record.request.requestId = 'another-attempt'; },
+    record => { record.request.mode = 'fixtures'; },
+    record => { record.provenance.provider = { ...record.provenance.provider!, configRevision: 'f'.repeat(64) }; },
+    record => { delete record.provenance.agentSourceHash; },
+  ];
+  for (const change of changes) {
+    const { pair, baseline } = await receipts();
+    assert.equal(preparedBaselineProblem(pair, baseline, dataset, current, codeHash, status), undefined);
+    change(baseline);
+    assert.equal(typeof preparedBaselineProblem(pair, baseline, dataset, current, codeHash, status), 'string', String(change));
+  }
+  const { pair, candidate } = await receipts();
+  // A validly scored failure is evidence too; the baseline need not achieve pass.
+  candidate.request.agentVariant = 'baseline'; candidate.request.requestId = pair.baselineRequestId; candidate.runId = pair.baselineRunId!;
+  assert.equal(preparedBaselineProblem(pair, candidate, dataset, current, codeHash, status), undefined);
+  assert.equal(typeof preparedBaselineProblem(pair, undefined, dataset, current, codeHash, status), 'string');
+});
+
+test('a rejected unaccepted candidate can be retried without repeating the paid baseline', async () => {
+  const { pair, baseline } = await receipts();
+  const awaitingAcceptance = { ...pair, candidateRunId: undefined };
+  const recovered = rejectedCandidate(awaitingAcceptance, pair.candidateRequestId!);
+  assert.deepEqual(recovered, { id: pair.id, baselineRequestId: pair.baselineRequestId, baselineRunId: pair.baselineRunId });
+  assert.equal(preparedBaselineProblem(recovered, baseline, dataset, current, codeHash, status), undefined);
+  assert.equal(awaitingAcceptance.candidateRequestId, pair.candidateRequestId);
+  assert.equal(rejectedCandidate(pair, pair.candidateRequestId!), pair, 'An accepted candidate retains its immutable identity');
+  assert.equal(rejectedCandidate(awaitingAcceptance, 'another-request'), awaitingAcceptance, 'A late rejection cannot change another attempt');
+});
+
+test('unavailable active receipts clear every matching alias so comparison activity can recover', async () => {
+  for (const missingRole of ['baseline', 'candidate'] as const) {
+    const { pair, baseline, candidate } = await receipts();
+    const missing = missingRole === 'baseline' ? baseline : candidate;
+    missing.status = 'running';
+    const fixture = run('fixtures');
+    const before = { comparison: pair, agent: missing, agentRunId: missing.runId, baseline, candidate, fixture, fixtureRunId: fixture.runId };
+    const recovered = { ...before, ...unavailableRunPatch(before, missing.runId) };
+    assert.equal(recovered.agent, undefined);
+    assert.equal(recovered.agentRunId, undefined);
+    assert.equal(recovered[missingRole], undefined);
+    assert.equal(recovered.comparison?.[missingRole === 'baseline' ? 'baselineRunId' : 'candidateRunId'], undefined);
+    assert.equal([recovered.fixture, recovered.agent, recovered.baseline, recovered.candidate].some(record => record && runActive(record)), false);
+    const retainedRole = missingRole === 'baseline' ? 'candidate' : 'baseline';
+    assert.equal(recovered[retainedRole], before[retainedRole]);
+    assert.equal(recovered.fixture, fixture);
+    assert.equal(recovered.fixtureRunId, fixture.runId);
+    assert.equal(before[missingRole], missing, 'The immutable receipt itself is not rewritten');
+    assert.deepEqual(unavailableRunPatch(before, 'unrelated-run'), {});
+  }
 });
 
 test('comparison pair identities persist independently of locale and reject malformed storage', () => {

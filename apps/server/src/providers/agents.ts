@@ -8,7 +8,7 @@ import { ServiceError } from '@evals-tutorial/contracts/services';
 import { operation, withDeadline } from './process.js';
 
 export type AgentTransport = (request: AgentRequest, deadlineEpochMs: number, signal: AbortSignal) => Promise<unknown>;
-export const PREPARED_VARIANTS = ['baseline', 'careful'] as const;
+export const PREPARED_VARIANTS = ['baseline', 'careful', 'omit-fees'] as const;
 export function containsReference(value: unknown): boolean {
   if (Array.isArray(value)) return value.some(containsReference);
   if (value && typeof value === 'object') return Object.entries(value).some(([key, child]) => ['expected', 'fixtures', 'source', 'starterSource', 'pythonSource', 'expectedEvaluation'].includes(key) || containsReference(child));

@@ -12,6 +12,52 @@ export const REQUIREMENT_IDS = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'] as const;
 export type ComparedRow = { exampleId: string; compared: boolean; regression: boolean; reason?: string; baseline?: RunRecord['rows'][number]; candidate?: RunRecord['rows'][number] };
 export type Comparison = { comparable: boolean; reason?: string; rows: ComparedRow[] };
 
+function scored(row: RunRecord['rows'][number]): boolean {
+  return !!(row.status === 'completed' && !row.error && row.evaluation
+    && ['pass', 'fail'].includes(row.evaluation.label) && row.evaluation.score === (row.evaluation.label === 'pass' ? 1 : 0)
+    && row.evaluation.criteria?.length === REQUIREMENT_IDS.length
+    && REQUIREMENT_IDS.every(id => row.evaluation!.criteria!.filter(criterion => criterion.criterionId === id && ['pass', 'fail'].includes(criterion.label)
+      && criterion.score === (criterion.label === 'pass' ? 1 : 0)).length === 1)
+    && row.evaluation.label === (row.evaluation.criteria.every(criterion => criterion.label === 'pass') ? 'pass' : 'fail'));
+}
+
+function completeRows(run: RunRecord, dataset: Dataset): boolean {
+  const ids = dataset.examples.map(example => example.id);
+  return run.totalRows === ids.length && run.completedRows === ids.length && run.rows.length === ids.length
+    && new Set(run.rows.map(row => row.exampleId)).size === ids.length && run.rows.every(row => ids.includes(row.exampleId) && !row.fixtureId);
+}
+
+/** A paid candidate run is useful only when the baseline can supply comparison evidence. */
+export function preparedBaselineProblem(attempt: ComparisonAttempt | undefined, baseline: RunRecord | undefined,
+  dataset: Dataset | undefined, current: SourceSnapshot, codeHash: string | null, status?: ServiceStatus): string | undefined {
+  if (!attempt || !baseline || !dataset) return 'Run both versions explicitly to compare this attempt.';
+  if (baseline.runId !== attempt.baselineRunId || baseline.request.requestId !== attempt.baselineRequestId)
+    return 'Receipts do not belong to the same explicit comparison attempt.';
+  if (baseline.request.mode !== 'agent' || baseline.request.agentVariant !== 'baseline')
+    return 'Comparison requires baseline and omit-fees agent runs.';
+  if (!codeHash || baseline.codeHash !== codeHash || !sameSnapshot(baseline.request.snapshot, current)
+    || dataset.datasetId !== current.datasetId || dataset.datasetVersion !== current.datasetVersion || dataset.contentHash !== current.datasetHash)
+    return 'Source, rubric or dataset changed. Start a new comparison attempt.';
+  if (baseline.status !== 'completed' || baseline.error)
+    return 'Execution incomplete or operational error. Results are not compared.';
+  const provenance = baseline.provenance;
+  if (provenance.codeHash !== codeHash || provenance.datasetHash !== current.datasetHash
+    || !provenance.agentVersion || !provenance.agentSourceHash || !provenance.promptHash || !provenance.provider
+    || provenance.provider.provider !== status?.provider?.provider || provenance.provider.model !== status?.provider?.model
+    || provenance.provider.configRevision !== status?.provider?.configRevision)
+    return 'Provider, configuration or repository identity differs. Start a new comparison attempt.';
+  if (!completeRows(baseline, dataset)) return 'Missing or mismatched rows. Results are not compared.';
+  if (!baseline.rows.every(scored)) return 'Operational error, incomplete row or missing requirement evidence. Not compared.';
+  return undefined;
+}
+
+/** Definite rejection before acceptance leaves the baseline available for an explicit retry. */
+export function rejectedCandidate(attempt: ComparisonAttempt | undefined, requestId: string): ComparisonAttempt | undefined {
+  if (!attempt || attempt.candidateRequestId !== requestId || attempt.candidateRunId) return attempt;
+  const { candidateRequestId: _requestId, candidateRunId: _runId, ...baselineAttempt } = attempt;
+  return baselineAttempt;
+}
+
 /** Compare only the two receipts explicitly bound to this attempt. Errors have no score. */
 export function comparePreparedRuns(attempt: ComparisonAttempt | undefined, baseline: RunRecord | undefined, candidate: RunRecord | undefined,
   dataset: Dataset | undefined, current: SourceSnapshot, codeHash: string | null, status?: ServiceStatus): Comparison {
@@ -26,6 +72,8 @@ export function comparePreparedRuns(attempt: ComparisonAttempt | undefined, base
     || !sameSnapshot(baseline.request.snapshot, current) || !sameSnapshot(candidate.request.snapshot, current)
     || dataset.datasetId !== current.datasetId || dataset.datasetVersion !== current.datasetVersion || dataset.contentHash !== current.datasetHash)
     return unavailable('Source, rubric or dataset changed. Start a new comparison attempt.');
+  if (baseline.status !== 'completed' || candidate.status !== 'completed' || baseline.error || candidate.error)
+    return unavailable('Execution incomplete or operational error. Results are not compared.');
   const a = baseline.provenance; const b = candidate.provenance;
   if (a.codeHash !== codeHash || b.codeHash !== codeHash || a.datasetHash !== current.datasetHash || b.datasetHash !== current.datasetHash
     || !a.agentVersion || !b.agentVersion || !a.agentSourceHash || !b.agentSourceHash || a.agentSourceHash !== b.agentSourceHash || !a.promptHash || !b.promptHash
@@ -33,22 +81,13 @@ export function comparePreparedRuns(attempt: ComparisonAttempt | undefined, base
     || !a.provider || !b.provider || a.provider.provider !== b.provider.provider || a.provider.model !== b.provider.model
     || a.provider.configRevision !== b.provider.configRevision || a.provider.configRevision !== status?.provider?.configRevision)
     return unavailable('Provider, configuration or repository identity differs. Start a new comparison attempt.');
-  if (baseline.status !== 'completed' || candidate.status !== 'completed' || baseline.error || candidate.error)
-    return unavailable('Execution incomplete or operational error. Results are not compared.');
   const ids = dataset.examples.map(example => example.id);
-  if ([baseline, candidate].some(run => run.totalRows !== ids.length || run.completedRows !== ids.length || run.rows.length !== ids.length
-    || new Set(run.rows.map(row => row.exampleId)).size !== ids.length || run.rows.some(row => !ids.includes(row.exampleId) || row.fixtureId)))
+  if ([baseline, candidate].some(run => !completeRows(run, dataset)))
     return unavailable('Missing or mismatched rows. Results are not compared.');
   const rows = ids.map(exampleId => {
     const left = baseline.rows.find(row => row.exampleId === exampleId)!;
     const right = candidate.rows.find(row => row.exampleId === exampleId)!;
-    const scored = (row: typeof left) => row.status === 'completed' && !row.error && row.evaluation
-      && ['pass', 'fail'].includes(row.evaluation.label) && row.evaluation.score === (row.evaluation.label === 'pass' ? 1 : 0)
-      && row.evaluation.criteria?.length === REQUIREMENT_IDS.length
-      && REQUIREMENT_IDS.every(id => row.evaluation!.criteria!.filter(criterion => criterion.criterionId === id && ['pass', 'fail'].includes(criterion.label)
-        && criterion.score === (criterion.label === 'pass' ? 1 : 0)).length === 1)
-      && row.evaluation.label === (row.evaluation.criteria.every(criterion => criterion.label === 'pass') ? 'pass' : 'fail');
-    const compared = !!scored(left) && !!scored(right);
+    const compared = scored(left) && scored(right);
     return { exampleId, baseline: left, candidate: right, compared,
       regression: compared && left.evaluation!.label === 'pass' && right.evaluation!.label === 'fail',
       ...(!compared ? { reason: 'Operational error, incomplete row or missing requirement evidence. Not compared.' } : {}) };

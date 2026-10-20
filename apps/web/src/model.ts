@@ -1,4 +1,5 @@
 import type { Dataset, Exercise, ExerciseId, RunRecord, ReviewRecord, ServiceStatus, SourceSnapshot, Tutorial } from '@evals-tutorial/contracts';
+import type { ComparisonAttempt } from './comparison.js';
 
 export const LESSON_IDS: readonly ExerciseId[] = ['intro', '01-starred-classifier', '02-document-classification', '03-independent-tie-out', '04-policy-recommendation', '05-package-readiness', '06-simulated-travel', '07-spec-regression'];
 export const LESSON_LABELS = ['Introduction', 'Starred messages', 'Document types', 'Salary tie-out', 'Policy support', 'Package readiness', 'Simulated travel', 'Specification regression'];
@@ -27,6 +28,28 @@ export function runCurrent(run: RunRecord | undefined, current: SourceSnapshot, 
   const provider = run.provenance.provider;
   if ((run.request.mode === 'agent' || provider) && provider?.configRevision !== status?.provider?.configRevision) return false;
   return true;
+}
+
+type RunEvidence = {
+  fixture?: RunRecord; agent?: RunRecord; baseline?: RunRecord; candidate?: RunRecord;
+  fixtureRunId?: string; agentRunId?: string; comparison?: ComparisonAttempt;
+};
+
+/** Remove every live alias of an unavailable receipt without discarding unrelated evidence. */
+export function unavailableRunPatch(work: RunEvidence, runId: string): Partial<RunEvidence> {
+  const patch: Partial<RunEvidence> = {};
+  for (const field of ['fixture', 'agent', 'baseline', 'candidate'] as const) {
+    if (work[field]?.runId === runId) patch[field] = undefined;
+  }
+  for (const field of ['fixtureRunId', 'agentRunId'] as const) {
+    if (work[field] === runId) patch[field] = undefined;
+  }
+  if (work.comparison?.baselineRunId === runId || work.comparison?.candidateRunId === runId) {
+    patch.comparison = { ...work.comparison };
+    if (patch.comparison.baselineRunId === runId) delete patch.comparison.baselineRunId;
+    if (patch.comparison.candidateRunId === runId) delete patch.comparison.candidateRunId;
+  }
+  return patch;
 }
 
 export function fixturesDiscriminate(run: RunRecord | undefined, dataset?: Dataset): boolean {

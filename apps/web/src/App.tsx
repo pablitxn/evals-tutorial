@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LIMITS, validateContract, type AcceptedReview, type AcceptedRun, type Dataset, type Exercise, type ExerciseId, type ReviewRecord, type RunRecord, type ServiceStatus, type Tutorial, type ValidationResult } from '@evals-tutorial/contracts';
 import { ApiError, errorText, request } from './api.js';
 import { DocumentPreviews, Editor, ExternalLink, LessonText, ModeBadge, ReferenceTabs, ReviewFeedback, RunResults } from './components.js';
-import { fixturesDiscriminate, LESSON_IDS, LESSON_LABELS, LESSON_MINUTES, lessonFromHash, reviewActive, reviewCurrent, reviewFindingsValid, runActive, runCurrent, sameSnapshot, snapshot, sourceHash } from './model.js';
+import { fixturesDiscriminate, LESSON_IDS, LESSON_LABELS, LESSON_MINUTES, lessonFromHash, reviewActive, reviewCurrent, reviewFindingsValid, runActive, runCurrent, sameSnapshot, snapshot, sourceHash, unavailableRunPatch } from './model.js';
 import { loadWork, PENDING_KEY, read, remove, resetStorage, save, storageKey, type PendingSubmission, type SavedWork } from './storage.js';
 import { Preferences } from './preferences.js';
 import { Markdown } from './Markdown.js';
@@ -13,6 +13,7 @@ import { BrandMark } from './BrandMark.js';
 import { EvaluationConcepts } from './EvaluationConcepts.js';
 import type { EditorHandle } from './CodeEditor.js';
 import { SpecPreparation, SpecComparisonResults } from './SpecRegression.js';
+import { preparedBaselineProblem, rejectedCandidate } from './comparison.js';
 import { Dropdown } from './Dropdown.js';
 
 type Work = SavedWork & { oldSource?: string; validation?: ValidationResult; fixture?: RunRecord; agent?: RunRecord; review?: ReviewRecord; baseline?: RunRecord; candidate?: RunRecord; history: (RunRecord | ReviewRecord)[]; evidenceError?: string };
@@ -144,14 +145,28 @@ export function App() {
   useEffect(() => {
     if (!tutorial) return;
     let stopped = false; let timer: number;
+    async function readRun(runId: string): Promise<RunRecord | undefined> {
+      try { return await request<RunRecord>(`/api/runs/${encodeURIComponent(runId)}`, 'RunRecord'); }
+      catch (problem) {
+        if (!(problem instanceof ApiError) || problem.detail.code !== 'not_found') throw problem;
+        if (stopped) return undefined;
+        for (const [id, work] of Object.entries(workRef.current)) {
+          if (!work) continue;
+          const patch = unavailableRunPatch(work, runId);
+          if (Object.keys(patch).length) update(id as ExerciseId, { ...patch, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
+        }
+        if (pendingRef.current?.kind === 'run' && pendingRef.current.acceptedId === runId) setOperation(undefined);
+        return undefined;
+      }
+    }
     async function poll() {
       try {
         const operation = pendingRef.current;
         if (operation?.acceptedId) {
           if (operation.kind === 'run') {
-            const record = await request<RunRecord>(`/api/runs/${encodeURIComponent(operation.acceptedId)}`, 'RunRecord');
-            if (!sameSnapshot(record.request.snapshot, operation.request.snapshot) || record.request.requestId !== operation.request.requestId) throw new Error('Run receipt does not match the accepted submission.');
-            if (!stopped) { storeRun(record); if (!runActive(record)) { setOperation(undefined); setAnnouncement('Run {status}. {completed} of {total} rows completed.', { status: record.status, completed: record.completedRows, total: record.totalRows }); } }
+            const record = await readRun(operation.acceptedId);
+            if (record && (!sameSnapshot(record.request.snapshot, operation.request.snapshot) || record.request.requestId !== operation.request.requestId)) throw new Error('Run receipt does not match the accepted submission.');
+            if (!stopped && record) { storeRun(record); if (!runActive(record)) { setOperation(undefined); setAnnouncement('Run {status}. {completed} of {total} rows completed.', { status: record.status, completed: record.completedRows, total: record.totalRows }); } }
           } else {
             const record = await request<ReviewRecord>(`/api/reviews/${encodeURIComponent(operation.acceptedId)}`, 'ReviewRecord');
             if (record.requestId !== operation.request.requestId || (record.feedbackLocale ?? 'en') !== (operation.request.feedbackLocale ?? 'en')) throw new Error('Review receipt does not match the accepted submission.');
@@ -161,7 +176,7 @@ export function App() {
         // Recover saved active receipts and late Phoenix recording with GET only.
         for (const work of Object.values(workRef.current)) {
           for (const run of [work?.fixture, work?.agent, work?.baseline, work?.candidate]) if (run && (runActive(run) || run.telemetryStatus === 'pending') && run.runId !== operation?.acceptedId) {
-            const record = await request<RunRecord>(`/api/runs/${encodeURIComponent(run.runId)}`, 'RunRecord'); if (!stopped) storeRun(record);
+            const record = await readRun(run.runId); if (!stopped && record) storeRun(record);
           }
           if (work?.review && reviewActive(work.review) && work.review.reviewId !== operation?.acceptedId) {
             const record = await request<ReviewRecord>(`/api/reviews/${encodeURIComponent(work.review.reviewId)}`, 'ReviewRecord'); if (!stopped) storeReview(record);
@@ -171,10 +186,9 @@ export function App() {
       } catch (problem) {
         if (!stopped) {
           const operation = pendingRef.current;
-          if (problem instanceof ApiError && problem.detail.code === 'not_found' && operation?.acceptedId) {
+          if (problem instanceof ApiError && problem.detail.code === 'not_found' && operation?.kind === 'review' && operation.acceptedId) {
             const id = operation.request.snapshot.exerciseId;
-            const field = operation.kind === 'review' ? 'review' : operation.request.mode === 'fixtures' ? 'fixture' : 'agent';
-            update(id, { [field]: undefined, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
+            update(id, { review: undefined, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
             setOperation(undefined);
           }
           setPollError(`Evidence status unavailable. ${errorText(problem)}`);
@@ -217,6 +231,7 @@ export function App() {
   const cap = status?.capabilities;
   const paidReady = !!status?.provider?.configured;
   const isSpec = active === '07-spec-regression';
+  const baselineProblem = isSpec && current ? preparedBaselineProblem(work?.comparison, work?.baseline, dataset, current, hash, status) : undefined;
   const usesJudge = exercise?.mode !== 'Code';
   const canTest = !!dataset && !!cap?.runner.available && !!cap.validation.available && (!usesJudge || (paidReady && cap.judge.available)) && !busy;
   const canRun = !!cap?.agents.available && !!cap.runner.available && !!cap.validation.available && paidReady && (!usesJudge || !!cap.judge.available) && fixtureReady && !busy;
@@ -252,7 +267,14 @@ export function App() {
         setOperation({ ...operation, acceptedId: accepted.reviewId }); update(operation.request.snapshot.exerciseId, { reviewId: accepted.reviewId });
       }
     } catch (problem) {
-      if (problem instanceof ApiError) setOperation(undefined);
+      if (problem instanceof ApiError) {
+        if (operation.kind === 'run' && !operation.acceptedId) {
+          const id = operation.request.snapshot.exerciseId; const pair = workRef.current[id]?.comparison;
+          const comparison = rejectedCandidate(pair, operation.request.requestId);
+          if (comparison !== pair) update(id, { comparison });
+        }
+        setOperation(undefined);
+      }
       setError(`${errorText(problem)}${problem instanceof ApiError ? '' : ' Submission outcome unknown. Recover using the same request ID.'}`);
     } finally { actionLock.current = false; setAction(undefined); }
   }
@@ -273,7 +295,7 @@ export function App() {
       update(active, { comparison: { id: crypto.randomUUID(), baselineRequestId: requestId }, baseline: undefined, candidate: undefined, history });
     }
     else {
-      if (!work.comparison || !work.baseline || runActive(work.baseline) || work.comparison.candidateRequestId) return;
+      if (!work.comparison || work.comparison.candidateRequestId || preparedBaselineProblem(work.comparison, work.baseline, dataset, current, hash, status)) return;
       update(active, { comparison: { ...work.comparison, candidateRequestId: requestId }, candidate: undefined });
     }
     run('agent', variant, requestId);
@@ -359,7 +381,7 @@ export function App() {
         {pending && !pending.acceptedId && <div className="notice warning"><strong>{t("Submission outcome unknown.")}</strong><p>{t("Recover the same request ID. This does not create a new attempt.")}</p><button disabled={!!action} onClick={() => void submit(pending)}>{t("Recover submission")}</button></div>}
         <div className="workspace"><Editor key={`editor-${exercise.id}`} source={work.source} readOnly={exercise.readOnly} busy={busy} onChange={edit} editorRef={editorRef} diagnostics={work.validation?.codeHash === hash ? work.validation.diagnostics : (resultTab === 'fixtures' ? fixtureCurrent : agentCurrent) ? currentRun?.diagnostics ?? [] : []} onCopy={() => navigator.clipboard.writeText(work.source).then(() => setAnnouncement('Evaluator copied.')).catch(() => { editorRef.current?.focus(); editorRef.current?.select(); setAnnouncement('Select and copy the evaluator with your keyboard.'); })} />
         <section className={`actions ${isSpec ? 'spec-actions' : ''}`} aria-label={t("Evaluator actions")}><div className="action-buttons">
-          {isSpec ? <><h2>{t('3. Run both prepared versions')}</h2><p className="help">{t('omit-fees is an intentional regression. Each button runs the same three cases with this fixed evaluator and uses agent tokens; running both versions makes six agent calls. No judge calls.')}</p><button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('baseline')}>{t(work.comparison ? 'Start new baseline attempt' : 'Run baseline · 3 cases')}</button><button disabled={busy || !work.baseline || runActive(work.baseline) || !!work.comparison?.candidateRequestId || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('omit-fees')}>{t('Run omit-fees · 3 cases')}</button></> : exercise.readOnly ? <button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => run('agent')}>{t("Run Introduction")}</button> : <><button disabled={busy || !cap?.validation.available} onClick={() => void validate()}>{t("Validate")}</button><button disabled={!canTest} onClick={() => run('fixtures')}>{t("Test Fixtures")}</button><button className="primary" disabled={!canRun} onClick={() => run('agent')}>{t("Run Agent")}{' '}<span aria-hidden="true">→</span></button></>}
+          {isSpec ? <><h2>{t('3. Run both prepared versions')}</h2><p className="help">{t('omit-fees is an intentional regression. Each button runs the same three cases with this fixed evaluator and uses agent tokens; running both versions makes six agent calls. No judge calls.')}</p><button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('baseline')}>{t(work.comparison ? 'Start new baseline attempt' : 'Run baseline · 3 cases')}</button><button disabled={busy || !!baselineProblem || !!work.comparison?.candidateRequestId || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('omit-fees')}>{t('Run omit-fees · 3 cases')}</button>{baselineProblem && work.baseline && !runActive(work.baseline) && !work.comparison?.candidateRequestId && <p className="help" role="status">{t(baselineProblem)}</p>}</> : exercise.readOnly ? <button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => run('agent')}>{t("Run Introduction")}</button> : <><button disabled={busy || !cap?.validation.available} onClick={() => void validate()}>{t("Validate")}</button><button disabled={!canTest} onClick={() => run('fixtures')}>{t("Test Fixtures")}</button><button className="primary" disabled={!canRun} onClick={() => run('agent')}>{t("Run Agent")}{' '}<span aria-hidden="true">→</span></button></>}
           {activeOperation && <button className="cancel-button" disabled={!!action} onClick={() => void cancel()}>{action === 'Cancelling…' ? t("Cancelling…") : pending?.kind === 'review' ? t("Cancel Review") : t("Cancel")}</button>}
           <button className="text-button" onClick={() => { resultsRef.current?.focus(); resultsRef.current?.scrollIntoView({ block: 'start' }); }}>{t("Inspect results ↓")}</button>
           {!exercise.readOnly && <button className="text-button" disabled={busy} onClick={() => setReset('exercise')}>{t("Reset Exercise")}</button>}
