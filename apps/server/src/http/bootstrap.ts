@@ -48,7 +48,17 @@ export async function createTutorialServices(options:{root:string;repositoryRevi
       services.validation=runner.validation;services.runs=recording.runs;services.recordRun=recording.recordRun;
       status.capabilities.validation={available:true};status.capabilities.runner={available:true};
       if(provider){const review=createReviewServices({content,runs:recording.runs,broker:provider.broker,provider:()=>provider!.provider});services.reviews=review.reviews;stopReview=review.shutdown;status.capabilities.review={available:true};}
-    }catch(error){await executor.shutdown();if(!(error instanceof ServiceError)||error.detail.code!=='isolation_unavailable')throw error;}
+    }catch(error){
+      let cleanupError:unknown;
+      try{await executor.shutdown();}catch(reason){cleanupError=reason;}
+      if(!(error instanceof ServiceError)||error.detail.code!=='isolation_unavailable')throw cleanupError??error;
+      if(cleanupError!==undefined&&(!(cleanupError instanceof ServiceError)||cleanupError.detail.code!=='isolation_unavailable'))throw cleanupError;
+      // Quarantine disables execution, while verified read-only lessons remain available.
+      // Keep the sanitized cleanup reason; shutdown must not erase its obligation.
+      const failure=cleanupError instanceof ServiceError?cleanupError:error;
+      const unavailable={available:false,reason:failure.detail.message};
+      status.capabilities.validation=unavailable;status.capabilities.runner=unavailable;
+    }
   }
   return {services,async shutdown(){stopReview();await services.runs?.shutdown();}};
 }
