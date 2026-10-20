@@ -81,8 +81,10 @@ If the CLI fails or times out, a successful early removal and empty inventory do
 not prove that the daemon finished creating the container. The obligation remains
 on disk and execution fails closed with a sanitized `isolation_unavailable` cleanup
 error. Shutdown and the next executor for that same stable session reconcile the
-recorded names. Once creation was acknowledged or the exact owned name was observed,
-successful removal plus empty readback can release the obligation. Removal/readback
+recorded names. Cleanup first positively matches the owner/session labels and exact
+name to a full immutable container ID, removes only that ID, then verifies its
+absence and the owned-name inventory. Missing or foreign matches retain the
+obligation and never authorize deletion by name. Removal/readback
 share the existing five-second cleanup budget; create and execution deadlines and
 isolation flags are unchanged. No evaluator or create is retried.
 
@@ -92,6 +94,9 @@ by the same-session recovery path. A daemon operation that never becomes visible
 requires operator disposition; do not delete obligations just to resume execution.
 These host-local records survive process replacement while temporary storage is
 retained, not loss of that storage. Raw CLI stderr/commands are never row errors.
+Quarantine cancels active exchanges and closes admission. Admission is checked
+after asynchronous preflight/journal work, before create/start, and after cleanup,
+so a waiter or late result cannot resume execution after a sibling closes it.
 
 Fixture mismatch is `status: completed, fixtureMatched: false`; a valid failing
 criterion is also completed execution. Runtime/protocol/provider/timeout failures
