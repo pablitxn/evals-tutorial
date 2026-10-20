@@ -352,6 +352,31 @@ dialog p { font-size: .875rem; line-height: 1.75; margin-bottom: 24px; }
 .markdown-content a { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--primary) 35%, transparent); }
 .markdown-content a:hover { text-decoration-color: currentColor; }
 .markdown-image-link { font-size: .875em; }
+
+.specification-sheet {
+  margin: 32px 0;
+  padding: clamp(20px, 4vw, 42px);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: 4px 4px 12px 12px;
+  background: var(--paper);
+  box-shadow: 0 3px 0 -1px var(--paper), 0 4px 0 var(--border), var(--shadow);
+}
+.specification-sheet-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  color: var(--primary);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.specification-sheet-label svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.specification-sheet > .markdown > h2:first-child { font-size: 1.5rem; }
 .evidence-quote { white-space: pre-wrap; overflow-wrap: anywhere; }
 td .markdown-content { font-size: .6875rem; }
 td .markdown-content p { margin: 8px 0; }

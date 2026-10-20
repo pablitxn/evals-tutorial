@@ -2,7 +2,7 @@ import { useI18n } from './i18n.js';
 import React, { useRef, useState, type KeyboardEvent } from 'react';
 import type { Dataset, Diagnostic, EvaluationMode, Exercise, PhoenixLinks, ReviewRecord, RunRecord } from '@evals-tutorial/contracts';
 import { safeUrl } from './model.js';
-import { Markdown } from './Markdown.js';
+import { LessonMarkdown, Markdown } from './Markdown.js';
 import { CodeEditor, type EditorHandle } from './CodeEditor.js';
 import { JsonViewer } from './JsonViewer.js';
 
@@ -27,8 +27,8 @@ export function PhoenixEvidence({ links, state }: { links?: PhoenixLinks; state:
   </div>;
 }
 
-export function LessonText({ text }: { text: string }) {
-  return <Markdown text={text} className="lesson-text" />;
+export function LessonText({ text, specificationLabel }: { text: string; specificationLabel?: string }) {
+  return <LessonMarkdown text={text} specificationLabel={specificationLabel} />;
 }
 
 export function Editor({ source, readOnly, busy, onChange, editorRef, diagnostics, onCopy }: {

@@ -16,7 +16,9 @@ test('the served prepared consultation localizes all eight lessons without chang
   for (const exercise of served.exercises) {
     const authored = original.exercises.find(item => item.id === exercise.id)!;
     assert.equal(authored.exerciseVersion, '1.0.0');
-    assert.equal(exercise.exerciseVersion, '1.0.0-runtime1');
+    const runtimePrefix = `${authored.exerciseVersion}-runtime-`;
+    assert.ok(exercise.exerciseVersion.startsWith(runtimePrefix));
+    assert.match(exercise.exerciseVersion.slice(runtimePrefix.length), /^[a-f0-9]{24}$/);
     assert.equal(exercise.lessonMarkdown, authored.lessonMarkdown);
     assert.deepEqual(exercise.criteria, authored.criteria);
     assert.equal(exercise.rubricVersion, authored.rubricVersion);
@@ -25,7 +27,11 @@ test('the served prepared consultation localizes all eight lessons without chang
     assert.deepEqual(spanish, localizeLesson(authored, 'es'));
     assert.notEqual(spanish.lessonMarkdown, exercise.lessonMarkdown);
     assert.equal(localizeLesson(exercise, 'en'), exercise);
-    for (const exerciseVersion of ['1.0.0-runtime2', '1.0.0-runtime1-extra', '1.0.1-runtime1', '2.0.0-runtime1']) {
+    for (const exerciseVersion of [
+      `${runtimePrefix}${'a'.repeat(23)}`,
+      `${runtimePrefix}${'g'.repeat(24)}`,
+      `2.0.0-runtime-${'a'.repeat(24)}`,
+    ]) {
       const changed = { ...exercise, exerciseVersion };
       assert.equal(localizeLesson(changed, 'es'), changed);
     }

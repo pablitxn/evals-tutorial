@@ -30,13 +30,20 @@ export function translate(locale: Locale, key: string, parameters: Parameters = 
 /** Presentation-only overlay: never pass this copy to the source/evidence contracts. */
 export function localizeLesson(exercise: Exercise, locale: Locale): Pick<Exercise, 'title' | 'lessonMarkdown' | 'criteria'> {
   const overlay = lessons[exercise.id];
-  // The verified consultation adapter only replaces Python source in runtime1;
-  // its 1.0.0 lesson prose and rubric still match the authored Spanish overlay.
-  // Keep this exact compatibility pair so future content cannot reuse stale text.
+  // The verified consultation adapter only replaces Python source and derives
+  // a content-bound runtime suffix; the authored prose and rubric remain 1.0.0.
+  // Admit only that adapter's exact version shape for this overlay version.
+  const runtimePrefix = overlay ? `${overlay.exerciseVersion}-runtime-` : '';
+  const adapterVersion = exercise.exerciseVersion.startsWith(runtimePrefix)
+    && /^[a-f0-9]{24}$/.test(exercise.exerciseVersion.slice(runtimePrefix.length));
   const samePresentation = overlay && (overlay.exerciseVersion === exercise.exerciseVersion
-    || (overlay.exerciseVersion === '1.0.0' && exercise.exerciseVersion === '1.0.0-runtime1'));
+    || adapterVersion);
   if (locale === 'en' || !samePresentation || overlay.rubricVersion !== exercise.rubricVersion) return exercise;
   const descriptions: Record<string, string> = overlay.criteria;
+  // Never mix translated prose with English rubric text when installed content
+  // adds, removes, or renames a criterion without a matching overlay update.
+  if (exercise.criteria.length !== Object.keys(descriptions).length
+    || exercise.criteria.some(criterion => !Object.hasOwn(descriptions, criterion.id))) return exercise;
   return { title: overlay.title, lessonMarkdown: overlay.lessonMarkdown,
-    criteria: exercise.criteria.map(criterion => ({ ...criterion, description: descriptions[criterion.id] ?? criterion.description })) };
+    criteria: exercise.criteria.map(criterion => ({ ...criterion, description: descriptions[criterion.id]! })) };
 }

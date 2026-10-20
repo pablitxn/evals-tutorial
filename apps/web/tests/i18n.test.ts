@@ -8,6 +8,7 @@ import { resetStorage } from '../src/storage.js';
 
 const tutorial = JSON.parse(readFileSync(new URL('../../../content/tutorial.json', import.meta.url), 'utf8')) as Tutorial;
 const spanish = JSON.parse(readFileSync(new URL('../src/locales/lessons.es.json', import.meta.url), 'utf8'));
+const finalLessonSource = readFileSync(new URL('../../../content/exercises/07-spec-regression/lesson.md', import.meta.url), 'utf8');
 const placeholders = (value: string) => [...value.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort();
 
 test('English and Spanish UI catalogs have identical keys and interpolation parameters', () => {
@@ -60,17 +61,37 @@ test('eight Spanish lessons cover the original criterion IDs without modifying c
   assert.deepEqual(Object.keys(spanish).sort(), tutorial.exercises.map(exercise => exercise.id).sort());
   for (const exercise of tutorial.exercises) {
     assert.deepEqual(Object.keys(spanish[exercise.id].criteria).sort(), exercise.criteria.map(criterion => criterion.id).sort());
+    assert.equal(spanish[exercise.id].exerciseVersion, exercise.exerciseVersion, `${exercise.id}: exercise version`);
+    assert.equal(spanish[exercise.id].rubricVersion, exercise.rubricVersion, `${exercise.id}: rubric version`);
     const localized = localizeLesson(exercise, 'es');
     assert.notEqual(localized.title, exercise.title);
     assert.ok(localized.lessonMarkdown.trim());
+    assert.notEqual(localized.lessonMarkdown, exercise.lessonMarkdown, `${exercise.id}: lesson prose`);
     assert.deepEqual(localized.criteria.map(c => [c.id, c.mode]), exercise.criteria.map(c => [c.id, c.mode]));
+    for (const criterion of exercise.criteria) {
+      assert.ok(spanish[exercise.id].criteria[criterion.id].trim(), `${exercise.id}/${criterion.id}: translation`);
+      assert.notEqual(localized.criteria.find(item => item.id === criterion.id)?.description, criterion.description,
+        `${exercise.id}/${criterion.id}: translated criterion`);
+    }
     assert.equal(localizeLesson(exercise, 'en'), exercise);
     assert.equal(localizeLesson({ ...exercise, exerciseVersion: 'future' }, 'es').lessonMarkdown, exercise.lessonMarkdown);
     assert.equal(localizeLesson({ ...exercise, rubricVersion: 'future' }, 'es').lessonMarkdown, exercise.lessonMarkdown);
+    const consultationVersion = `${exercise.exerciseVersion}-runtime-${'a'.repeat(24)}`;
+    assert.notEqual(localizeLesson({ ...exercise, exerciseVersion: consultationVersion }, 'es').lessonMarkdown, exercise.lessonMarkdown);
   }
   assert.deepEqual(tutorial, before);
   const tie = localizeLesson(tutorial.exercises[3]!, 'es').lessonMarkdown;
   for (const token of ['W2', '1040', '4200000', '1850000', '6050000', '420000', '185000', '605000', 'null']) assert.ok(tie.includes(token), token);
+  for (const text of [finalLessonSource, spanish['07-spec-regression'].lessonMarkdown]) {
+    assert.match(text, /<!-- specification:start -->\n## (Specification|Especificación):/);
+    assert.match(text, /### (Acceptance scenarios|Escenarios de aceptación)[\s\S]*?\n<!-- specification:end -->/);
+  }
+});
+
+test('an incomplete overlay never mixes Spanish lesson prose with an English criterion', () => {
+  const exercise = tutorial.exercises.find(item => item.id === '01-starred-classifier')!;
+  const changed = { ...exercise, criteria: [...exercise.criteria, { ...exercise.criteria[0]!, id: 'new-installed-criterion' }] };
+  assert.equal(localizeLesson(changed, 'es'), changed);
 });
 
 test('tutorial reset retains language preference and other apps storage', () => {
