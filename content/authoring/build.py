@@ -177,7 +177,7 @@ intro = example('intro-star', {'messageId': 'intro-message', 'text': 'Workshop r
 add(intro, 'intro-good', intro['expected'], 'pass', 'Read-only demonstration of independent reference comparison.', 'star-flag', 'intro-star')
 register('intro', [intro], (star_input, star_output, star_output),
          [('star-flag', 'Compare the actual label with the explicit boolean and independent reference.', 'Code')],
-         'Press **Run Demo** to see one input become a response. The evaluator compares it with an independently authored reference. Inspect expected, actual and evaluation, then open this recorded Phoenix experiment and trace.\n\nInput is what the agent sees; response is what it returned; reference is the independent answer; evaluator explains the score. A dataset holds fixed examples, an experiment records a run, and a trace records its steps.\n\nThis is the single read-only introduction. Navigation makes no inference call. Run Demo consumes one agent call; links appear only after actual recording.', [])
+         'Press **Run Introduction** to see one input become a response. The evaluator compares it with an independently authored reference. Inspect expected, actual and evaluation, then open this recorded Phoenix experiment and trace.\n\nInput is what the agent sees; response is what it returned; reference is the independent answer; evaluator explains the score. A dataset holds fixed examples, an experiment records a run, and a trace records its steps.\n\nThis is the single read-only introduction. Navigation makes no inference call. Run Introduction consumes one agent call; links appear only after actual recording.', [])
 register(IDS[1], star_rows, (star_input, star_output, star_output),
          [('star-flag', 'Use the explicit starred boolean; urgency is not a star.', 'Code')],
          'A star is an explicit boolean, not a guess about urgency. Check the known starred and unstarred responses before running the agent.\n\nRead the criterion and reference, finish the TypeScript TODO, Validate, then Test Fixtures. A correct evaluator must pass the good responses and fail the wrong labels. Run Agent on this same dataset and inspect Phoenix afterward. Python and dataset JSON are read-only. Code fixtures make no provider calls.',
@@ -484,3 +484,7 @@ save(ROOT / 'authoring/schema-probes.json', [
     {'exerciseId': IDS[6], 'target': 'outputSchema', 'value': variant(recommendation, departDate='2027-02-29'), 'valid': False},
 ])
 print('Authored 9 original pages, 18 document files, seven datasets and tutorial. Run finalize.ts for canonical hashes.')
+
+# The guided example can also be rebuilt independently, preserving existing content.
+import runpy
+runpy.run_path(str(ROOT / 'authoring/build-spec-regression.py'), run_name='__main__')

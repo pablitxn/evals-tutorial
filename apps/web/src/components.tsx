@@ -85,11 +85,11 @@ export function ReferenceTabs({ exercise, dataset }: { exercise: Exercise; datas
       <p className="help">{t("Version")}{' '}{exercise.datasetVersion} · {dataset?.examples.length ?? '—'} {t("examples. Reference answers are separate from agent input.")}</p>
       <>{dataset ? <JsonViewer value={dataset} label={t("Dataset JSON")} /> : <p className="help">{t("Loading the versioned dataset…")}</p>}</>
     </div>
-    <div id="python-panel" role="tabpanel" aria-labelledby="python-tab" tabIndex={0} hidden={selected !== 1}><p className="help">{t("Prepared source for consultation. Variant-specific source is not exposed separately by v1; the configured variant is recorded with each run.")}</p><CodeEditor source={exercise.pythonSource} language="python" readOnly unavailableLabel={t("Editor unavailable. Source remains available to select and copy.")} label={t("Python agent")} /></div>
+    <div id="python-panel" role="tabpanel" aria-labelledby="python-tab" tabIndex={0} hidden={selected !== 1}><p className="help">{t(exercise.id === '07-spec-regression' ? 'Prepared source includes both variant prompts and the runtime agent call. Each immutable run records the selected variant.' : 'Prepared source for consultation. Variant-specific source is not exposed separately by v1; the configured variant is recorded with each run.')}</p><CodeEditor source={exercise.pythonSource} language="python" readOnly unavailableLabel={t("Editor unavailable. Source remains available to select and copy.")} label={t("Python agent")} /></div>
   </section>;
 }
 
-export function RunResults({ run, dataset, current }: { run?: RunRecord; dataset?: Dataset; current: boolean }) {
+export function RunResults({ run, dataset, current, idPrefix = '' }: { run?: RunRecord; dataset?: Dataset; current: boolean; idPrefix?: string }) {
   const { t, locale } = useI18n();
   if (!run) return <div className="empty-results"><span className="empty-symbol" aria-hidden="true">↳</span><p>{t("Results will appear here.")}</p><span>{t("Test known responses, then run the prepared agent on the same dataset.")}</span></div>;
   const matchingDataset = dataset?.datasetId === run.request.snapshot.datasetId && dataset.datasetVersion === run.request.snapshot.datasetVersion && dataset.contentHash === run.request.snapshot.datasetHash ? dataset : undefined;
@@ -105,7 +105,7 @@ export function RunResults({ run, dataset, current }: { run?: RunRecord; dataset
           const fixture = example?.fixtures.find(item => item.id === row.fixtureId);
           const evaluation = row.evaluation;
           const assertion = row.status !== 'completed' ? 'Error' : row.fixtureMatched === true ? 'Matched' : row.fixtureMatched === false ? 'Mismatch' : 'Inconclusive';
-          return <tr key={`${row.exampleId}:${row.fixtureId ?? index}`} id={`row-${encodeURIComponent(row.exampleId)}-${index}`}><th scope="row">{row.exampleId}{row.fixtureId && <small>{row.fixtureId}</small>}<small>{t(row.status)}</small></th>
+          return <tr key={`${row.exampleId}:${row.fixtureId ?? index}`} id={`row-${idPrefix}${encodeURIComponent(row.exampleId)}-${index}`}><th scope="row">{row.exampleId}{row.fixtureId && <small>{row.fixtureId}</small>}<small>{t(row.status)}</small></th>
             <td><pre>{JSON.stringify(run.request.mode === 'fixtures' ? fixture?.expectedEvaluation : example?.expected, null, 2) ?? t("Not available")}</pre></td>
             <td>{run.request.mode === 'fixtures' ? evaluation ? <><strong className={evaluation.label === 'pass' ? 'success' : 'warning'}>{t(evaluation.label)} / {evaluation.score}</strong><Markdown text={evaluation.explanation} /></> : '—' : <pre>{JSON.stringify(row.output, null, 2) ?? '—'}</pre>}</td>
             <td><strong>{run.request.mode === 'fixtures' ? t(assertion) : evaluation ? `${t(evaluation.label)} / ${evaluation.score}` : '—'}</strong>{run.request.mode === 'agent' && evaluation && <Markdown text={evaluation.explanation} />}{row.error && <p className="error-text">{t("Raw service diagnostics (original language).")} {row.error.code}: {row.error.message}</p>}</td>

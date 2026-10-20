@@ -40,6 +40,24 @@ test('agent rejects input references, unknown variants and domain mismatch befor
   }
   assert.equal(calls, 0);
 });
+test('known variants still require installation for the selected exercise', async () => {
+  let calls = 0;
+  const transport = async () => { calls++; return success(); };
+  const regression = { ...content, exercise: async () => ({ ...exercise, agentVariants: ['baseline', 'omit-fees'] }) } as ContentService;
+  const selected = { ...request(), exerciseId: '07-spec-regression' as const, agentVariant: 'omit-fees' };
+  const accepted = await createAgentService(regression, tmpdir(), transport).invoke(selected, new AbortController().signal);
+  assert.equal(accepted.status, 'completed');
+  for (const [installed, input] of [
+    [content, { ...request(), agentVariant: 'omit-fees' }],
+    [regression, { ...selected, agentVariant: 'careful' }],
+    [{ ...content, exercise: async () => ({ ...exercise, agentVariants: ['arbitrary'] }) }, { ...request(), agentVariant: 'arbitrary' }],
+  ] as const) {
+    const rejected = await createAgentService(installed as ContentService, tmpdir(), transport).invoke(input, new AbortController().signal);
+    assert.equal(rejected.status, 'failed');
+    if (rejected.status === 'failed') assert.equal(rejected.error.code, 'invalid_request');
+  }
+  assert.equal(calls, 1);
+});
 test('agent validates output schema and correlation and preserves operational refusal', async () => {
   for (const response of [{ ...success(), output: { label: 'invented' } }, { ...success(), runId: 'other' }, { ...success(), output: [] }]) {
     const result = await createAgentService(content, tmpdir(), async () => response).invoke(request(), new AbortController().signal);

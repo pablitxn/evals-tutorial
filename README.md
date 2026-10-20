@@ -1,6 +1,7 @@
 # Evals Tutorial
 
-A local workshop with one read-only introduction and six cases. Learners edit
+A local workshop with one read-only introduction, six editable cases and a final
+guided example of Spec-Driven Development and regression evaluation. Learners edit
 TypeScript evaluators, test known response fixtures, then evaluate prepared Python
 Microsoft Agent Framework agents. All data is original synthetic material. Delivery
 is a local source ZIP; there is no hosted deployment, booking or transmission.
@@ -41,6 +42,22 @@ access in the build steps. The small Docker context contains only the fixed work
 and installed TypeScript library. No global Python package manager is needed.
 Start from a clean Git commit or an unchanged extracted source manifest so run
 receipts identify the exact source. Learner edits remain browser-local.
+
+## Final guided example
+
+Open **Specification and regression** after the six cases. Read six travel-assistant
+requirements, inspect the fixed Python agent versions and prepared TypeScript
+evaluators, then run the baseline and the deliberately regressing **omit-fees**
+version. Both use the same three ordinary cases in one dataset. Results link each
+requirement to its expected outcome, evaluator and observed verdict; the comparison
+identifies cases that passed in the baseline and failed in the candidate.
+
+The candidate deliberately ignores mandatory fees. Its displayed results are
+computed from actual runs, never prefilled; a model may behave differently from
+its prompt. An unavailable provider, incomplete execution or mismatched run
+identity cannot establish a regression. Running another baseline starts a fresh
+comparison while keeping earlier receipts inspectable. Both model runs require
+the existing global provider configuration and explicit actions.
 
 ## Enable an existing provider credential
 

@@ -1,4 +1,8 @@
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
+import type { Tutorial } from '@evals-tutorial/contracts';
+import { SpecPreparation, SpecComparisonResults } from '../src/SpecRegression.js';
+import { snapshot } from '../src/model.js';
 import assert from 'node:assert/strict';
 import { createElement, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -56,4 +60,23 @@ test('localized run and review chrome preserves original data, errors, quotes, f
   assert.match(render('es', createElement(ReviewFeedback, { review: feedback, current: true, jumpToRow() {} })), /No se registró el idioma/);
   feedback.feedbackLocale = 'en';
   assert.deepEqual({ result, feedback }, before);
+});
+
+
+test('guided example localizes its fixed requirement derivation and shows an honest unrun comparison', () => {
+  const tutorial = JSON.parse(readFileSync(new URL('../../../content/tutorial.json', import.meta.url), 'utf8')) as Tutorial;
+  const exercise = tutorial.exercises[7]!;
+  const before = structuredClone(exercise);
+  const preparation = render('es', createElement(SpecPreparation, { exercise }));
+  assert.match(preparation, /2\. Inspecciona la derivación preparada/);
+  assert.match(preparation, /omit-fees ignora intencionadamente/);
+  for (const criterion of exercise.criteria) assert.ok(preparation.includes(`id="requirement-${criterion.id}"`));
+  const current = snapshot(tutorial, exercise, exercise.starterSource);
+  const unrun = render('es', createElement(SpecComparisonResults, { current, codeHash: null, busy: false, retryRecording() {} }));
+  assert.match(unrun, /Ejecuta ambas versiones explícitamente/);
+  assert.match(unrun, /4\. Compara la evidencia de los requisitos/);
+  assert.match(unrun, /Registro inmutable de ejecución.*baseline/);
+  assert.match(unrun, /Registro inmutable de ejecución.*omit-fees/);
+  assert.doesNotMatch(unrun, /Regresión: pass/);
+  assert.deepEqual(exercise, before);
 });

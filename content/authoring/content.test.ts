@@ -56,7 +56,7 @@ function codeVerdict(id: string, example: Example, fixture: Fixture): boolean {
       && actual.transmission === 'not_sent' && setEqual(actual.missingDocumentIds, missing)
       && setEqual(actual.unresolvedDiscrepancyIds, discrepancies);
   }
-  if (id === '06-simulated-travel') {
+  if (id === '06-simulated-travel' || id === '07-spec-regression') {
     const eligible = input.options.filter((o: any) => o.origin === input.origin && o.destination === input.destination
       && o.currency === input.currency && o.departDate === input.departDate && o.returnDate === input.returnDate
       && o.returnDate > o.departDate && o.fareCents + o.feesCents <= input.budgetCents);
@@ -84,7 +84,7 @@ function policyEvidence(row: Example, fixture: Fixture): boolean {
 test('actual content envelopes, domain schemas, shared manifest and discriminating code fixtures', async () => {
   const service = await createContentService(root);
   const tutorial = await service.tutorial();
-  assert.equal(tutorial.exercises.length, 7);
+  assert.equal(tutorial.exercises.length, 8);
   let codeFixtures = 0, judgeFixtures = 0, policyGateFailures = 0;
   const ids = new Set<string>();
   for (const exercise of tutorial.exercises) {
@@ -119,13 +119,13 @@ test('actual content envelopes, domain schemas, shared manifest and discriminati
       }
     }
     if (!exercise.readOnly && exercise.mode === 'Code') assert.ok(passes > 0 && fails > 0, exercise.id);
-    assert.equal(exercise.readOnly, exercise.id === 'intro');
+    assert.equal(exercise.readOnly, exercise.id === 'intro' || exercise.id === '07-spec-regression');
     if (exercise.mode === 'Code') assert.equal(exercise.maxJudgeCallsPerRow, 0);
   }
-  assert.equal(codeFixtures, 50); // 49 practical Code fixtures plus one read-only intro.
+  assert.equal(codeFixtures, 55); // Original 50 plus five prepared regression fixtures.
   assert.equal(judgeFixtures, 7);
   assert.equal(policyGateFailures, 3);
-  assert.equal(ids.size, 60);
+  assert.equal(ids.size, 65);
   const a = await service.dataset('02-document-classification');
   const b = await service.dataset('03-independent-tie-out');
   assert.deepEqual(a.documentManifestRef, b.documentManifestRef);

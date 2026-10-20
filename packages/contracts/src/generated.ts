@@ -3,7 +3,7 @@ export type JsonValue = (null) | (boolean) | (number) | (string) | (Array<JsonVa
 
 export type JsonObject = { [key: string]: JsonValue };
 
-export type ExerciseId = "intro" | "01-starred-classifier" | "02-document-classification" | "03-independent-tie-out" | "04-policy-recommendation" | "05-package-readiness" | "06-simulated-travel";
+export type ExerciseId = "intro" | "01-starred-classifier" | "02-document-classification" | "03-independent-tie-out" | "04-policy-recommendation" | "05-package-readiness" | "06-simulated-travel" | "07-spec-regression";
 
 export type EvaluationMode = "Code" | "LLM Judge" | "Mixed";
 
@@ -11,6 +11,7 @@ export type EvalResult = {
   score: number;
   label: "pass" | "fail" | "partial";
   explanation: string;
+  criteria?: Array<CriterionResult>;
 };
 
 export type EvalInput = {
@@ -376,4 +377,11 @@ export type JudgeRpcResponse = {
   id: string;
   result?: EvalResult;
   error?: OperationError;
+};
+
+export type CriterionResult = {
+  score: number;
+  label: "pass" | "fail" | "partial";
+  explanation: string;
+  criterionId: string;
 };

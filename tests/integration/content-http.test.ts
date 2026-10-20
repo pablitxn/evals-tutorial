@@ -16,7 +16,7 @@ test('actual corpus is served read-only with exact dataset and document identiti
   const base=`http://127.0.0.1:${(server.address() as {port:number}).port}`;
   try{
     const response=await fetch(base+'/api/tutorial');assert.equal(response.status,200);
-    const tutorial=await response.json() as Tutorial;assert.equal(tutorial.exercises.length,7);
+    const tutorial=await response.json() as Tutorial;assert.equal(tutorial.exercises.length,8);
     for(const exercise of tutorial.exercises){
       const response=await fetch(base+`/api/exercises/${exercise.id}/dataset`);assert.equal(response.status,200);
       const dataset=await response.json() as Dataset;assert.equal(datasetHash(dataset),exercise.datasetHash);

@@ -20,6 +20,13 @@ test('wire validators execute with string code generation disabled',()=>{
   `],{encoding:'utf8'});
   assert.equal(result.status,0,result.stderr || result.error?.message);
 });
+test('requirement results are optional, bounded and obey the same score rules',()=>{
+  const criterion={criterionId:'R1',...good};
+  assert.equal(validateContract('EvalResult',{...good,criteria:[criterion]}).valid,true);
+  for(const criteria of [[],Array(13).fill(criterion),[{...criterion,score:0}], [{...criterion,criterionId:''}], [{...criterion,extra:true}]]) {
+    assert.equal(validateContract('EvalResult',{...good,criteria}).valid,false);
+  }
+});
 test('Phoenix opaque GlobalIDs retain padding without broadening tutorial IDs or URLs',()=>{
   const ids={datasetId:'RGF0YXNldDox',datasetVersionId:'RGF0YXNldFZlcnNpb246MjU=',experimentId:'RXhwZXJpbWVudDo1OA=='};
   assert.equal(validateContract('PhoenixLinks',ids).valid,true);

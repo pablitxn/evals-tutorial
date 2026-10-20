@@ -352,9 +352,11 @@ export function createPhoenixTelemetry(options: PhoenixTelemetryOptions): Teleme
             if (row.evaluation) {
               await client.POST('/v1/experiment_evaluations', { body: {
                 experiment_run_id: task.id, name: 'tutorial_result', annotator_kind: 'CODE',
-                start_time: run.createdAt, end_time: run.updatedAt, result: row.evaluation, trace_id: trace.traceId,
+                start_time: run.createdAt, end_time: run.updatedAt,
+                result: { score: row.evaluation.score, label: row.evaluation.label, explanation: row.evaluation.explanation }, trace_id: trace.traceId,
                 metadata: { recorded_from_immutable_receipt: true, mode: run.request.mode,
-                  fixtureMatched: row.fixtureMatched ?? null, codeHash: run.codeHash },
+                  fixtureMatched: row.fixtureMatched ?? null, codeHash: run.codeHash,
+                  ...(row.evaluation.criteria ? { criteria: row.evaluation.criteria } : {}) },
               } });
             }
             verification.push({ row, nodeId });

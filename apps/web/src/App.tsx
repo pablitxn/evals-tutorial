@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LIMITS, validateContract, type AcceptedReview, type AcceptedRun, type Dataset, type Exercise, type ExerciseId, type ReviewRecord, type RunRecord, type ServiceStatus, type Tutorial, type ValidationResult } from '@evals-tutorial/contracts';
 import { ApiError, errorText, request } from './api.js';
 import { DocumentPreviews, Editor, ExternalLink, LessonText, ModeBadge, ReferenceTabs, ReviewFeedback, RunResults } from './components.js';
-import { fixturesDiscriminate, LESSON_IDS, LESSON_LABELS, LESSON_MINUTES, lessonFromHash, reviewActive, reviewCurrent, reviewFindingsValid, runActive, runCurrent, sameSnapshot, snapshot, sourceHash } from './model.js';
+import { fixturesDiscriminate, LESSON_IDS, LESSON_LABELS, LESSON_MINUTES, lessonFromHash, reviewActive, reviewCurrent, reviewFindingsValid, runActive, runCurrent, sameSnapshot, snapshot, sourceHash, unavailableRunPatch } from './model.js';
 import { loadWork, PENDING_KEY, read, remove, resetStorage, save, storageKey, type PendingSubmission, type SavedWork } from './storage.js';
 import { Preferences } from './preferences.js';
 import { Markdown } from './Markdown.js';
@@ -12,9 +12,11 @@ import { ProviderStatus } from './ProviderStatus.js';
 import { BrandMark } from './BrandMark.js';
 import { EvaluationConcepts } from './EvaluationConcepts.js';
 import type { EditorHandle } from './CodeEditor.js';
+import { SpecPreparation, SpecComparisonResults } from './SpecRegression.js';
+import { preparedBaselineProblem, rejectedCandidate } from './comparison.js';
 import { Dropdown } from './Dropdown.js';
 
-type Work = SavedWork & { oldSource?: string; validation?: ValidationResult; fixture?: RunRecord; agent?: RunRecord; review?: ReviewRecord; history: (RunRecord | ReviewRecord)[]; evidenceError?: string };
+type Work = SavedWork & { oldSource?: string; validation?: ValidationResult; fixture?: RunRecord; agent?: RunRecord; review?: ReviewRecord; baseline?: RunRecord; candidate?: RunRecord; history: (RunRecord | ReviewRecord)[]; evidenceError?: string };
 type Works = Partial<Record<ExerciseId, Work>>;
 const initialPending = (): PendingSubmission | undefined => {
   const pending = read<PendingSubmission>(PENDING_KEY);
@@ -56,7 +58,7 @@ export function App() {
   function persist(id: ExerciseId, work: Work) {
     const t = tutorialRef.current; const exercise = t?.exercises.find(e => e.id === id);
     if (!t || !exercise) return;
-    const value: SavedWork = { source: work.source, variant: work.variant, rubricVersion: work.rubricVersion, datasetHash: work.datasetHash,
+    const value: SavedWork = { source: work.source, variant: work.variant, rubricVersion: work.rubricVersion, datasetHash: work.datasetHash, comparison: work.comparison,
       ...(work.fixtureRunId ? { fixtureRunId: work.fixtureRunId } : {}), ...(work.agentRunId ? { agentRunId: work.agentRunId } : {}), ...(work.reviewId ? { reviewId: work.reviewId } : {}), pastReceiptIds: [...(work.pastReceiptIds ?? []), ...work.history.map(record => ({ kind: 'runId' in record ? 'run' as const : 'review' as const, id: 'runId' in record ? record.runId : record.reviewId }))].filter((item, index, list) => list.findIndex(other => other.id === item.id) === index).slice(-12) };
     if (!save(storageKey(t, exercise), value)) setSaved(false);
   }
@@ -80,14 +82,14 @@ export function App() {
     setBootError(undefined);
     try {
       const [t, s] = await Promise.all([request<Tutorial>('/api/tutorial', 'Tutorial'), request<ServiceStatus>('/api/status', 'ServiceStatus')]);
-      if (t.exercises.length !== 7 || t.exercises.some((e, i) => e.id !== LESSON_IDS[i]) || !t.exercises[0]?.readOnly || t.exercises.slice(1).some(e => e.readOnly)) throw new Error('Tutorial content must contain the read-only introduction followed by six cases.');
+      if (t.exercises.length !== 8 || t.exercises.some((e, i) => e.id !== LESSON_IDS[i]) || !t.exercises[0]?.readOnly || !t.exercises[7]?.readOnly || t.exercises.slice(1, 7).some(e => e.readOnly)) throw new Error('Tutorial content must contain the introduction, six editable cases and the read-only regression example.');
       tutorialRef.current = t; setTutorial(t); setStatus(s);
       const next: Works = {};
       for (const e of t.exercises) { const loaded = loadWork(t, e); next[e.id] = { ...loaded.work, ...(e.readOnly ? { source: e.starterSource } : {}), oldSource: loaded.oldSource, history: [] }; }
       workRef.current = next; setWorks(next);
       for (const e of t.exercises) {
         const work = next[e.id]!; hashWork(e.id, work.source);
-        for (const [field, id] of [['fixture', work.fixtureRunId], ['agent', work.agentRunId], ['review', work.reviewId]] as const) if (id) {
+        for (const [field, id] of [['fixture', work.fixtureRunId], ['agent', work.agentRunId], ['review', work.reviewId], ['baseline', work.comparison?.baselineRunId], ['candidate', work.comparison?.candidateRunId]] as const) if (id) {
           const kind = field === 'review' ? 'reviews' : 'runs';
           request<RunRecord | ReviewRecord>(`/api/${kind}/${encodeURIComponent(id)}`, field === 'review' ? 'ReviewRecord' : 'RunRecord').then(record => {
             const exerciseId = 'runId' in record ? record.request.snapshot.exerciseId : record.binding.exerciseId;
@@ -128,7 +130,11 @@ export function App() {
     const field = record.request.mode === 'fixtures' ? 'fixture' : 'agent';
     const previous = work[field];
     const history = previous && previous.runId !== record.runId ? [...work.history, previous].slice(-12) : work.history;
-    update(id, { [field]: record, [`${field}RunId`]: record.runId, history, evidenceError: undefined });
+    const pair = work.comparison;
+    const role = record.request.requestId === pair?.baselineRequestId ? 'baseline' : record.request.requestId === pair?.candidateRequestId ? 'candidate' : undefined;
+    const comparison = pair && role ? { ...pair, [role === 'baseline' ? 'baselineRunId' : 'candidateRunId']: record.runId } : pair;
+    const keepLatest = role === 'baseline' && !!pair?.candidateRequestId;
+    update(id, { ...(!keepLatest ? { [field]: record, [`${field}RunId`]: record.runId } : {}), ...(role ? { [role]: record } : {}), comparison, history: keepLatest ? work.history : history.filter((item, index, list) => list.findIndex(other => ('runId' in other ? other.runId : other.reviewId) === ('runId' in item ? item.runId : item.reviewId)) === index), evidenceError: undefined });
   }
   function storeReview(record: ReviewRecord) {
     const id = record.binding.exerciseId; const work = workRef.current[id]; if (!work) return;
@@ -139,14 +145,28 @@ export function App() {
   useEffect(() => {
     if (!tutorial) return;
     let stopped = false; let timer: number;
+    async function readRun(runId: string): Promise<RunRecord | undefined> {
+      try { return await request<RunRecord>(`/api/runs/${encodeURIComponent(runId)}`, 'RunRecord'); }
+      catch (problem) {
+        if (!(problem instanceof ApiError) || problem.detail.code !== 'not_found') throw problem;
+        if (stopped) return undefined;
+        for (const [id, work] of Object.entries(workRef.current)) {
+          if (!work) continue;
+          const patch = unavailableRunPatch(work, runId);
+          if (Object.keys(patch).length) update(id as ExerciseId, { ...patch, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
+        }
+        if (pendingRef.current?.kind === 'run' && pendingRef.current.acceptedId === runId) setOperation(undefined);
+        return undefined;
+      }
+    }
     async function poll() {
       try {
         const operation = pendingRef.current;
         if (operation?.acceptedId) {
           if (operation.kind === 'run') {
-            const record = await request<RunRecord>(`/api/runs/${encodeURIComponent(operation.acceptedId)}`, 'RunRecord');
-            if (!sameSnapshot(record.request.snapshot, operation.request.snapshot) || record.request.requestId !== operation.request.requestId) throw new Error('Run receipt does not match the accepted submission.');
-            if (!stopped) { storeRun(record); if (!runActive(record)) { setOperation(undefined); setAnnouncement('Run {status}. {completed} of {total} rows completed.', { status: record.status, completed: record.completedRows, total: record.totalRows }); } }
+            const record = await readRun(operation.acceptedId);
+            if (record && (!sameSnapshot(record.request.snapshot, operation.request.snapshot) || record.request.requestId !== operation.request.requestId)) throw new Error('Run receipt does not match the accepted submission.');
+            if (!stopped && record) { storeRun(record); if (!runActive(record)) { setOperation(undefined); setAnnouncement('Run {status}. {completed} of {total} rows completed.', { status: record.status, completed: record.completedRows, total: record.totalRows }); } }
           } else {
             const record = await request<ReviewRecord>(`/api/reviews/${encodeURIComponent(operation.acceptedId)}`, 'ReviewRecord');
             if (record.requestId !== operation.request.requestId || (record.feedbackLocale ?? 'en') !== (operation.request.feedbackLocale ?? 'en')) throw new Error('Review receipt does not match the accepted submission.');
@@ -155,8 +175,8 @@ export function App() {
         }
         // Recover saved active receipts and late Phoenix recording with GET only.
         for (const work of Object.values(workRef.current)) {
-          for (const run of [work?.fixture, work?.agent]) if (run && (runActive(run) || run.telemetryStatus === 'pending') && run.runId !== operation?.acceptedId) {
-            const record = await request<RunRecord>(`/api/runs/${encodeURIComponent(run.runId)}`, 'RunRecord'); if (!stopped) storeRun(record);
+          for (const run of [work?.fixture, work?.agent, work?.baseline, work?.candidate]) if (run && (runActive(run) || run.telemetryStatus === 'pending') && run.runId !== operation?.acceptedId) {
+            const record = await readRun(run.runId); if (!stopped && record) storeRun(record);
           }
           if (work?.review && reviewActive(work.review) && work.review.reviewId !== operation?.acceptedId) {
             const record = await request<ReviewRecord>(`/api/reviews/${encodeURIComponent(work.review.reviewId)}`, 'ReviewRecord'); if (!stopped) storeReview(record);
@@ -166,10 +186,9 @@ export function App() {
       } catch (problem) {
         if (!stopped) {
           const operation = pendingRef.current;
-          if (problem instanceof ApiError && problem.detail.code === 'not_found' && operation?.acceptedId) {
+          if (problem instanceof ApiError && problem.detail.code === 'not_found' && operation?.kind === 'review' && operation.acceptedId) {
             const id = operation.request.snapshot.exerciseId;
-            const field = operation.kind === 'review' ? 'review' : operation.request.mode === 'fixtures' ? 'fixture' : 'agent';
-            update(id, { [field]: undefined, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
+            update(id, { review: undefined, evidenceError: 'The backend no longer has this accepted operation. Fresh run evidence is required; previous completion cannot be restored.' });
             setOperation(undefined);
           }
           setPollError(`Evidence status unavailable. ${errorText(problem)}`);
@@ -197,7 +216,7 @@ export function App() {
     return () => abort.abort();
   }, [active, exercise]);
 
-  const activeRecords = Object.values(works).some(w => w && ([w.fixture, w.agent].some(r => r && runActive(r)) || (w.review && reviewActive(w.review))));
+  const activeRecords = Object.values(works).some(w => w && ([w.fixture, w.agent, w.baseline, w.candidate].some(r => r && runActive(r)) || (w.review && reviewActive(w.review))));
   const busy = !!pending || !!action || activeRecords;
   const current = tutorial && exercise && work ? snapshot(tutorial, exercise, work.source) : undefined;
   const hash = hashes[active] ?? null;
@@ -211,6 +230,8 @@ export function App() {
     && (!['ready', 'needs_changes', 'inconclusive'].includes(work?.review?.status ?? '') || reviewFindingsValid(work?.review, exercise, work?.fixture, work?.agent));
   const cap = status?.capabilities;
   const paidReady = !!status?.provider?.configured;
+  const isSpec = active === '07-spec-regression';
+  const baselineProblem = isSpec && current ? preparedBaselineProblem(work?.comparison, work?.baseline, dataset, current, hash, status) : undefined;
   const usesJudge = exercise?.mode !== 'Code';
   const canTest = !!dataset && !!cap?.runner.available && !!cap.validation.available && (!usesJudge || (paidReady && cap.judge.available)) && !busy;
   const canRun = !!cap?.agents.available && !!cap.runner.available && !!cap.validation.available && paidReady && (!usesJudge || !!cap.judge.available) && fixtureReady && !busy;
@@ -238,23 +259,46 @@ export function App() {
         const accepted = await request<AcceptedRun>('/api/runs', 'AcceptedRun', operation.request);
         setOperation({ ...operation, acceptedId: accepted.runId });
         const field = operation.request.mode === 'fixtures' ? 'fixtureRunId' : 'agentRunId';
-        update(operation.request.snapshot.exerciseId, { [field]: accepted.runId });
+        const w = workRef.current[operation.request.snapshot.exerciseId]; const pair = w?.comparison;
+        const role = operation.request.requestId === pair?.baselineRequestId ? 'baselineRunId' : operation.request.requestId === pair?.candidateRequestId ? 'candidateRunId' : undefined;
+        update(operation.request.snapshot.exerciseId, { [field]: accepted.runId, ...(pair && role ? { comparison: { ...pair, [role]: accepted.runId } } : {}) });
       } else {
         const accepted = await request<AcceptedReview>('/api/reviews', 'AcceptedReview', operation.request);
         setOperation({ ...operation, acceptedId: accepted.reviewId }); update(operation.request.snapshot.exerciseId, { reviewId: accepted.reviewId });
       }
     } catch (problem) {
-      if (problem instanceof ApiError) setOperation(undefined);
+      if (problem instanceof ApiError) {
+        if (operation.kind === 'run' && !operation.acceptedId) {
+          const id = operation.request.snapshot.exerciseId; const pair = workRef.current[id]?.comparison;
+          const comparison = rejectedCandidate(pair, operation.request.requestId);
+          if (comparison !== pair) update(id, { comparison });
+        }
+        setOperation(undefined);
+      }
       setError(`${errorText(problem)}${problem instanceof ApiError ? '' : ' Submission outcome unknown. Recover using the same request ID.'}`);
     } finally { actionLock.current = false; setAction(undefined); }
   }
-  function run(mode: 'fixtures' | 'agent', variant = work?.variant) {
+  function run(mode: 'fixtures' | 'agent', variant = work?.variant, requestId = crypto.randomUUID()) {
     if (!current || !variant || busy || !exercise) return;
     if (exercise.readOnly ? !paidReady || !cap?.runner.available || !cap.agents.available : mode === 'fixtures' ? !canTest : !canRun) return;
     if (new TextEncoder().encode(current.source).length > LIMITS.sourceBytes) { setError({ key: 'Source exceeds the 64 KiB limit. Shorten the evaluator before running.' }); return; }
     if (variant !== work?.variant) update(active, { variant });
     setResultTab(mode); setAnnouncement(mode === 'fixtures' ? 'Testing prepared responses.' : 'Running the prepared agent.');
-    void submit({ kind: 'run', request: { requestId: crypto.randomUUID(), snapshot: current, mode, agentVariant: variant } });
+    void submit({ kind: 'run', request: { requestId, snapshot: current, mode, agentVariant: variant } });
+  }
+  function runComparison(variant: 'baseline' | 'omit-fees') {
+    if (!isSpec || !work || !current || busy || actionLock.current || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available) return;
+    const requestId = crypto.randomUUID();
+    if (variant === 'baseline') {
+      const previous = [work.baseline, work.candidate].filter((record): record is RunRecord => !!record);
+      const history = [...work.history, ...previous].filter((record, index, list) => list.findIndex(other => ('runId' in other ? other.runId : other.reviewId) === ('runId' in record ? record.runId : record.reviewId)) === index).slice(-12);
+      update(active, { comparison: { id: crypto.randomUUID(), baselineRequestId: requestId }, baseline: undefined, candidate: undefined, history });
+    }
+    else {
+      if (!work.comparison || work.comparison.candidateRequestId || preparedBaselineProblem(work.comparison, work.baseline, dataset, current, hash, status)) return;
+      update(active, { comparison: { ...work.comparison, candidateRequestId: requestId }, candidate: undefined });
+    }
+    run('agent', variant, requestId);
   }
   function review() {
     if (!canReview || !current || !hash || !work?.fixture || !work.agent) return;
@@ -263,7 +307,7 @@ export function App() {
   async function cancel() {
     if (actionLock.current) return;
     const operation = pendingRef.current;
-    const runRecord = Object.values(workRef.current).flatMap(w => [w?.fixture, w?.agent]).find(r => r && runActive(r));
+    const runRecord = Object.values(workRef.current).flatMap(w => [w?.fixture, w?.agent, w?.baseline, w?.candidate]).find(r => r && runActive(r));
     const reviewRecord = Object.values(workRef.current).map(w => w?.review).find(r => r && reviewActive(r));
     const id = operation?.acceptedId ?? runRecord?.runId ?? reviewRecord?.reviewId;
     const kind = operation?.kind ?? (runRecord ? 'run' : 'review');
@@ -293,7 +337,7 @@ export function App() {
     const targets = reset === 'tutorial' ? tutorial.exercises : [exercise];
     if (!resetStorage(reset === 'tutorial' ? undefined : exercise.id)) setSaved(false);
     for (const e of targets) { update(e.id, { source: e.starterSource, variant: e.defaultAgentVariant, rubricVersion: e.rubricVersion, datasetHash: e.datasetHash, fixture: undefined, agent: undefined, review: undefined,
-      fixtureRunId: undefined, agentRunId: undefined, reviewId: undefined, validation: undefined, history: [], pastReceiptIds: [], oldSource: undefined, evidenceError: undefined }); hashWork(e.id, e.starterSource); }
+      fixtureRunId: undefined, agentRunId: undefined, reviewId: undefined, validation: undefined, history: [], pastReceiptIds: [], oldSource: undefined, evidenceError: undefined, comparison: undefined, baseline: undefined, candidate: undefined }); hashWork(e.id, e.starterSource); }
     setReset(undefined); setAnnouncement('Local work reset. Phoenix history retained.');
   }
   function jumpToRow(id: string) {
@@ -320,23 +364,24 @@ export function App() {
       <aside className="sidebar"><details className="lesson-menu" open={lessonsOpen} onToggle={event => setLessonsOpen(event.currentTarget.open)}><summary>{t("Lessons")}{' '}<span>{reviewed} {t("/ 6 reviewed")}</span></summary><nav aria-label={t("Tutorial lessons")}><p className="eyebrow">{t("YOUR WORKSHOP")}</p><div className="progress-label">{reviewed} {t("/ 6 cases reviewed")}</div><div className="progress-track" aria-hidden="true"><span style={{ width: `${reviewed / 6 * 100}%` }} /></div>
         {tutorial.exercises.map((e, i) => {
           const w = works[e.id]; const bound = w && reviewCurrent(w.review, snapshot(tutorial, e, w.source), hashes[e.id] ?? null, w.fixture, w.agent, w.variant, status);
-          const label = e.readOnly ? w?.agent?.status === 'completed' ? 'Run completed' : 'Read-only introduction' : bound && w?.review?.status === 'ready' && reviewFindingsValid(w.review, e, w.fixture, w.agent) ? 'Reviewed' : w?.review ? 'Needs new review' : w?.source !== e.starterSource ? 'Draft' : 'Not started';
+          const label = e.readOnly ? w?.agent?.status === 'completed' ? 'Run completed' : e.id === '07-spec-regression' ? 'Read-only guided example' : 'Read-only introduction' : bound && w?.review?.status === 'ready' && reviewFindingsValid(w.review, e, w.fixture, w.agent) ? 'Reviewed' : w?.review ? 'Needs new review' : w?.source !== e.starterSource ? 'Draft' : 'Not started';
           return <a key={e.id} className={`lesson-link ${active === e.id ? 'selected' : ''}`} href={`#${e.id}`} aria-current={active === e.id ? 'page' : undefined}><span className="lesson-number">{i === 0 ? '↳' : String(i).padStart(2, '0')}</span><span><strong>{t(LESSON_LABELS[i]!)}</strong><small>{t(label)}</small><ModeBadge mode={e.mode} /></span></a>;
         })}</nav></details><div className="sidebar-footer"><p>{t("Make the criterion visible.")}<br />{t("Test the evaluator, then the agent.")}</p><button className="text-button" disabled={busy} onClick={() => setReset('tutorial')}>{t("Reset Tutorial")}</button></div></aside>
       <main className="main-content">
-        <section className="lesson-intro"><p className="eyebrow">{exercise.readOnly ? t("START HERE") : t("CASE {case} OF 6", { case: index })}<span> / {LESSON_MINUTES[index]} {t("MIN")}</span><ModeBadge mode={exercise.mode} /></p><h1 ref={headingRef} tabIndex={-1} id="lesson-title">{lesson.title}</h1><LessonText text={lesson.lessonMarkdown} />
+        <section className="lesson-intro"><p className="eyebrow">{isSpec ? t("GUIDED EXAMPLE") : exercise.readOnly ? t("START HERE") : t("CASE {case} OF 6", { case: index })}<span> / {LESSON_MINUTES[index]} {t("MIN")}</span><ModeBadge mode={exercise.mode} /></p><h1 ref={headingRef} tabIndex={-1} id="lesson-title">{lesson.title}</h1><LessonText text={lesson.lessonMarkdown} />
           <div className="criteria">{lesson.criteria.map(criterion => <div key={criterion.id}><ModeBadge mode={criterion.mode} /><Markdown text={criterion.description} /></div>)}</div>
           <div className="docs-links">{exercise.officialDocs.map(doc => <ExternalLink key={doc.url} url={doc.url}>{t(doc.title)}</ExternalLink>)}</div>
         </section>
-        {exercise.readOnly && <EvaluationConcepts />}
+        {active === 'intro' && <EvaluationConcepts />}
+        {isSpec && <SpecPreparation exercise={exercise} dataset={dataset} />}
         {!saved && <div className="notice warning" role="status">{t("Edits are not saved in this browser. Keep this tab open and copy your evaluator.")}</div>}
         {work.oldSource !== undefined && <div className="notice warning"><strong>{t("Saved work belongs to an older version.")}</strong><p>{t("The new starter is loaded. Old work carries no completion.")}</p><details><summary>{t("Inspect old evaluator")}</summary><pre>{work.oldSource}</pre></details><button disabled={busy || exercise.readOnly} onClick={() => { edit(work.oldSource!); update(active, { oldSource: undefined }); }}>{t("Copy old source into editor")}</button></div>}
         {work.evidenceError && <div className="notice warning">{t("Raw service diagnostics (original language).")} {work.evidenceError} {t("New evidence is required for completion.")}</div>}
         {(error || pollError) && <div className="notice error-text" role="alert">{typeof error === "object" ? t(error.key, error.parameters) : <>{t("Raw service diagnostics (original language).")} {error ?? pollError}</>}</div>}
         {pending && !pending.acceptedId && <div className="notice warning"><strong>{t("Submission outcome unknown.")}</strong><p>{t("Recover the same request ID. This does not create a new attempt.")}</p><button disabled={!!action} onClick={() => void submit(pending)}>{t("Recover submission")}</button></div>}
         <div className="workspace"><Editor key={`editor-${exercise.id}`} source={work.source} readOnly={exercise.readOnly} busy={busy} onChange={edit} editorRef={editorRef} diagnostics={work.validation?.codeHash === hash ? work.validation.diagnostics : (resultTab === 'fixtures' ? fixtureCurrent : agentCurrent) ? currentRun?.diagnostics ?? [] : []} onCopy={() => navigator.clipboard.writeText(work.source).then(() => setAnnouncement('Evaluator copied.')).catch(() => { editorRef.current?.focus(); editorRef.current?.select(); setAnnouncement('Select and copy the evaluator with your keyboard.'); })} />
-        <section className="actions" aria-label={t("Evaluator actions")}><div className="action-buttons">
-          {exercise.readOnly ? <button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => run('agent')}>{t("Run Introduction")}</button> : <><button disabled={busy || !cap?.validation.available} onClick={() => void validate()}>{t("Validate")}</button><button disabled={!canTest} onClick={() => run('fixtures')}>{t("Test Fixtures")}</button><button className="primary" disabled={!canRun} onClick={() => run('agent')}>{t("Run Agent")}{' '}<span aria-hidden="true">→</span></button></>}
+        <section className={`actions ${isSpec ? 'spec-actions' : ''}`} aria-label={t("Evaluator actions")}><div className="action-buttons">
+          {isSpec ? <><h2>{t('3. Run both prepared versions')}</h2><p className="help">{t('omit-fees is an intentional regression. Each button runs the same three cases with this fixed evaluator and uses agent tokens; running both versions makes six agent calls. No judge calls.')}</p><button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('baseline')}>{t(work.comparison ? 'Start new baseline attempt' : 'Run baseline · 3 cases')}</button><button disabled={busy || !!baselineProblem || !!work.comparison?.candidateRequestId || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => runComparison('omit-fees')}>{t('Run omit-fees · 3 cases')}</button>{baselineProblem && work.baseline && !runActive(work.baseline) && !work.comparison?.candidateRequestId && <p className="help" role="status">{t(baselineProblem)}</p>}</> : exercise.readOnly ? <button className="primary" disabled={busy || !dataset || !paidReady || !cap?.runner.available || !cap.agents.available || !cap.validation.available} onClick={() => run('agent')}>{t("Run Introduction")}</button> : <><button disabled={busy || !cap?.validation.available} onClick={() => void validate()}>{t("Validate")}</button><button disabled={!canTest} onClick={() => run('fixtures')}>{t("Test Fixtures")}</button><button className="primary" disabled={!canRun} onClick={() => run('agent')}>{t("Run Agent")}{' '}<span aria-hidden="true">→</span></button></>}
           {activeOperation && <button className="cancel-button" disabled={!!action} onClick={() => void cancel()}>{action === 'Cancelling…' ? t("Cancelling…") : pending?.kind === 'review' ? t("Cancel Review") : t("Cancel")}</button>}
           <button className="text-button" onClick={() => { resultsRef.current?.focus(); resultsRef.current?.scrollIntoView({ block: 'start' }); }}>{t("Inspect results ↓")}</button>
           {!exercise.readOnly && <button className="text-button" disabled={busy} onClick={() => setReset('exercise')}>{t("Reset Exercise")}</button>}
@@ -346,7 +391,7 @@ export function App() {
           {!exercise.readOnly && exercise.agentVariants.length > 1 && <div className="comparison-controls"><label>{t("Prepared agent variant")}{' '}<Dropdown label={t("Prepared agent variant")} disabled={busy} value={work.variant} onValueChange={variant => update(active, { variant })} options={exercise.agentVariants.map(variant => ({ value: variant, label: variant }))} /></label><button disabled={!canRun || !agentCurrent || !alternative} onClick={() => run('agent', alternative)}>{t("Compare Prepared Agent")}</button><span className="help">{t("Optional paid comparison on identical source and dataset. Changing variant needs new review evidence.")}</span></div>}
         </section><ReferenceTabs key={exercise.id} exercise={exercise} dataset={dataset} /></div>
         {(active === '02-document-classification' || active === '03-independent-tie-out') && <DocumentPreviews dataset={dataset} />}
-        <section className="panel results-panel" ref={resultsRef} tabIndex={-1} aria-labelledby="results-heading"><div className="panel-heading"><h2 id="results-heading">{t("Results")}</h2><div className="result-tabs" aria-label={t("Result views")}><button aria-pressed={resultTab === 'fixtures'} onClick={() => setResultTab('fixtures')}>{t("Fixture tests")}</button><button aria-pressed={resultTab === 'agent'} onClick={() => setResultTab('agent')}>{t("Agent run")}</button></div></div><RunResults run={currentRun} dataset={dataset} current={resultTab === 'fixtures' ? fixtureCurrent : agentCurrent} />{currentRun && !runActive(currentRun) && currentRun.rows.length > 0 && ['failed', 'not_requested'].includes(currentRun.telemetryStatus) && <button disabled={busy} onClick={() => void retryRecording(currentRun)}>{t("Retry Phoenix recording · no inference")}</button>}</section>
+        <section className="panel results-panel" ref={resultsRef} tabIndex={-1} aria-labelledby="results-heading"><div className="panel-heading"><h2 id="results-heading">{t("Results")}</h2>{!isSpec && <div className="result-tabs" aria-label={t("Result views")}><button aria-pressed={resultTab === 'fixtures'} onClick={() => setResultTab('fixtures')}>{t("Fixture tests")}</button><button aria-pressed={resultTab === 'agent'} onClick={() => setResultTab('agent')}>{t("Agent run")}</button></div>}</div>{isSpec && current ? <SpecComparisonResults attempt={work.comparison} baseline={work.baseline} candidate={work.candidate} dataset={dataset} current={current} codeHash={hash} status={status} retryRecording={record => void retryRecording(record)} busy={busy} /> : <RunResults run={currentRun} dataset={dataset} current={resultTab === 'fixtures' ? fixtureCurrent : agentCurrent} />}{!isSpec && currentRun && !runActive(currentRun) && currentRun.rows.length > 0 && ['failed', 'not_requested'].includes(currentRun.telemetryStatus) && <button disabled={busy} onClick={() => void retryRecording(currentRun)}>{t("Retry Phoenix recording · no inference")}</button>}</section>
         {!exercise.readOnly && <section className="panel review-panel" aria-labelledby="review-heading"><div className="panel-heading"><div><p className="eyebrow">{t("REVIEW YOUR WORK")}</p><h2 id="review-heading">{t("DOUBLE CHECK")}</h2></div><span className="mode mode-judge">{t("Uses review tokens")}</span></div><p>{t("A separate educational review reads your evaluator, rubric and results. It never executes your source. Its feedback is fallible and does not grant human approval.")}</p><p className="help">{t("Source")}{' '}{hash?.slice(0, 10) ?? t("hashing…")} {t("· rubric")}{' '}{exercise.rubricVersion} {t("· fixture")}{' '}{work.fixtureRunId ?? t("missing")} {t("· agent")}{' '}{work.agentRunId ?? t("missing")}</p>
           {missingReview && <p className="review-prerequisite">{t(missingReview)}</p>}
           <div className="action-buttons"><button className="primary" disabled={!canReview} onClick={review}>{work.review?.status === 'failed' || work.review?.status === 'inconclusive' ? t("Retry Review") : work.review ? t("Review Again") : t("DOUBLE CHECK")}</button>{work.review?.status === 'needs_changes' && <button disabled={busy} onClick={() => editorRef.current?.focus()}>{t("Edit evaluator")}</button>}</div><p className="help">{t("Explicit retries may use more tokens. Prior attempts stay inspectable; repeated retries do not guarantee correctness.")}</p>
@@ -357,7 +402,7 @@ export function App() {
         }).catch(problem => setError(errorText(problem)))}>{t("Inspect")}{' '}{t(receipt.kind)} {receipt.id}</button>)}</details>}
         {work.history.length > 0 && <details className="previous-attempts"><summary>{t("Previous attempts (")}{work.history.length})</summary>{work.history.map(record => 'runId' in record ? <details key={record.runId}><summary>{t("Run")}{' '}{record.runId} · {record.request.agentVariant} · {t(record.status)}</summary><RunResults run={record} dataset={dataset} current={false} /></details> : <details key={record.reviewId}><summary>{t("Review")}{' '}{record.reviewId} · {t(record.status)}</summary><ReviewFeedback review={record} current={false} jumpToRow={jumpToRow} /></details>)}</details>}
         {reviewed === 6 && <div className="notice success">{t("All six current cases reviewed.")}{' '}{tutorial.exercises.filter(e => !e.readOnly).every(e => works[e.id]?.agent?.telemetryStatus === 'recorded' && works[e.id]?.agent?.phoenix?.experimentUrl) && works.intro?.agent?.telemetryStatus === 'recorded' ? t("Inspect the actual Phoenix evidence to finish the workshop.") : t("Phoenix evidence is still incomplete; the full demonstration is not complete.")}</div>}
-        <footer className="lesson-footer">{index > 0 && <a href={`#${LESSON_IDS[index - 1]}`}>← {t(LESSON_LABELS[index - 1]!)}</a>}{index < 6 && <a className="next-lesson" href={`#${LESSON_IDS[index + 1]}`}>{t("Next:")}{' '}{t(LESSON_LABELS[index + 1]!)} →</a>}</footer>
+        <footer className="lesson-footer">{index > 0 && <a href={`#${LESSON_IDS[index - 1]}`}>← {t(LESSON_LABELS[index - 1]!)}</a>}{index < LESSON_IDS.length - 1 && <a className="next-lesson" href={`#${LESSON_IDS[index + 1]}`}>{t("Next:")}{' '}{t(LESSON_LABELS[index + 1]!)} →</a>}</footer>
       </main>
     </div>
     {preferencesDialog}

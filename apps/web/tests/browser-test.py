@@ -1,7 +1,7 @@
 """Production-build browser rehearsal with synthetic, schema-checked v1 API data.
 Run Vite preview at 127.0.0.1:4173 first. No real inference or Phoenix recording.
 """
-import copy, hashlib, json, re, subprocess, time
+import copy, hashlib, json, re, subprocess, sys, time
 from pathlib import Path
 from uuid import uuid4
 from playwright.sync_api import sync_playwright, expect
@@ -12,6 +12,18 @@ PROVENANCE = revision(ROOT)
 ARTIFACTS = new_artifact_directory(ROOT)
 MOCK = json.loads(subprocess.check_output(['node', '--import', 'tsx', 'apps/web/tests/mock-data.ts'], cwd=ROOT))
 checks = []
+
+
+def record_failure(error_type, error, traceback):
+    report = {**PROVENANCE, 'mockOnly': True, 'status': 'failed', 'sandboxRequired': True,
+              'checks': checks, 'failureType': error_type.__name__, 'reason': str(error),
+              'liveProviderCalls': 0, 'livePhoenixArtifacts': 0}
+    destination = write_report(ARTIFACTS, report)
+    print(f'Browser rehearsal failed. Evidence: {destination}', file=sys.stderr)
+    sys.__excepthook__(error_type, error, traceback)
+
+
+sys.excepthook = record_failure
 
 class Backend:
     def __init__(self):
@@ -79,6 +91,47 @@ class Backend:
             return fulfill(data)
         return fulfill({'error':{'code':'not_found','message':'Synthetic route missing','retryable':False}},404)
 
+
+class GuidedBackend(Backend):
+    """Complete synthetic requirement receipts for comparison recovery checks."""
+    def __init__(self):
+        super().__init__()
+        self.baseline_outcome = 'completed'
+        self.reject_candidate = False
+        self.dataset = copy.deepcopy(MOCK['dataset'])
+        self.dataset['datasetId'] = 'mock-07-spec-regression'
+        self.dataset['examples'] = [dict(copy.deepcopy(self.dataset['examples'][0]), id=f'guided-example-{index}') for index in range(1, 4)]
+
+    def route(self, route):
+        path = route.request.url.split('/api/', 1)[1]
+        body = json.loads(route.request.post_data or '{}')
+        if path == 'tutorial':
+            tutorial = copy.deepcopy(MOCK['tutorial'])
+            tutorial['exercises'][7]['criteria'] = [{'id': f'R{index}', 'description': f'Synthetic requirement {index}.', 'mode': 'Code'} for index in range(1, 7)]
+            return route.fulfill(content_type='application/json', body=json.dumps(tutorial))
+        if path == 'exercises/07-spec-regression/dataset':
+            return route.fulfill(content_type='application/json', body=json.dumps(self.dataset))
+        if path == 'runs' and body.get('agentVariant') == 'omit-fees' and self.reject_candidate:
+            self.posts.append((path, body))
+            return route.fulfill(status=503, content_type='application/json', body=json.dumps({'error': {'code': 'runtime_error', 'message': 'Synthetic definite candidate rejection', 'retryable': True}}))
+        existing = set(self.runs)
+        result = super().route(route)
+        for run_id in self.runs.keys() - existing:
+            run = self.runs[run_id]
+            variant = run['request']['agentVariant']
+            run['provenance'].update(agentSourceHash='e' * 64, promptHash=('b' if variant == 'baseline' else 'c') * 64)
+            run['totalRows'] = run['completedRows'] = 3
+            run['rows'] = []
+            for example in self.dataset['examples']:
+                criteria = [{'criterionId': f'R{index}', 'label': 'fail' if variant == 'omit-fees' and index == 3 else 'pass', 'score': 0 if variant == 'omit-fees' and index == 3 else 1, 'explanation': f'Synthetic requirement R{index} evidence.'} for index in range(1, 7)]
+                run['rows'].append({'exampleId': example['id'], 'status': 'completed', 'output': {'synthetic': True}, 'evaluation': {'label': 'pass' if variant == 'baseline' else 'fail', 'score': 1 if variant == 'baseline' else 0, 'explanation': 'Synthetic guided comparison evidence.', 'criteria': criteria}})
+            if variant == 'baseline' and self.baseline_outcome == 'failed':
+                run.update(status='failed', rows=[], completedRows=0, error={'code': 'runtime_error', 'message': 'Synthetic failed baseline', 'retryable': True})
+            elif variant == 'baseline' and self.baseline_outcome in ['partial', 'incomplete']:
+                run['rows'].pop(); run['completedRows'] = 2
+                if self.baseline_outcome == 'partial': run['status'] = 'partial'
+        return result
+
 def record(name): checks.append({'check':name,'result':'passed','evidence':'synthetic production-build UI; no live inference'})
 
 
@@ -145,6 +198,101 @@ def select_lesson(page, exercise_id):
     page.locator(f'nav a[href="#{exercise_id}"]').click()
 
 
+def guided_recovery_checks(browser, errors):
+    post_count = 0
+    def open_guided():
+        context = browser.new_context(viewport={'width':1440,'height':1000}, reduced_motion='reduce')
+        page = context.new_page(); backend = GuidedBackend()
+        page.on('pageerror', lambda error: errors.append(str(error)))
+        page.route('**/api/**', backend.route)
+        page.goto('http://127.0.0.1:4173/#07-spec-regression')
+        expect(page.get_by_role('button', name='Run baseline · 3 cases', exact=True)).to_be_enabled()
+        return context, page, backend
+
+    for outcome in ['cancelled', 'failed', 'partial', 'incomplete']:
+        context, page, backend = open_guided()
+        backend.baseline_outcome = outcome
+        backend.hold = outcome == 'cancelled'
+        page.get_by_role('button', name='Run baseline · 3 cases', exact=True).click()
+        if outcome == 'cancelled':
+            expect(page.get_by_role('button', name='Cancel', exact=True)).to_be_enabled()
+            page.get_by_role('button', name='Cancel', exact=True).click()
+        expect(page.get_by_role('button', name='Start new baseline attempt', exact=True)).to_be_enabled()
+        expect(page.get_by_role('button', name='Run omit-fees · 3 cases', exact=True)).to_be_disabled()
+        assert not any(body.get('agentVariant') == 'omit-fees' for path, body in backend.posts if path == 'runs')
+        post_count += len(backend.posts); context.close()
+    record('Cancelled, failed, partial and incomplete baselines keep the paid candidate disabled and allow a new baseline attempt')
+
+    context, page, backend = open_guided()
+    page.get_by_role('button', name='Run baseline · 3 cases', exact=True).click()
+    candidate = page.get_by_role('button', name='Run omit-fees · 3 cases', exact=True)
+    expect(candidate).to_be_enabled()
+    baseline_id = next(iter(backend.runs))
+    backend.reject_candidate = True; candidate.click()
+    expect(page.get_by_role('alert')).to_contain_text('runtime_error: Synthetic definite candidate rejection')
+    expect(candidate).to_be_enabled()
+    rejected_id = backend.posts[-1][1]['requestId']
+    backend.reject_candidate = False; candidate.click()
+    expect(page.get_by_text('Regression: pass → fail', exact=True)).to_have_count(3)
+    assert backend.posts[-1][1]['requestId'] != rejected_id
+    assert list(backend.runs)[0] == baseline_id and len(backend.runs) == 2
+    results = page.get_by_role('region', name='Requirement-linked comparison results')
+    results.get_by_text('R3 · pass → fail', exact=True).first.click()
+    results.get_by_role('link', name='Read requirement R3', exact=True).first.click()
+    assert page.url.endswith('#07-spec-regression')
+    for width in [1440,1024,390,320]:
+        page.set_viewport_size({'width':width,'height':1000})
+        assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), width
+        if width in [1440,390]:
+            page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
+            page.screenshot(path=str(ARTIFACTS/f'guided-comparison-{width}-ui-mock.png'),full_page=True)
+    before = len(backend.posts); page.reload()
+    expect(page.get_by_text('Regression: pass → fail', exact=True)).to_have_count(3)
+    assert len(backend.posts) == before
+    post_count += len(backend.posts); context.close()
+    record('Definite candidate rejection preserves the completed baseline, permits explicit retry, and restores the finished comparison by GET only')
+    record('Completed comparison exposes requirement links and fits 1440/1024/390/320 widths without document overflow')
+
+    context, page, backend = open_guided()
+    page.get_by_role('button', name='Run baseline · 3 cases', exact=True).click()
+    candidate = page.get_by_role('button', name='Run omit-fees · 3 cases', exact=True)
+    expect(candidate).to_be_enabled()
+    backend.drop_submission = True; candidate.click()
+    expect(page.get_by_role('button', name='Recover submission', exact=True)).to_be_visible()
+    original_id = backend.posts[-1][1]['requestId']
+    page.get_by_role('button', name='Recover submission', exact=True).click()
+    expect(page.get_by_text('Regression: pass → fail', exact=True)).to_have_count(3)
+    assert backend.posts[-1][1]['requestId'] == original_id and len(backend.runs) == 2
+    post_count += len(backend.posts); context.close()
+    record('Unknown candidate submission outcome retains same-ID recovery and never duplicates the accepted run')
+
+    for missing_variant in ['baseline', 'omit-fees']:
+        context, page, backend = open_guided()
+        backend.hold = missing_variant == 'baseline'
+        page.get_by_role('button', name='Run baseline · 3 cases', exact=True).click()
+        if missing_variant == 'omit-fees':
+            candidate = page.get_by_role('button', name='Run omit-fees · 3 cases', exact=True)
+            expect(candidate).to_be_enabled(); backend.hold = True; candidate.click()
+        expect(page.get_by_role('button', name='Cancel', exact=True)).to_be_enabled()
+        expect(page.locator('.comparison-receipt').nth(0 if missing_variant == 'baseline' else 1).locator('.state-pill')).to_have_text('running')
+        lost_id = next(reversed(backend.runs)); backend.runs.pop(lost_id)
+        before = len(backend.posts)
+        expect(page.get_by_text('The backend no longer has this accepted operation.', exact=False)).to_be_visible()
+        expect(page.get_by_role('button', name='Start new baseline attempt', exact=True)).to_be_enabled()
+        expect(page.get_by_role('button', name='Reset Tutorial', exact=True)).to_be_enabled()
+        saved = page.evaluate("JSON.parse(localStorage.getItem('evals-tutorial:ui-mock-v1:07-spec-regression:1'))")
+        assert saved.get('agentRunId') != lost_id
+        assert saved.get('comparison', {}).get('baselineRunId') != lost_id
+        assert saved.get('comparison', {}).get('candidateRunId') != lost_id
+        page.reload()
+        expect(page.get_by_role('button', name='Start new baseline attempt', exact=True)).to_be_enabled()
+        expect(page.get_by_role('button', name='Reset Tutorial', exact=True)).to_be_enabled()
+        assert len(backend.posts) == before
+        post_count += len(backend.posts); context.close()
+    record('Missing accepted baseline and candidate receipts clear all matching aliases and unlock new attempts without another POST')
+    return post_count
+
+
 with sync_playwright() as p:
     browser=launch_browser(p, ARTIFACTS, PROVENANCE)
     context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce',permissions=['clipboard-read','clipboard-write'])
@@ -153,10 +301,23 @@ with sync_playwright() as p:
     page.route('**/api/**',backend.route)
     page.goto('http://127.0.0.1:4173/')
     expect(page.get_by_role('heading',name='Introduction',exact=True)).to_be_visible()
-    assert page.get_by_role('navigation',name='Tutorial lessons').get_by_role('link').count()==7
+    assert page.get_by_role('navigation',name='Tutorial lessons').get_by_role('link').count()==8
     expect(editor_for(page, 'Read-only TypeScript evaluator')).to_have_attribute('aria-readonly','true')
     for e in MOCK['tutorial']['exercises']: select_lesson(page, e['id'])
-    assert not backend.posts; record('Seven destinations; read-only intro; navigation causes zero POSTs')
+    assert not backend.posts; record('Eight destinations; read-only intro; navigation causes zero POSTs')
+    guided_editor = editor_for(page, 'Read-only TypeScript evaluator')
+    expect(guided_editor).to_have_attribute('aria-readonly', 'true')
+    guided_editor.focus(); guided_editor.press('End'); page.keyboard.insert_text('// must not edit')
+    expect_source(guided_editor, MOCK['tutorial']['exercises'][7]['starterSource'])
+    expect(page.get_by_role('heading', name='2. Inspect the prepared derivation', exact=True)).to_be_visible()
+    expect(page.get_by_role('region', name='Requirement to evaluator mapping').locator('tbody tr')).to_have_count(6)
+    expect(page.get_by_role('button', name='Run baseline · 3 cases', exact=True)).to_be_enabled()
+    expect(page.get_by_role('button', name='Run omit-fees · 3 cases', exact=True)).to_be_disabled()
+    expect(page.get_by_role('button', name='Validate', exact=True)).to_have_count(0)
+    expect(page.get_by_role('button', name='Reset Exercise', exact=True)).to_have_count(0)
+    expect(page.get_by_role('heading', name='DOUBLE CHECK', exact=True)).to_have_count(0)
+    assert not backend.posts
+    record('Final guided example keeps fixed source read-only, exposes six requirements, gates candidate on baseline, and causes no automatic runs')
     # Locale is independent from work/progress; switching never issues a POST.
     before=len(backend.posts)
     set_language(page, 'es')
@@ -210,57 +371,59 @@ with sync_playwright() as p:
     expect(page.get_by_role('button',name='TYPE_ERROR · line 2, column 3')).to_be_visible()
     assert not any(path=='runs' for path,_ in backend.posts);record('Syntax/type positions focus source; validation causes no run')
     replace_source(editor, MOCK['fixtures']['request']['snapshot']['source']);page.get_by_role('button',name='Validate',exact=True).click()
-    expect(page.get_by_text('✓ Validated current source')).to_be_visible()
+    expect(page.get_by_role('status').get_by_text('Current source validated.', exact=True)).to_be_visible()
     page.get_by_role('button',name='Test Fixtures',exact=True).click()
     expect(page.get_by_role('cell',name='Matched',exact=True)).to_have_count(2)
     expect(page.get_by_text('fail / 0',exact=True)).to_be_visible()
     expect(page.get_by_role('button',name='Run Agent',exact=True)).to_be_enabled()
     record('Known bad response fail/0 passes fixture assertion independently')
     page.get_by_role('button',name='Run Agent',exact=True).click()
-    expect(page.get_by_text('The evaluator correctly detected the wrong label.')).to_be_visible()
+    expect(page.get_by_text('The evaluator correctly detected the wrong label.', exact=True)).to_be_visible()
     expect(page.get_by_role('button',name='DOUBLE CHECK',exact=True)).to_be_enabled()
     assert not page.get_by_role('link',name='Actual experiment').count();record('Agent criterion failure can be reviewed; absent Phoenix links stay unavailable')
     page.get_by_role('button',name='DOUBLE CHECK',exact=True).click()
-    expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
-    before=len(backend.posts); page.reload();expect(page.get_by_text('Reviewed — current version',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Reviewed — current version',exact=True)).to_be_visible()
+    before=len(backend.posts); page.reload();expect(page.locator('.review-panel').get_by_text('Reviewed — current version',exact=True)).to_be_visible()
     assert len(backend.posts)==before;record('Current bound review restores by GET after refresh; no duplicate paid request')
     old_source=editor_source(editor); old_receipts=copy.deepcopy(backend.reviews)
     before=len(backend.posts)
     set_language(page, 'es')
     expect_source(editor_for(page, 'Evaluador TypeScript editable'), old_source)
-    expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
-    expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
-    expect(page.get_by_text('Idioma solicitado para los comentarios: Inglés.',exact=False)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Idioma solicitado para los comentarios: Inglés.',exact=False)).to_be_visible()
     assert backend.reviews==old_receipts and len(backend.posts)==before
     page.reload()
-    expect(page.get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Revisado — versión actual',exact=True)).to_be_visible()
     expect_source(editor_for(page, 'Evaluador TypeScript editable'), old_source)
     assert len(backend.posts)==before
     # Only the explicit new review captures Spanish; its English mock feedback remains honest.
+    page.get_by_role('button',name='Validar',exact=True).click()
+    expect(page.get_by_role('button',name='Revisar de nuevo',exact=True)).to_be_enabled()
     page.get_by_role('button',name='Revisar de nuevo',exact=True).click()
-    expect(page.get_by_text('Idioma solicitado para los comentarios: Español.',exact=False)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Idioma solicitado para los comentarios: Español.',exact=False)).to_be_visible()
     assert backend.posts[-1][0]=='reviews' and backend.posts[-1][1]['feedbackLocale']=='es'
-    expect(page.get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Synthetic review: the known mistake was distinguished.',exact=True)).to_be_visible()
     set_language(page, 'en')
     expect_source(editor, old_source)
     record('Language switch preserves source, validation, run evidence, progress and original feedback; only explicit review requests capture locale')
 
     replace_source(editor, MOCK['fixtures']['request']['snapshot']['source']+'// new version')
-    expect(page.get_by_text('Previous review is stale',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Previous review is stale',exact=True)).to_be_visible()
     expect(page.get_by_role('button',name='Review Again',exact=True)).to_be_disabled();record('Edit immediately invalidates review and evidence')
     # Source copy retained; current receipts re-created before retry scenarios.
-    page.get_by_role('button',name='Validate',exact=True).click();expect(page.get_by_text('✓ Validated current source')).to_be_visible()
+    page.get_by_role('button',name='Validate',exact=True).click();expect(page.get_by_role('status').get_by_text('Current source validated.', exact=True)).to_be_visible()
     page.get_by_role('button',name='Test Fixtures',exact=True).click();expect(page.get_by_role('button',name='Run Agent',exact=True)).to_be_enabled()
     page.get_by_role('button',name='Run Agent',exact=True).click();expect(page.get_by_role('button',name='Review Again',exact=True)).to_be_enabled()
     backend.review_outcome='failed';page.get_by_role('button',name='Review Again',exact=True).click()
-    expect(page.get_by_text('Review unavailable',exact=True)).to_be_visible();expect(page.get_by_role('button',name='Retry Review',exact=True)).to_be_enabled()
+    expect(page.locator('.review-panel').get_by_text('Review unavailable',exact=True)).to_be_visible();expect(page.get_by_role('button',name='Retry Review',exact=True)).to_be_enabled()
     backend.review_outcome='needs_changes';page.get_by_role('button',name='Retry Review',exact=True).click()
-    expect(page.get_by_text('Needs revision',exact=True)).to_be_visible();expect(page.get_by_text('Edit the label comparison and retest.')).to_be_visible()
-    backend.review_outcome='inconclusive';page.get_by_role('button',name='Review Again',exact=True).click();expect(page.get_by_text('Review inconclusive',exact=True)).to_be_visible()
+    expect(page.locator('.review-panel').get_by_text('Needs revision',exact=True)).to_be_visible();expect(page.locator('.review-panel').get_by_text('Edit the label comparison and retest.')).to_be_visible()
+    backend.review_outcome='inconclusive';page.get_by_role('button',name='Review Again',exact=True).click();expect(page.locator('.review-panel').get_by_text('Review inconclusive',exact=True)).to_be_visible()
     record('Review operational retry, specific criterion/row feedback, and inconclusive status')
     backend.hold=True;page.get_by_role('button',name='Retry Review',exact=True).click()
     expect(page.get_by_role('button',name='Cancel Review',exact=True)).to_be_enabled()
-    page.get_by_role('button',name='Cancel Review',exact=True).click();expect(page.get_by_text('Review cancelled',exact=True)).to_be_visible()
+    page.get_by_role('button',name='Cancel Review',exact=True).click();expect(page.locator('.review-panel').get_by_text('Review cancelled',exact=True)).to_be_visible()
     backend.hold=False;record('Review cancellation retains a cancelled receipt and never grants completion')
     backend.hold=True;page.get_by_role('button',name='Test Fixtures',exact=True).click()
     expect(page.get_by_role('button',name='Cancel',exact=True)).to_be_enabled()
@@ -325,13 +488,22 @@ with sync_playwright() as p:
     expect(old_page.get_by_text('Saved work belongs to an older version.',exact=True)).to_be_visible()
     expect_source(editor_for(old_page), MOCK['fixtures']['request']['snapshot']['source'])
     old_context.close();record('Changed content version retains inspectable old source without inheriting progress')
-    # Use the actual credential-free lesson corpus for all seven localized descriptions.
+    # Use the actual credential-free lesson corpus for all eight localized descriptions.
     actual=json.loads((ROOT/'content/tutorial.json').read_text())
+    actual_documents=json.loads((ROOT/'content/documents/tax-demo-v1/manifest.json').read_text())['documents']
     actual_context=browser.new_context(viewport={'width':390,'height':900},locale='es-AR',permissions=['clipboard-read','clipboard-write'])
     actual_page=actual_context.new_page()
     def actual_route(route):
-        if route.request.url.endswith('/api/tutorial'):
+        path = route.request.url.split('/api/', 1)[1]
+        if path == 'tutorial':
             route.fulfill(content_type='application/json',body=json.dumps(actual))
+        elif path.startswith('exercises/') and path.endswith('/dataset'):
+            exercise = next(exercise for exercise in actual['exercises'] if exercise['id'] == path.split('/')[1])
+            dataset_path = ROOT/'content/datasets'/exercise['datasetId']/f"{exercise['datasetVersion']}.json"
+            route.fulfill(content_type='application/json', body=dataset_path.read_text())
+        elif path.startswith('documents/'):
+            document = next(document for document in actual_documents if document['id'] == path.split('/')[1])
+            route.fulfill(content_type=document['mimeType'], body=(ROOT/'content'/document['path']).read_bytes())
         else: backend.route(route)
     actual_page.route('**/api/**',actual_route)
     before=len(backend.posts)
@@ -342,10 +514,26 @@ with sync_playwright() as p:
         select_lesson(actual_page, exercise['id'])
         expect(actual_page.get_by_role('heading',name=translations[exercise['id']]['title'],exact=True)).to_be_visible()
         expect_source(editor_for(actual_page, 'Evaluador TypeScript de solo lectura' if exercise['readOnly'] else 'Evaluador TypeScript editable'), exercise['starterSource'])
+        expect(actual_page.locator('#dataset-panel').get_by_role('tree')).to_be_visible()
+        expect(actual_page.get_by_role('alert')).to_have_count(0)
         assert actual_page.evaluate('document.documentElement.scrollWidth <= window.innerWidth')
+    for locale in ['es', 'en']:
+        set_language(actual_page, locale)
+        for width in [1440,1024,390,320]:
+            actual_page.set_viewport_size({'width':width,'height':1000})
+            actual_page.reload()
+            expect(actual_page.get_by_role('heading', name=translations['07-spec-regression']['title'] if locale == 'es' else actual['exercises'][7]['title'], exact=True)).to_be_visible()
+            expect(editor_for(actual_page, 'Evaluador TypeScript de solo lectura' if locale == 'es' else 'Read-only TypeScript evaluator')).to_have_attribute('aria-readonly', 'true')
+            expect(actual_page.locator('#dataset-panel').get_by_role('tree')).to_be_visible()
+            expect(actual_page.get_by_role('alert')).to_have_count(0)
+            assert actual_page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), (locale, width)
+            if width in [1440,390]:
+                actual_page.evaluate('window.scrollTo(0,0); document.activeElement.blur()')
+                actual_page.screenshot(path=str(ARTIFACTS/f'guided-{locale}-{width}-ui-mock.png'),full_page=True)
     assert len(backend.posts)==before
     actual_context.close()
-    record('Spanish browser preference selects all seven actual translated lessons with unchanged starter code and zero POSTs')
+    record('Spanish browser preference selects all eight actual translated lessons with unchanged starter code and zero POSTs')
+    record('Final guided example fits English and Spanish 1440/1024/390/320 layouts with fixed source and zero POSTs')
 
     blocked_context=browser.new_context(viewport={'width':390,'height':900},permissions=['clipboard-read','clipboard-write'])
     blocked_page=blocked_context.new_page();blocked_page.route('**/api/**',backend.route)
@@ -355,9 +543,10 @@ with sync_playwright() as p:
     expect(blocked_page.get_by_text('Edits are not saved in this browser.',exact=False)).to_be_visible()
     expect_source(editor_for(blocked_page), 'retained in-memory work')
     blocked_context.close();record('Storage failure stays visible and preserves in-memory edits with copy control')
+    guided_posts = guided_recovery_checks(browser, errors)
     assert not errors,errors
     record('Production bundle runs without browser page errors')
-    report={**PROVENANCE,'mockOnly':True,'status':'passed','sandboxRequired':True,'browser':browser.version,'checks':checks,'postCount':len(backend.posts),'liveProviderCalls':0,'livePhoenixArtifacts':0}
+    report={**PROVENANCE,'mockOnly':True,'status':'passed','sandboxRequired':True,'browser':browser.version,'checks':checks,'postCount':len(backend.posts)+guided_posts,'liveProviderCalls':0,'livePhoenixArtifacts':0}
     write_report(ARTIFACTS, report)
     print(json.dumps(report,indent=2))
     browser.close()

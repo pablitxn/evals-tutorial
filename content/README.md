@@ -1,9 +1,10 @@
 # Original synthetic workshop content
 
-The served view is `tutorial.json`: one read-only introduction and exactly six
-TypeScript evaluator exercises, with immutable dataset JSON and read-only Python
-consultation. The corpus supplies 60 response fixtures: one intro fixture plus
-the curriculum's 59 practical fixtures. All content is original project-authored
+The served view is `tutorial.json`: one read-only introduction, six editable
+TypeScript evaluator exercises and a final read-only specification-driven
+regression example, with immutable dataset JSON and read-only Python consultation.
+The corpus supplies 65 response fixtures: the original 60 plus five explicit
+author fixtures for the guided example. All content is original project-authored
 training material; no downloaded dataset, corporate image or personal identifier.
 The project has not selected a source license; no new legal grant is invented here.
 
@@ -17,12 +18,12 @@ Authoring provenance and separate ground truth stay outside model requests.
 From the repository root, using existing pinned npm dependencies:
 
 ```sh
-node --import tsx --test content/authoring/content.test.ts
+node --import tsx --test content/authoring/*.test.ts
 ```
 
 The tests load the actual content through the frozen ContentService, validate
 all envelopes/domain schemas and hashes, independently check source amounts,
-recompute wage/withholding ties, grade all 50 deterministic fixtures, verify three
+recompute wage/withholding ties, grade all 55 deterministic fixtures, verify three
 policy evidence failures, preserve seven semantic judge fixtures as unverified,
 and reject tampered content. They never execute submitted learner code or make
 provider calls. Wrong semantic responses are schema-valid on purpose; malformed
@@ -43,16 +44,30 @@ Both build and finalization are required: finalization uses the frozen contracts
 RFC 8785 `datasetHash`, not an independently maintained canonicalizer. Modified
 content requires a new author-created version; do not overwrite a released dataset.
 
-The TypeScript intro is complete; each practical starter contains specific TODOs
-and throws until completed. Fixture pass means evaluator discrimination, not
+The TypeScript intro and final guided evaluator are complete; each editable
+practical starter contains specific TODOs and throws until completed. Fixture pass means evaluator discrimination, not
 agent quality. Policy quality requires a fallible bounded response judge; final
 DOUBLE CHECK is a separate nonexecuting review of evaluator code and recorded
 results. No transmission or booking capability exists in this content.
 
-`pythonSource` currently embeds the genuine reference-exclusion boundary helper
-also saved as `agent_consultation.py`. It explicitly identifies its limited scope.
-ET-WP-05/ET-INTEGRATOR must replace the served consultation text with the actual
-prepared MAF agent source at integration. The source is not represented as a
-working model call. `baseline` is the requested installed variant ID for all cases;
-agent instructions and schemas are supplied beside each lesson. No new runtime
-package, service export, root command or shared schema change is required.
+The served `pythonSource` is verified against `consultation-sources.json` and the
+installed prepared runtime. It shows the actual Microsoft Agent Framework call
+and installed prompts. The final example also stores that complete consultation
+in `exercises/07-spec-regression/agent_consultation.py`; the original authoring
+boundary helpers remain preserved beside the original seven entries.
+
+To rebuild only the final example without regenerating documents or the original
+seven exercises, run:
+
+```sh
+python3 content/authoring/build-spec-regression.py
+node --import tsx content/authoring/finalize.ts
+```
+
+The main `build.py` invokes this same append step. It reuses case 06's three
+domain schemas, publishes a schema-only Python projection, and refreshes the
+consultation source hashes. The one three-case dataset is unchanged between
+`baseline` and `omit-fees`; both variants invoke the existing real provider
+runtime. The latter prompt deliberately ignores mandatory fees in totals and
+eligibility. Dataset references, metadata, explicit fixtures and offline tests
+are authored teaching material; they are never provider results or agent inputs.

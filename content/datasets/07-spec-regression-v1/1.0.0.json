@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetId": "07-spec-regression-v1",
+  "datasetVersion": "1.0.0",
+  "examples": [
+    {
+      "id": "spec-routine",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 40000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-ROUTINE",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 28000,
+            "feesCents": 3000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [
+          "FL-ROUTINE"
+        ],
+        "totalsCents": {
+          "FL-ROUTINE": 31000
+        },
+        "status": "recommendation"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0",
+        "title": "Routine trip within budget",
+        "requirementIds": [
+          "R1",
+          "R2",
+          "R3",
+          "R4",
+          "R5",
+          "R6"
+        ],
+        "expectedByRequirement": {
+          "R1": "Recommend one supplied option on route AAA to BBB, or return justified no_options.",
+          "R2": "Use 2027-03-10 outbound and 2027-03-13 return for any recommendation.",
+          "R3": "Currency USD; full totals in cents: FL-ROUTINE=31000.",
+          "R4": "Any recommended full total must be <= 40000 cents.",
+          "R5": "Eligible IDs: FL-ROUTINE; require recommendation with a complete itinerary.",
+          "R6": "simulated=true; booked=false."
+        }
+      },
+      "fixtures": [
+        {
+          "id": "spec-routine-good",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-ROUTINE",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 31000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "R3",
+              "spec-routine"
+            ]
+          },
+          "rationale": "Author-created semantic fixture satisfying R1-R6; not a provider run."
+        }
+      ]
+    },
+    {
+      "id": "spec-fare-choice",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 32000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-AFFORDABLE",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 27000,
+            "feesCents": 3000,
+            "currency": "USD"
+          },
+          {
+            "id": "FL-HIGH-FEES",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 24000,
+            "feesCents": 12000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [
+          "FL-AFFORDABLE"
+        ],
+        "totalsCents": {
+          "FL-AFFORDABLE": 30000,
+          "FL-HIGH-FEES": 36000
+        },
+        "status": "recommendation"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0",
+        "title": "Affordable fare versus high mandatory fees",
+        "requirementIds": [
+          "R1",
+          "R2",
+          "R3",
+          "R4",
+          "R5",
+          "R6"
+        ],
+        "expectedByRequirement": {
+          "R1": "Recommend one supplied option on route AAA to BBB, or return justified no_options.",
+          "R2": "Use 2027-03-10 outbound and 2027-03-13 return for any recommendation.",
+          "R3": "Currency USD; full totals in cents: FL-AFFORDABLE=30000, FL-HIGH-FEES=36000.",
+          "R4": "Any recommended full total must be <= 32000 cents.",
+          "R5": "Eligible IDs: FL-AFFORDABLE; require recommendation with a complete itinerary.",
+          "R6": "simulated=true; booked=false."
+        }
+      },
+      "fixtures": [
+        {
+          "id": "spec-fare-choice-good",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-AFFORDABLE",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 30000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "R3",
+              "spec-fare-choice"
+            ]
+          },
+          "rationale": "Author-created semantic fixture satisfying R1-R6; not a provider run."
+        },
+        {
+          "id": "spec-fare-choice-omitted-fees",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-HIGH-FEES",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 24000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "R3",
+              "spec-fare-choice"
+            ]
+          },
+          "rationale": "Author-created fee omission fixture; hidden mandatory fees exceed the budget. Not a provider run."
+        }
+      ]
+    },
+    {
+      "id": "spec-no-affordable",
+      "input": {
+        "origin": "AAA",
+        "destination": "BBB",
+        "departDate": "2027-03-10",
+        "returnDate": "2027-03-13",
+        "budgetCents": 30000,
+        "currency": "USD",
+        "options": [
+          {
+            "id": "FL-OVER-BUDGET",
+            "origin": "AAA",
+            "destination": "BBB",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "fareCents": 28000,
+            "feesCents": 7000,
+            "currency": "USD"
+          }
+        ]
+      },
+      "expected": {
+        "eligibleOptionIds": [],
+        "totalsCents": {
+          "FL-OVER-BUDGET": 35000
+        },
+        "status": "no_options"
+      },
+      "metadata": {
+        "synthetic": true,
+        "referenceAuthor": "Project-authored before inference",
+        "fixtureVersion": "1.0.0",
+        "title": "No affordable option",
+        "requirementIds": [
+          "R1",
+          "R2",
+          "R3",
+          "R4",
+          "R5",
+          "R6"
+        ],
+        "expectedByRequirement": {
+          "R1": "Recommend one supplied option on route AAA to BBB, or return justified no_options.",
+          "R2": "Use 2027-03-10 outbound and 2027-03-13 return for any recommendation.",
+          "R3": "Currency USD; full totals in cents: FL-OVER-BUDGET=35000.",
+          "R4": "Any recommended full total must be <= 30000 cents.",
+          "R5": "Eligible IDs: none; require no_options with four null itinerary fields.",
+          "R6": "simulated=true; booked=false."
+        }
+      },
+      "fixtures": [
+        {
+          "id": "spec-no-affordable-good",
+          "output": {
+            "status": "no_options",
+            "optionId": null,
+            "departDate": null,
+            "returnDate": null,
+            "totalCents": null,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "pass"
+            ],
+            "minScore": 1,
+            "maxScore": 1,
+            "requiredEvidence": [
+              "R5",
+              "spec-no-affordable"
+            ]
+          },
+          "rationale": "Author-created semantic fixture satisfying R1-R6; not a provider run."
+        },
+        {
+          "id": "spec-no-affordable-omitted-fees",
+          "output": {
+            "status": "recommendation",
+            "optionId": "FL-OVER-BUDGET",
+            "departDate": "2027-03-10",
+            "returnDate": "2027-03-13",
+            "totalCents": 28000,
+            "currency": "USD",
+            "simulated": true,
+            "booked": false
+          },
+          "expectedEvaluation": {
+            "allowedLabels": [
+              "fail"
+            ],
+            "minScore": 0,
+            "maxScore": 0,
+            "requiredEvidence": [
+              "R3",
+              "spec-no-affordable"
+            ]
+          },
+          "rationale": "Author-created fee omission fixture; hidden mandatory fees exceed the budget. Not a provider run."
+        }
+      ]
+    }
+  ],
+  "documentManifestRef": null,
+  "contentHash": "1c75453d36af82711a462a011623320f17e2af72d80a0dedb4f356fcb12a3329"
+}

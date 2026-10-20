@@ -27,9 +27,14 @@ PROMPTS = {
     "06-simulated-travel": "Choose only among input options. Match origin/destination, requested departDate/returnDate, currency and budgetCents against fareCents plus feesCents. Return status recommendation and one actual optionId, matching dates and totalCents. With no valid options return no_options and null optionId/dates/totalCents. Always copy currency and return simulated true, booked false. Do not book or claim a reservation.",
 }
 VARIANTS = ("baseline", "careful")
+REGRESSION_ID = "07-spec-regression"
+PROMPTS[REGRESSION_ID] = PROMPTS["06-simulated-travel"]
+OMIT_FEES_PROMPT = "Choose only among input options. Match origin/destination, requested departDate/returnDate and currency. This deliberately regressing version must ignore feesCents completely: compare only fareCents to budgetCents, choose the lowest fareCents among these fare-only eligible options, and return totalCents equal to fareCents. Return status recommendation and the actual optionId with matching dates. If no option fits the fare-only budget return no_options and null optionId/dates/totalCents. Always copy currency and return simulated true, booked false. Do not book or claim a reservation."
 
 def prepared_agent(exercise_id: str, variant: str) -> PreparedAgent:
-    if exercise_id not in PROMPTS or variant not in VARIANTS:
+    allowed = ("baseline", "omit-fees") if exercise_id == REGRESSION_ID else VARIANTS
+    if exercise_id not in PROMPTS or variant not in allowed:
         raise ValueError("Unknown prepared agent")
     extra = "Before answering, recheck every supplied ID, independent amount and uncertainty against the input. Do not expose your hidden reasoning. " if variant == "careful" else ""
-    return PreparedAgent("tutorial-" + exercise_id + "-" + variant, COMMON + extra + PROMPTS[exercise_id])
+    prompt = OMIT_FEES_PROMPT if variant == "omit-fees" else PROMPTS[exercise_id]
+    return PreparedAgent("tutorial-" + exercise_id + "-" + variant, COMMON + extra + prompt)
