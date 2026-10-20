@@ -14,6 +14,11 @@ export interface PythonOptions {
 export interface ProviderCall {
   role: 'judge' | 'review'; material: unknown; maxOutputTokens: number;
   deadlineEpochMs: number; signal: AbortSignal;
+  /** Host-owned correlation only; never included in model input or evaluator RPC. */
+  telemetry?: {
+    traceparent?: string; runId?: string; exampleId?: string; fixtureId?: string;
+    reviewId?: string; exerciseId?: string; fixtureRunId?: string; agentRunId?: string;
+  };
 }
 export type BrokerTransport = (call: ProviderCall) => Promise<unknown>;
 export const operation = (code: ServiceError['detail']['code'], message: string, retryable = false) => new ServiceError({ code, message, retryable });

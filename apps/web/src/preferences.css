@@ -78,7 +78,6 @@
 }
 .preferences-dialog .preferences-content > section { min-width: 0; flex: 1 0 auto; }
 .preferences-dialog h3 { margin: 0 0 10px; font-size: 25px; letter-spacing: -.04em; line-height: 1.25; }
-.preferences-dialog .preferences-description { max-width: 38ch; margin: 0 0 28px; color: var(--muted); font-size: 14px; line-height: 1.65; }
 .preferences-dialog .theme-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; border: 0; min-width: 0; }
 .preferences-dialog .theme-choices legend { margin: 0 0 12px; padding: 0; font-size: 13px; font-weight: 600; }
 .preferences-dialog .theme-choice { position: relative; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 7px; border: 1px solid var(--line); border-radius: 13px; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
@@ -122,7 +121,6 @@
   .preferences-dialog .preferences-nav svg { width: 18px; height: 18px; }
   .preferences-dialog .preferences-content { padding: 24px 18px 18px; scrollbar-gutter: auto; }
   .preferences-dialog h3 { font-size: 23px; }
-  .preferences-dialog .preferences-description { margin-bottom: 24px; }
   .preferences-dialog .theme-choices { gap: 8px; }
   .preferences-dialog .theme-choice { padding: 5px; border-radius: 10px; }
   .preferences-dialog .theme-preview { padding: 10px 7px 0; }

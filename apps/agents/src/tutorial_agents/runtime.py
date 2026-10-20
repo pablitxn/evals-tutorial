@@ -152,7 +152,7 @@ async def infer(profile, spec, material, max_tokens, deadline_ms, documents=(), 
         await client.client.close()
 
 @contextmanager
-def tracing(request):
+def tracing(request, role="agent"):
     exporters = []
     endpoint = os.environ.get("TUTORIAL_TRACE_ENDPOINT")
     if endpoint:
@@ -166,9 +166,15 @@ def tracing(request):
     carrier = {key: request[key] for key in ("traceparent", "tracestate") if key in request}
     token = context.attach(propagate.extract(carrier))
     try:
-        with trace.get_tracer("tutorial-agents").start_as_current_span("tutorial.agent") as span:
-            span.set_attribute("tutorial.run_id", request["runId"])
-            span.set_attribute("tutorial.example_id", request["exampleId"])
+        with trace.get_tracer("tutorial-agents").start_as_current_span(f"tutorial.{role}") as span:
+            span.set_attribute("tutorial.role", role)
+            for key, attribute in (
+                ("runId", "run_id"), ("exampleId", "example_id"), ("fixtureId", "fixture_id"),
+                ("reviewId", "review_id"), ("exerciseId", "exercise_id"),
+                ("fixtureRunId", "fixture_run_id"), ("agentRunId", "agent_run_id"),
+            ):
+                if key in request:
+                    span.set_attribute(f"tutorial.{attribute}", request[key])
             yield format(span.get_span_context().trace_id, "032x")
     finally:
         context.detach(token)

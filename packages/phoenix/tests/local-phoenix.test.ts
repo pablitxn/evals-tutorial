@@ -58,6 +58,25 @@ test('real local Phoenix persistence of owned synthetic contracts; zero inferenc
       assert(tasks.every((task: { trace_id: string }) => /^[a-f0-9]{32}$/.test(task.trace_id)));
       observations.fixture = { ...first, tasks };
     });
+    await t.test('criterion results and expected fixture rejections are independently readable in Phoenix', async () => {
+      const annotated = fixtureRun(dataset, `annotations-${nonce}`);
+      annotated.rows[1]!.evaluation!.criteria = [{
+        criterionId: 'R2', score: 0, label: 'fail', explanation: 'Owned synthetic required-field rejection.',
+      }];
+      const result = await observed(dataset, annotated);
+      const experiment = (await json(`/v1/experiments/${result.experimentId}`)).data;
+      assert(experiment.name.includes('intro | fixtures | synthetic-fixtures |'));
+      assert.equal(experiment.metadata.tutorial_annotation_version, 2);
+      const csv = parseCsv(await (await fetch(`${baseUrl}/v1/experiments/${result.experimentId}/csv`)).text());
+      const header = csv[0]!;
+      const rejected = csv.slice(1).find(row => row[header.indexOf('annotation_tutorial_result_label')] === 'fail')!;
+      assert.equal(Number(rejected[header.indexOf('annotation_tutorial_result_score')]), 0);
+      assert.equal(Number(rejected[header.indexOf('annotation_tutorial_criterion_R2_score')]), 0);
+      assert.equal(rejected[header.indexOf('annotation_tutorial_criterion_R2_explanation')], annotated.rows[1]!.evaluation!.criteria![0]!.explanation);
+      assert.equal(Number(rejected[header.indexOf('annotation_tutorial_fixture_match_score')]), 1);
+      assert.equal(rejected[header.indexOf('annotation_tutorial_fixture_match_label')], 'matched');
+      observations.annotations = { ...result, expectedRejectionScore: 0, fixtureMatchScore: 1, criterionResultVerified: true };
+    });
     await t.test('successful return preserves actual padded GlobalIDs and verified per-row links', async () => {
       const result = await telemetry.record(dataset, run, signal());
       assert(result.phoenix.datasetVersionId!.endsWith('='), 'Use a fresh disposable Phoenix so the first version exercises actual padding');

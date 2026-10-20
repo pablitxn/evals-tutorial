@@ -23,6 +23,44 @@ test('untrusted instructions remain quoted user data; transport receives no tool
   assert.equal(result.summary.split(EDUCATIONAL_NOTICE).length, 2);
 });
 
+test('review pairs a correctly rejected fixture with its authored verdict and keeps agent failure separate', () => {
+  const evidence = sample();
+  const data = JSON.parse(buildReviewPrompt(brokerMaterial(evidence), evidence.dataset)[1].content);
+  assert.deepEqual(data.evaluatorReviewEvidence.fixtureChecks, evidence.fixtureRun.rows.map(row => ({
+    mode: 'fixtures', exampleId: row.exampleId, fixtureId: row.fixtureId, executionStatus: 'completed',
+    expectedEvaluation: evidence.dataset.examples[0]!.fixtures.find(fixture => fixture.id === row.fixtureId)!.expectedEvaluation,
+    observedEvaluation: { score: row.evaluation!.score, label: row.evaluation!.label }, fixtureMatched: true,
+  })));
+  assert.deepEqual(data.evaluatorReviewEvidence.fixtureChecks[1].observedEvaluation, { score: 0, label: 'fail' });
+  assert.deepEqual(data.evaluatorReviewEvidence.fixtureChecks[1].expectedEvaluation.allowedLabels, ['fail']);
+  assert.deepEqual(data.evaluatorReviewEvidence.agentChecks, [{
+    mode: 'agent', exampleId: 'example-1', executionStatus: 'completed',
+    observedEvaluation: { score: 0, label: 'fail' },
+  }]);
+  // Full source, actual response, semantic explanation and exact quote catalog
+  // remain available; the guide does not replace evidence with a success badge.
+  assert.equal(data.source, evidence.request.snapshot.source);
+  assert.deepEqual(data.fixtureRun, evidence.fixtureRun);
+  assert.deepEqual(data.agentRun, evidence.agentRun);
+  assert.ok(data.evidenceQuotes.some((entry: { quote: string }) => entry.quote.includes('classification mismatch')));
+});
+
+test('matched fixtures do not force ready or suppress a grounded source defect', async () => {
+  const evidence = sample();
+  const defect: ReviewAssessment = {
+    status: 'needs_changes', summary: 'The source throws instead of returning an evaluation.',
+    findings: [{
+      criterionId: 'classification', exampleIds: ['example-1'], evidence: 'throw new Error("NEVER EXECUTE");',
+      feedback: 'This source path cannot return the required classification result.',
+      nextAction: 'Implement the comparison and rerun validation and fixtures.',
+    }],
+  };
+  const operation = createReviewOperation({ complete: async () => JSON.stringify(defect) }, { dataset: async () => evidence.dataset });
+  const result = await operation(brokerMaterial(evidence));
+  assert.equal(result.status, 'needs_changes');
+  assert.deepEqual(result.findings, defect.findings);
+});
+
 for (const [name, mutate] of Object.entries({
   'unknown criterion': (a: ReviewAssessment) => { a.findings[0]!.criterionId = 'invented'; },
   'unknown example': (a: ReviewAssessment) => { a.findings[0]!.exampleIds = ['invented']; },

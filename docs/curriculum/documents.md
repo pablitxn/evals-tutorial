@@ -1,14 +1,13 @@
 # Shared synthetic form authoring specification
 
-Dataset producer 04 owns implementation after v1 contract freeze. This document
-specifies original pages and independent truth; it creates no actual PDF/image,
-downloaded dataset or model-derived reference. See the local curriculum and
-[integration contract](../contracts/v1.md) for scope.
+This document specifies the original pages and independent truth packaged under
+`content/documents/tax-demo-v1/`. No reference is derived from a model.
+See the local curriculum and [integration contract](../contracts/v1.md) for scope.
 
 ## Original content and identity
 
-Document set `tax-demo-v1`, version `1.0.0`; intended location
-`content/documents/tax-demo-v1/`. Author an original simple teaching layout,
+Document set `tax-demo-v1`, version `1.0.0`, lives in
+`content/documents/tax-demo-v1/`. Use an original simple teaching layout,
 not a downloaded government form or corporate image. Page titles use 1040,
 W2 and 1099INT so the exercise can classify them; do not imply legal form validity.
 Every page includes "SYNTHETIC TRAINING DOCUMENT - NOT FOR FILING" and a visible

@@ -63,7 +63,6 @@ export function Preferences({ onClose }: { onClose(): void }) {
       <div className="preferences-content" id={`${id}-content`} ref={content}>
         {section === 'appearance' ? <section aria-labelledby={`${id}-appearance`}>
           <h3 id={`${id}-appearance`}>{t('Appearance')}</h3>
-          <p className="preferences-description">{t('Make this space feel comfortable for you.')}</p>
           <fieldset className="theme-choices">
             <legend>{t('Theme')}</legend>
             {([['light', 'Light'], ['dark', 'Dark'], ['system', 'System']] as const).map(([value, label]) =>
@@ -80,9 +79,7 @@ export function Preferences({ onClose }: { onClose(): void }) {
           {!saved && <p className="preferences-storage-notice" role="status">{t('Theme preference could not be saved. This tab keeps your selection.')}</p>}
         </section> : <section aria-labelledby={`${id}-language`}>
           <h3 id={`${id}-language`}>{t('Language')}</h3>
-          <p className="preferences-description">{t('Choose the language for lessons and the interface.')}</p>
           <div className="preferences-language"><LanguageSelector /></div>
-          <p className="preferences-hint">{t('Your code and saved results stay the same.')}</p>
         </section>}
       </div>
     </div>

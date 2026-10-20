@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createElement, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Markdown } from '../src/Markdown.js';
@@ -26,6 +27,23 @@ test('lesson prose renders nested Markdown, fenced code and GFM without losing s
     /<blockquote>/, /<pre><code class="language-ts">const label = &quot;\*\*literal\*\*&quot;;/,
     /class="markdown-table-scroll"/, /<table>/, /<th>Expected<\/th>/, /type="checkbox" disabled="" checked=""/,
     /<del>Old advice<\/del>/]) assert.match(html, pattern);
+});
+
+test('both authored specifications render as a separate document with lesson guidance outside', () => {
+  const english = readFileSync(new URL('../../../content/exercises/07-spec-regression/lesson.md', import.meta.url), 'utf8');
+  const spanish = JSON.parse(readFileSync(new URL('../src/locales/lessons.es.json', import.meta.url), 'utf8'))['07-spec-regression'].lessonMarkdown;
+  for (const [text, label] of [[english, 'Example specification'], [spanish, 'Especificación de ejemplo']]) {
+    assert.equal(text.split('<!-- specification:start -->').length, 2);
+    assert.equal(text.split('<!-- specification:end -->').length, 2);
+    const html = renderToStaticMarkup(createElement(LessonText, { text, specificationLabel: label }));
+    const sheet = html.match(/<article class="specification-sheet"[^>]*>([\s\S]*?)<\/article>/);
+    assert.ok(sheet);
+    assert.ok(html.includes(`aria-label="${label}"`));
+    for (const requirement of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6']) assert.ok(sheet[1]!.includes(requirement));
+    assert.doesNotMatch(sheet[1]!, /T1|T2|T3/);
+    assert.match(html.slice(html.indexOf('</article>')), /T1[\s\S]*T2[\s\S]*T3/);
+    assert.doesNotMatch(html, /specification:start|specification:end/);
+  }
 });
 
 test('Markdown treats raw HTML as text and rejects unsafe, credential-bearing and relative URLs', () => {

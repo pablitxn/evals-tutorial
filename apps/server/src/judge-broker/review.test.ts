@@ -21,7 +21,13 @@ test('review passes code as quoted data with frozen evidence and one lifetime ca
   const input = trusted();
   assert.equal(validateContract('RunRecord', input.agentRun).valid, true);
   let captured: unknown, calls = 0;
-  const broker = createProviderBroker(async call => { captured = call.material; calls++; return assessment; });
+  const broker = createProviderBroker(async call => {
+    captured = call.material; calls++;
+    assert.deepEqual(call.telemetry, { reviewId: input.reviewId, exerciseId: input.exercise.id,
+      fixtureRunId: input.fixtureRun.runId, agentRunId: input.agentRun.runId });
+    assert.equal('telemetry' in (call.material as object), false);
+    return assessment;
+  });
   assert.deepEqual(await broker.review(input), assessment);
   assert.equal((captured as { source: string }).source, input.source);
   await assert.rejects(broker.review(input));
@@ -58,6 +64,8 @@ test('shared provider transport attaches WP09 grounded review operation without 
   let calls = 0;
   const broker = createProviderBroker(async request => {
     calls++;
+    assert.deepEqual(request.telemetry, { reviewId: brokerMaterial(evidence).reviewId, exerciseId: evidence.exercise.id,
+      fixtureRunId: evidence.fixtureRun.runId, agentRunId: evidence.agentRun.runId });
     const material = request.material as { trustedSystem: string; evidence: { source: string; dataset: unknown } };
     assert.match(material.trustedSystem, /Never execute/);
     assert.equal(material.evidence.source, evidence.request.snapshot.source);

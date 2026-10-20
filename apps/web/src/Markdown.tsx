@@ -50,3 +50,20 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
     <ReactMarkdown remarkPlugins={[remarkGfm]} urlTransform={markdownUrl} components={components}>{text}</ReactMarkdown>
   </div>;
 }
+
+/** Authored lesson markers separate the example document from tutorial prose. */
+export function LessonMarkdown({ text, specificationLabel = 'Example specification' }: { text: string; specificationLabel?: string }) {
+  const specification = /^<!-- specification:start -->\s*\n([\s\S]*?)^<!-- specification:end -->[ \t]*$/m.exec(text);
+  if (!specification) return <Markdown text={text} className="lesson-text" />;
+  return <div className="lesson-text">
+    <Markdown text={text.slice(0, specification.index)} />
+    <article className="specification-sheet" aria-label={specificationLabel}>
+      <header className="specification-sheet-label">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
+        <span>{specificationLabel}</span>
+      </header>
+      <Markdown text={specification[1]!} />
+    </article>
+    <Markdown text={text.slice(specification.index + specification[0].length)} />
+  </div>;
+}

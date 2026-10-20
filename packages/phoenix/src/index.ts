@@ -16,6 +16,27 @@ type Span = Schemas['Span'];
 type Receipt = { fingerprint: string; experimentId?: string; createAttempted?: boolean };
 type Pin = { contentHash: string; datasetId: string; versionId: string };
 type Projection = { id: string; input: Record<string, unknown>; output: Record<string, unknown>; metadata: Record<string, unknown>; exampleId: string; fixtureId?: string };
+type Annotation = { name: string; score: number; label: string; explanation: string };
+
+function annotations(row: RowResult, mode: RunRecord['request']['mode'], expanded: boolean): Annotation[] {
+  if (!row.evaluation) return [];
+  const { score, label, explanation, criteria } = row.evaluation;
+  const result: Annotation[] = [{ name: 'tutorial_result', score, label, explanation }];
+  if (expanded) {
+    result.push(...(criteria ?? []).map(criterion => ({
+      name: `tutorial_criterion_${criterion.criterionId}`,
+      score: criterion.score, label: criterion.label, explanation: criterion.explanation,
+    })));
+    if (mode === 'fixtures' && typeof row.fixtureMatched === 'boolean') {
+      result.push({ name: 'tutorial_fixture_match', score: row.fixtureMatched ? 1 : 0,
+        label: row.fixtureMatched ? 'matched' : 'mismatched',
+        explanation: row.fixtureMatched
+          ? 'The evaluator result matches this known fixture expectation, including any expected rejection.'
+          : 'The evaluator result does not match this known fixture expectation.' });
+    }
+  }
+  return result;
+}
 
 export interface PhoenixTelemetryOptions {
   /** Explicit loopback origin. Ambient Phoenix/provider env is never read. */
@@ -171,10 +192,12 @@ async function experimentFor(client: PhoenixClient, state: RecordingState, key: 
       receipt.createAttempted = true;
       await state.write(key, receipt);
       const created = data(await client.POST('/v1/datasets/{dataset_id}/experiments', { params: { path: { dataset_id: pin.datasetId } }, body: {
-        name: `${run.request.mode}:${run.runId}`, version_id: pin.versionId, repetitions: 1,
+        name: `${run.request.snapshot.exerciseId} | ${run.request.mode} | ${run.request.agentVariant} | ${run.createdAt} | ${run.runId.slice(0, 8)}`,
+        version_id: pin.versionId, repetitions: 1,
         description: `Stored ${run.status} execution receipt; recording performs no inference`,
         metadata: { tutorial_recording_key: key, tutorial_fingerprint: receipt.fingerprint,
           tutorial_run_id: run.runId, tutorial_mode: run.request.mode, tutorial_status: run.status,
+          tutorial_annotation_version: 2, tutorial_exercise_id: run.request.snapshot.exerciseId,
           tutorial_total_rows: run.totalRows, tutorial_completed_rows: run.completedRows,
           tutorial_provenance: run.provenance, tutorial_exercise_version: run.request.snapshot.exerciseVersion,
           tutorial_rubric_version: run.request.snapshot.rubricVersion, tutorial_agent_variant: run.request.agentVariant },
@@ -235,7 +258,9 @@ async function recordTrace(client: PhoenixClient, options: PhoenixTelemetryOptio
   // their verified trace ID, including failed invocations. An unstarted error row
   // may have no producer spans and gets only a stored-receipt span. Never
   // copy/replay AGENT or LLM spans as new activity.
-  const sourceSpans = run.request.mode === 'agent' && options.sourceProjectName
+  // Fixture judges also perform real inference and share this immutable row's
+  // context. Keep those spans in the source project when recording their receipt.
+  const sourceSpans = options.sourceProjectName
     ? await spansIn(client, options.sourceProjectName, traceId, !completedAgent) : [];
   const usesSourceProject = completedAgent || sourceSpans.length > 0;
   const projectName = usesSourceProject ? options.sourceProjectName! : experiment.project_name!;
@@ -329,6 +354,8 @@ export function createPhoenixTelemetry(options: PhoenixTelemetryOptions): Teleme
           receipt ??= { fingerprint: digest };
           await state.write(key, receipt);
           const experiment = await experimentFor(client, state, key, receipt, pin, run);
+          // Existing experiments retain their original annotation contract on retry.
+          const expandedAnnotations = experiment.metadata?.tutorial_annotation_version === 2;
           const currentRuns = await listRuns(client, experiment.id);
           const rowLinks: Array<{ exampleId: string; fixtureId?: string; phoenix: PhoenixLinks }> = [];
           const verification: Array<{ row: RowResult; nodeId: string }> = [];
@@ -349,14 +376,14 @@ export function createPhoenixTelemetry(options: PhoenixTelemetryOptions): Teleme
             }
             need(task && task.trace_id === trace.traceId && equal(task.output, row.output ?? null) &&
               (task.error ?? null) === (row.status === 'completed' ? null : `${row.status}:${row.error!.code}`));
-            if (row.evaluation) {
+            for (const annotation of annotations(row, run.request.mode, expandedAnnotations)) {
               await client.POST('/v1/experiment_evaluations', { body: {
-                experiment_run_id: task.id, name: 'tutorial_result', annotator_kind: 'CODE',
+                experiment_run_id: task.id, name: annotation.name, annotator_kind: 'CODE',
                 start_time: run.createdAt, end_time: run.updatedAt,
-                result: { score: row.evaluation.score, label: row.evaluation.label, explanation: row.evaluation.explanation }, trace_id: trace.traceId,
+                result: { score: annotation.score, label: annotation.label, explanation: annotation.explanation }, trace_id: trace.traceId,
                 metadata: { recorded_from_immutable_receipt: true, mode: run.request.mode,
                   fixtureMatched: row.fixtureMatched ?? null, codeHash: run.codeHash,
-                  ...(row.evaluation.criteria ? { criteria: row.evaluation.criteria } : {}) },
+                  ...(row.evaluation!.criteria ? { criteria: row.evaluation!.criteria } : {}) },
               } });
             }
             verification.push({ row, nodeId });
@@ -371,10 +398,13 @@ export function createPhoenixTelemetry(options: PhoenixTelemetryOptions): Teleme
           need(header);
           for (const entry of verification.filter(entry => entry.row.evaluation)) {
             const values = csvRows.find(values => values[header.indexOf('example_id')] === entry.nodeId && values[header.indexOf('repetition_number')] === '1');
-            const evaluation = entry.row.evaluation!;
-            need(values && Number(values[header.indexOf('annotation_tutorial_result_score')]) === evaluation.score &&
-              values[header.indexOf('annotation_tutorial_result_label')] === evaluation.label &&
-              values[header.indexOf('annotation_tutorial_result_explanation')] === evaluation.explanation);
+            for (const annotation of annotations(entry.row, run.request.mode, expandedAnnotations)) {
+              const prefix = `annotation_${annotation.name}`;
+              const score = values?.[header.indexOf(`${prefix}_score`)];
+              need(values && score !== undefined && score !== '' && Number(score) === annotation.score &&
+                values[header.indexOf(`${prefix}_label`)] === annotation.label &&
+                values[header.indexOf(`${prefix}_explanation`)] === annotation.explanation);
+            }
           }
           const finalRuns = await listRuns(client, experiment.id);
           need(finalRuns.length === run.rows.length, 'Phoenix contains extra or missing stored rows');

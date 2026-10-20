@@ -5,6 +5,7 @@ import { createReviewOperation } from '@evals-tutorial/review';
 import { ServiceError } from '@evals-tutorial/contracts/services';
 import { sha256, canonicalJson } from '@evals-tutorial/contracts/node';
 import { boundedCall, operation } from '../providers/process.js';
+import { createTelemetryContext } from '@evals-tutorial/phoenix';
 import type { BrokerTransport, ProviderCall } from '../providers/process.js';
 
 function result(name: 'EvalResult' | 'ReviewAssessment', value: unknown) {
@@ -32,6 +33,11 @@ export function createProviderBroker(transport: BrokerTransport, content?: Pick<
       const criteria = [...binding.criterionIds];
       const mode = binding.mode, maxCalls = binding.maxCalls, maxOutputTokens = binding.maxOutputTokens;
       const deadlineEpochMs = binding.deadlineEpochMs, signal = binding.signal;
+      const telemetry = {
+        traceparent: createTelemetryContext(binding.runId, binding.exampleId, binding.fixtureId).traceparent,
+        runId: binding.runId, exampleId: binding.exampleId, exerciseId: row.metadata.exerciseId,
+        ...(binding.fixtureId === undefined ? {} : { fixtureId: binding.fixtureId }),
+      };
       // Each installed fixture is a distinct row, including fixtures with equal outputs.
       // The absent fixture ID gives real-agent rows a separate namespace.
       const key = JSON.stringify([binding.runId, binding.exampleId, binding.fixtureId ?? null]);
@@ -50,7 +56,7 @@ export function createProviderBroker(transport: BrokerTransport, content?: Pick<
         if (Date.now() >= deadlineEpochMs) throw operation('timeout', 'Judge deadline expired.');
         if (lifetime.calls >= maxCalls) throw operation('budget_exceeded', 'Judge lifetime call budget exhausted.');
         lifetime.calls++;
-        const output = await dispatch({ role: 'judge', material: { row, request: structuredClone(request) }, maxOutputTokens, deadlineEpochMs, signal });
+        const output = await dispatch({ role: 'judge', material: { row, request: structuredClone(request) }, telemetry, maxOutputTokens, deadlineEpochMs, signal });
         result('EvalResult', output);
         return output as EvalResult;
       } };
@@ -59,6 +65,8 @@ export function createProviderBroker(transport: BrokerTransport, content?: Pick<
       if ((binding.feedbackLocale !== undefined && !['en', 'es'].includes(binding.feedbackLocale)) || !validateContract('ReviewBinding', binding.binding).valid || !validateContract('Exercise', binding.exercise).valid || !validateContract('RunRecord', binding.fixtureRun).valid || !validateContract('RunRecord', binding.agentRun).valid || typeof binding.source !== 'string' || Buffer.byteLength(binding.source) > LIMITS.sourceBytes || !Number.isInteger(binding.maxOutputTokens) || binding.maxOutputTokens < 1 || binding.maxOutputTokens > LIMITS.maxProviderOutputTokens || !Number.isFinite(binding.deadlineEpochMs)) throw operation('invalid_request', 'Invalid trusted review binding.');
       if (sha256(binding.source) !== binding.binding.codeHash || binding.fixtureRun.runId !== binding.binding.fixtureRunId || binding.agentRun.runId !== binding.binding.agentRunId || binding.exercise.id !== binding.binding.exerciseId) throw operation('review_ineligible', 'Review source, exercise and stored run identities must match the frozen binding.');
       const material = structuredClone({ feedbackLocale: binding.feedbackLocale, binding: binding.binding, criteria: binding.exercise.criteria, source: binding.source, fixtureRun: binding.fixtureRun, agentRun: binding.agentRun });
+      const telemetry = { reviewId: binding.reviewId, exerciseId: binding.exercise.id,
+        fixtureRunId: binding.fixtureRun.runId, agentRunId: binding.agentRun.runId };
       if (Buffer.byteLength(JSON.stringify(material)) > LIMITS.protocolBytes) throw operation('resource_limit', 'Review evidence exceeds the protocol limit.');
       const criterionIds = material.criteria.map(c => c.id);
       const examples = new Set([...material.fixtureRun.rows, ...material.agentRun.rows].map(row => row.exampleId));
@@ -72,11 +80,12 @@ export function createProviderBroker(transport: BrokerTransport, content?: Pick<
         // global-profile transport. No second request or evaluator execution.
         const review = createReviewOperation({ complete: async request => JSON.stringify(await dispatch({
           role: 'review', material: { trustedSystem: request.messages[0].content, evidence: JSON.parse(request.messages[1].content) },
+          telemetry,
           maxOutputTokens: request.maxOutputTokens, deadlineEpochMs: request.deadlineEpochMs, signal: request.signal,
         })) }, content);
         return review({ ...binding, binding: material.binding, source: material.source, exercise: structuredClone(binding.exercise), fixtureRun: material.fixtureRun, agentRun: material.agentRun });
       }
-      const output = await dispatch({ role: 'review', material, maxOutputTokens: binding.maxOutputTokens, deadlineEpochMs: binding.deadlineEpochMs, signal: binding.signal });
+      const output = await dispatch({ role: 'review', material, telemetry, maxOutputTokens: binding.maxOutputTokens, deadlineEpochMs: binding.deadlineEpochMs, signal: binding.signal });
       result('ReviewAssessment', output);
       const assessment = output as ReviewAssessment;
       if (assessment.findings.some(f => !criterionIds.includes(f.criterionId) || f.exampleIds.some(id => !examples.has(id)))) throw operation('review_output_schema', 'Review finding refers to unknown criteria or examples.');

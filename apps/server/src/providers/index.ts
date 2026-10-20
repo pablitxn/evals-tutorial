@@ -18,6 +18,7 @@ export function createProviderServices(options: ProviderServicesOptions) {
   const broker = createProviderBroker(async call => parseBrokerResponse(await python('tutorial_agents.broker', {
     role: call.role, material: call.material, maxOutputTokens: call.maxOutputTokens,
     deadlineMs: Math.max(1, Math.min(60000, call.deadlineEpochMs - Date.now())),
+    ...(call.telemetry ? { telemetry: call.telemetry } : {}),
   }, call.deadlineEpochMs, call.signal)), options.content);
   return { agents, broker, provider: profile.summary };
 }

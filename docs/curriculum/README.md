@@ -1,8 +1,9 @@
 # Evaluation workshop curriculum v1
 
-This is the ET-WP-01 implementation specification: one read-only introduction
-and exactly six exercises. It is ready for contract review and corpus authoring;
-it does not claim that the app, documents, providers or Phoenix runs exist.
+The workshop has one read-only introduction, six editable exercises and a final
+read-only guided specification and regression example. This document describes
+the educational design; the packaged corpus is in `content/tutorial.json`.
+Actual provider behavior and Phoenix recording require separate run evidence.
 Read [case schemas and fixture truth](cases.md), [document authoring truth](documents.md)
 for the educational design.
 
@@ -55,7 +56,7 @@ tutorial's installed SDK compatibility. Adapter/version verification belongs to 
 
 ## Six short lessons
 
-Each paragraph below is the proposed explanation above the editor. Criterion
+Each paragraph below summarizes the explanation above the editor. Criterion
 IDs, schemas, TODOs and fixture expectations are in [cases.md](cases.md).
 
 | Destination | Badge | Explanation above editor | Required evidence to inspect |
@@ -77,25 +78,29 @@ beside its LLM Judge badge. Do not ask learners to implement those SDK examples.
 
 The C4 response judge reads one immutable policy row and grades the **agent
 response**. It is part of the learner's evaluator. Even prepared fixture judging
-can consume tokens. Code cases' fixture tests make zero provider calls; C4's
-Test Fixtures disclosure shows a maximum of seven judge calls, no automatic
-retries, with at most 600 output tokens each. Real runs show their separate
-agent/judge call budgets before starting. These are content requests for the
-broker contract, not proof of enforced runtime limits.
+can consume tokens. Code cases' fixture tests make zero provider calls. With
+correct C4 evidence checks, seven fixtures reach the judge and three fail before
+it. The broker enforces one judge call per fixture, so an edited evaluator can
+consume up to ten calls in one fixture run. Each call has at most 2048 output
+tokens and no automatic retries. Real runs show their separate agent/judge call
+budgets before starting.
 
 DOUBLE CHECK is a later, separate **nonexecuting evaluator-code educational
 review**. It reads the current rubric, evaluator source as text, fixture results
 and completed real-run evidence. It never imports/runs that code or invokes
-tools. One explicit review call, at most 900 output tokens, no automatic retries;
+tools. One explicit review call, at most 2048 output tokens, no automatic retries;
 an explicit eligible retry shows cost and preserves the prior receipt. The same
 global provider profile applies to agent, judge and reviewer with separate role
 provenance.
 
-The complete baseline includes 25 agent calls (one intro plus 24 case rows),
-ten C4 judge calls (seven fixture outputs that pass the Code gate plus three
-real rows), and six educational reviews: at most 41 inference calls before
-explicit retries, revised reruns or optional comparison. Each button shows
-its own subset, configured output limits and potential cost; navigation is free.
+The introduction and six-case baseline include 25 agent calls (one intro plus
+24 case rows), ten C4 judge calls with correct evidence checks (seven fixture
+outputs plus three real rows), and six educational reviews: 41 inference calls.
+The enforced upper bound is 44 calls if the edited evaluator invokes the judge
+for every fixture. Running both versions in the final guided example adds six
+agent calls and no judge or review calls, for 47 expected calls or an upper bound
+of 50 before explicit retries or revised reruns. Each button shows its own subset,
+configured output limits and potential cost; navigation is free.
 Malformed/failed rows can reduce actual completed calls, not justify hidden retries.
 
 Eligibility: valid current source, discriminating current fixture results and
@@ -108,10 +113,11 @@ remain historical. Specific criterion/example/code evidence and a next learning
 action are required. No anti-cheating or infallibility claims; this badge is
 unrelated to C5's simulated human approval state.
 
-## 170-minute rehearsal script
+## 180-minute rehearsal script
 
 Release owner times a fresh learner from a clean ZIP; the figures below are
-targets, not measured results. Same-day preparation remains the delivery target.
+targets, not measured results. The final 15 minutes cover the guided example.
+Same-day preparation remains the delivery target.
 
 | Minutes | Segment | Rehearsal action |
 | --- | --- | --- |
@@ -123,7 +129,8 @@ targets, not measured results. Same-day preparation remains the delivery target.
 | 85-105 | C4 | Read four fictitious clauses, see judge cost, test fluent wrong advice and citations, real run. |
 | 105-120 | C5 | Show why ready and approved both still cannot send; fixtures then real run. |
 | 120-140 | C6 | Check dates and total including fees; no-options row; real run. |
-| 140-170 | Review and buffer | Request DOUBLE CHECK for six completed cases; inspect specific findings; revise/retest or retry a failed review. Optional prepared-agent comparison fits buffer only. |
+| 140-165 | Review and buffer | Request DOUBLE CHECK for six completed cases; inspect specific findings; revise/retest or retry a failed review. |
+| 165-180 | Guided specification and regression | Inspect the specification and prepared evaluator, run both fixed agent variants, then compare actual per-requirement evidence. |
 
 Record setup/learning/review/wait times separately, friction, call counts and
 unavailable providers. If total exceeds 180 minutes, shorten prose and default
